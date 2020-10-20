@@ -17,8 +17,12 @@ const port = process.env.NODE_PORT
 const exceptions = {
   path: [{
     // this application version
-    url: /\/db\/v1\/version/i,
+    url: /\/api\/v1\/version/i,
     methods: ['GET']
+  }, {
+    // cisco SSO
+    url: /\/api\/v1\/sso/i,
+    methods: ['POST']
   }]
 }
 
@@ -73,7 +77,13 @@ Routes
 *****/
 
 // get this API version
-app.use('/db/v1/version', require('./routes/version'))
+app.use('/api/v1/version', require('./routes/version'))
+
+// do SSO login
+app.use('/api/v1/sso', require('./routes/sso'))
+
+// ldap accounts
+app.use('/api/v1/account', require('./routes/account'))
 
 // start listening
 app.listen(port, () => {

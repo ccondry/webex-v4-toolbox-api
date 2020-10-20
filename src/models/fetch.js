@@ -30,18 +30,19 @@ module.exports = async function (url, options = {}) {
     // add query parameters to URL
     let completeUrl = url
     if (options.query) {
-      completeUrl = addUrlQueryParams(url, query)
+      completeUrl = addUrlQueryParams(url, options.query)
     }
     const response = await fetch(completeUrl, options)
     const text = await response.text()
     if (response.ok) {
-      const json = JSON.stringify(text)
+      const json = JSON.parse(text)
       return json
     } else {
       let message = text
       try {
-        const json = JSON.stringify(text)
-        message = json.message
+        const json = JSON.parse(text)
+        // message = json.message
+        message = json.error_description || json.error
       } catch (e) {
         // continue
       }
@@ -49,6 +50,7 @@ module.exports = async function (url, options = {}) {
       error.status = response.status
       error.statusText = response.statusText
       error.text = message
+      error.response = response
       throw error
     }
   } catch (e) {
