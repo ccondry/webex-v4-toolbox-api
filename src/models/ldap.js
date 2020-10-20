@@ -30,7 +30,36 @@ module.exports = {
   createUser,
   addToGroup,
   lockUser,
-  listUsers
+  listUsers,
+  enableUser,
+  disableUser
+}
+
+async function disableUser (username) {
+  try {
+    const params = {
+      adminDn: process.env.LDAP_ADMIN_DN,
+      adminPassword: process.env.LDAP_ADMIN_PASSWORD,
+      username
+    }
+    await ldap.disableUser(params)
+  } catch (error) {
+    console.log('failed to disable LDAP user:', error.message)
+    throw error
+  }
+}
+async function enableUser (username) {
+  try {
+    const params = {
+      adminDn: process.env.LDAP_ADMIN_DN,
+      adminPassword: process.env.LDAP_ADMIN_PASSWORD,
+      username
+    }
+    await ldap.enableUser(params)
+  } catch (error) {
+    console.log('failed to enable LDAP user:', error.message)
+    throw error
+  }
 }
 
 async function listUsers ({
@@ -59,7 +88,7 @@ async function listUsers ({
     adminPassword: process.env.LDAP_ADMIN_PASSWORD,
     filter,
     attributes,
-    searchDn: process.env.LDAP_CCE_AGENTS_DN
+    searchDn: process.env.LDAP_BASE_DN
   })
 }
 
@@ -165,7 +194,7 @@ async function changePassword (body) {
 
 async function createUser (body) {
   try {
-    console.log('creating new LDAP user', body.username, '...')
+    // console.log('creating new LDAP user', body.username, '...')
     const adminCreds = {
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD
@@ -179,11 +208,11 @@ async function createUser (body) {
         delete params[key]
       }
     }
-    console.log('creating new LDAP user...')
+    // console.log('creating new LDAP user...')
     // create the user
     try {
       await ldap.createUser(params)
-      console.log('successfully created new LDAP user')
+      // console.log('successfully created new LDAP user')
     } catch (e) {
       if (e.message.includes('ENTRY_EXISTS')) {
         // continue if ldap account exists
@@ -192,12 +221,12 @@ async function createUser (body) {
         throw e
       }
     }
-    console.log('resetting the LDAP user password...')
+    // console.log('resetting the LDAP user password...')
     params.newPassword = params.password
     await ldap.resetPassword(params)
-    console.log('successfully reset password for LDAP user. enabling user account...')
+    // console.log('successfully reset password for LDAP user. enabling user account...')
     await ldap.enableUser(params)
-    console.log('successfully enabled LDAP user account. done creating user.')
+    // console.log('successfully enabled LDAP user account. done creating user.')
     return
   } catch (error) {
     console.log('failed to create LDAP user:', error.message)

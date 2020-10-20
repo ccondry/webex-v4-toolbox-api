@@ -4,7 +4,7 @@
   "description": "REST API for the dCloud GoCMS instant demo web portal",
   "main": "src/index.js",
   "scripts": {
-    "start": "NODE_EXTRA_CA_CERTS=ad1.pem node src/index",
+    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 node src/index",
     "test": "mocha --timeout 20000 test"
   },
   "repository": "https://github.com/ccondry/go-cms-api.git",
