@@ -1,3 +1,4 @@
 node_modules
 .env
-certs/rsa-private.pem
+rsa-private.pem
+rsa-public.pem
