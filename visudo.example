@@ -1,0 +1,2 @@
+# Allow 'administrator' user to restart go-cms-api service
+administrator ALL=NOPASSWD: /bin/systemctl restart go-cms-api.service
