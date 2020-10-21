@@ -7,6 +7,7 @@ const attributes = [
   'objectGUID',
   'name',
   'sAMAccountName',
+  'cn',
   'memberOf',
   'primaryGroupID',
   'description',
@@ -36,12 +37,13 @@ module.exports = {
   deleteUser
 }
 
-async function deleteUser (username) {
+async function deleteUser (cn) {
+  console.log('delete user', cn)
   try {
     const params = {
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD,
-      userDn: `CN=${username},${process.env.LDAP_BASE_DN}`
+      userDn: `CN=${cn},${process.env.LDAP_BASE_DN}`
       // userDn: username
     }
     await ldap.deleteUser(params)
@@ -79,24 +81,6 @@ async function enableUser (username) {
 }
 
 async function listUsers ({
-  attributes = [
-    'objectGUID',
-    'name',
-    'sAMAccountName',
-    'memberOf',
-    'primaryGroupID',
-    'description',
-    'physicalDeliveryOfficeName',
-    'distinguishedName',
-    'mail',
-    'userPrincipalName',
-    'whenChanged',
-    'whenCreated',
-    'givenName',
-    'sn',
-    'telephoneNumber',
-    'userAccountControl'
-  ],
   filter = '(&(objectClass=user)(objectcategory=person))'
 }) {
   return ldap.listUsers({
@@ -130,23 +114,23 @@ async function addToGroup (body) {
 
 async function getUser (username) {
   // console.log('request to get user', username)
-  const domain = process.env.LDAP_DOMAIN
-  const upn = username + '@' + domain
+  // const domain = process.env.LDAP_DOMAIN
+  // const upn = username + '@' + domain
 
   try {
     // console.log('running ldap.adminGetUser...')
     const user = await ldap.adminGetUser({
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD,
-      upn,
+      username,
       attributes
     })
     return user
   } catch (e) {
     console.log(e)
     // failed
-    console.log('failed to get LDAP user', upn, e.message)
-    throw new Error('failed to get LDAP user ' + upn + ':' + e.message)
+    console.log('failed to get LDAP user', username, e.message)
+    throw new Error('failed to get LDAP user ' + username + ':' + e.message)
   }
 }
 

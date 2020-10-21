@@ -24,15 +24,17 @@ function modUser (user) {
   }
 }
 
+async function get (username) {
+  try {
+    const user = await ldap.getUser(username)
+    return modUser(user)
+  } catch (e) {
+    throw e
+  }
+}
+
 module.exports = {
-  async get (username) {
-    try {
-      const user = await ldap.getUser(username)
-      return modUser(user)
-    } catch (e) {
-      throw e
-    }
-  },
+  get,
   async list () {
     try {
       const users = await ldap.listUsers({})
@@ -42,7 +44,14 @@ module.exports = {
     }
   },
   async delete (username) {
-    await ldap.deleteUser(username)
+    try {
+      // get user CN
+      const user = await get(username)
+      // delete user from AD
+      await ldap.deleteUser(user.cn)
+    } catch (e) {
+      throw e
+    }
   },
   async enable (username) {
     await ldap.enableUser(username)
@@ -51,6 +60,6 @@ module.exports = {
     await ldap.disableUser(username)
   },
   async create (username) {
-    await ldap.deleteUser(username)
+    await ldap.createUser(username)
   }
 }
