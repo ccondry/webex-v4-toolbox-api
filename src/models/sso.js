@@ -19,7 +19,7 @@ const urlEncode = function (params) {
 
 module.exports = {
   async authorize ({code, redirectUri}) {
-    console.log('sso authorize:', code, redirectUri)
+    // console.log('sso authorize:', code, redirectUri)
     // build body object
     const body = {
       grant_type: 'authorization_code',
@@ -48,7 +48,7 @@ module.exports = {
     }
   },
   async me (access_token) {
-    console.log('getting user info openid with token', access_token)
+    // console.log('getting user info openid with token', access_token)
     // get user data associated with this access token
     const url = 'https://cloudsso.cisco.com/idp/userinfo.openid'
     const options = {

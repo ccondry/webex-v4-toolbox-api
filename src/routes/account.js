@@ -1,20 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const ldap = require('../models/ldap')
+const model = require('../models/user')
 
 // get active directory account status
 router.get('/', async (req, res, next) => {
   // console.log(`getting active directory status for ${req.user.sub}`)
   try {
     // const account = await ldap.getUser(req.user.sub)
-    const user = await ldap.getUser(req.user.sub)
-    // append enabled boolean from userAccountControl data
-    user.enabled = (user.userAccountControl & 2) != 2
-    try {
-      user.admin = user.memberOf.includes(process.env.LDAP_ADMIN_GROUP_DN)
-    } catch (e) {
-      // continue
-    }
+    const user = await model.get(req.user.sub)
     return res.status(200).send(user)
   } catch (e) {
     const message = `Failed to get active directory account status for ${req.user.sub}: ${e.message}`

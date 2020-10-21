@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const model = require('../models/sso')
 const makeJwt = require('../models/make-jwt')
+const isAdmin = require('../models/is-admin')
 
 // complete cisco SSO login
 router.post('/', async (req, res, next) => {
@@ -12,7 +13,7 @@ router.post('/', async (req, res, next) => {
       redirectUri: req.headers.referer.split('?')[0].split('#')[0]
     })
   } catch (e) {
-    console.log('failed to get access token from authorization code', req.body.code, ':', e.message)
+    // console.log('failed to get access token from authorization code', req.body.code, ':', e.message)
     if (e.status && e.text) {
       // forward Cisco REST response
       return res.status(e.status).send({message: e.text})
@@ -41,6 +42,8 @@ router.post('/', async (req, res, next) => {
   }
   // remove memberof, which can be a long list of data
   delete me.memberof
+  // set admin flag
+  me.isAdmin = isAdmin(me)
   // make the JWT of the user profile data
   const jwt = makeJwt(me)
   // return the new JWT

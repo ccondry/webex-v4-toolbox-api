@@ -32,7 +32,23 @@ module.exports = {
   lockUser,
   listUsers,
   enableUser,
-  disableUser
+  disableUser,
+  deleteUser
+}
+
+async function deleteUser (username) {
+  try {
+    const params = {
+      adminDn: process.env.LDAP_ADMIN_DN,
+      adminPassword: process.env.LDAP_ADMIN_PASSWORD,
+      userDn: `CN=${username},${process.env.LDAP_BASE_DN}`
+      // userDn: username
+    }
+    await ldap.deleteUser(params)
+  } catch (error) {
+    console.log('failed to delete LDAP user:', error.message)
+    throw error
+  }
 }
 
 async function disableUser (username) {
@@ -125,14 +141,9 @@ async function getUser (username) {
       upn,
       attributes
     })
-    // console.log('ldap.adminGetUser finished.')
-    if (user) {
-      // respond OK with user info
-      return user
-    } else {
-      throw new Error('No LDAP user found matching ' + upn)
-    }
+    return user
   } catch (e) {
+    console.log(e)
     // failed
     console.log('failed to get LDAP user', upn, e.message)
     throw new Error('failed to get LDAP user ' + upn + ':' + e.message)
