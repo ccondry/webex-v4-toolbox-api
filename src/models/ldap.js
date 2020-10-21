@@ -38,7 +38,7 @@ module.exports = {
 }
 
 async function deleteUser (cn) {
-  console.log('delete user', cn)
+  // console.log('delete user', cn)
   try {
     const params = {
       adminDn: process.env.LDAP_ADMIN_DN,
