@@ -20,7 +20,8 @@ const attributes = [
   'givenName',
   'sn',
   'telephoneNumber',
-  'userAccountControl'
+  'userAccountControl',
+  'accountExpires'
 ]
 
 module.exports = {
