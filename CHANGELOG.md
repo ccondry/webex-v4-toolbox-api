@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2020.10.23-4
+
+### Features
+* **Set User Password:** Add route to set user LDAP password
+* **Demo Environment:** Add route to get demo environment info
+
+
 # 2020.10.23-3
 
 ### Bug Fixes
