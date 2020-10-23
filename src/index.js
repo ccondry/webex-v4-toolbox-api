@@ -82,10 +82,7 @@ app.use('/api/v1/version', require('./routes/version'))
 // do SSO login
 app.use('/api/v1/sso', require('./routes/sso'))
 
-// user ldap account
-app.use('/api/v1/account', require('./routes/account'))
-
-// admin manage ldap accounts
+// ldap user accounts
 app.use('/api/v1/user', require('./routes/user'))
 
 // start listening

@@ -3,12 +3,45 @@ const router = express.Router()
 const isAdmin = require('../models/is-admin')
 const model = require('../models/user')
 
+// create active directory user 
+router.post('/', async (req, res, next) => {
+  // console.log(`creating active directory for ${req.user.sub}`)
+  try {
+    if (!req.body.dn) {
+      const message = `'dn' is a required JSON property of the request body.`
+      return res.status(400).send({message})
+    }
+    if (!req.body.password) {
+      const message = `'password' is a required JSON property of the request body.`
+      return res.status(400).send({message})
+    }
+    const body = {
+      firstName: req.user.given_name,
+      lastName: req.user.family_name,
+      username: req.user.sub,
+      commonName: req.user.sub,
+      domain: process.env.LDAP_DOMAIN,
+      telephoneNumber: req.body.dn,
+      password: req.body.password,
+      mail: req.user.email,
+      description: 'dCloud Demo User',
+      usersDn: process.env.LDAP_BASE_DN
+    }
+    await model.create(body)
+    return res.status(200).send()
+  } catch (e) {
+    const message = `Failed to get active directory account status for ${req.user.sub}: ${e.message}`
+    console.log(message)
+    return res.status(500).send({message})
+  }
+})
+
 // list active directory users
 router.get('/', async (req, res, next) => {
   try {
     // authorize client 
     if (!isAdmin(req.user)) {
-      const message = 'You do not have permission to access this resource.'
+      const message = 'You are not an admin.'
       return res.status(403).send({message})
     }
     // get users from AD
@@ -46,7 +79,7 @@ router.delete('/:username', async (req, res, next) => {
   try {
     // authorize client 
     if (!isAdmin(req.user)) {
-      const message = 'You do not have permission to access this resource.'
+      const message = 'You are not an admin.'
       return res.status(403).send({message})
     }
     // delete user from AD
@@ -65,7 +98,7 @@ router.post('/:username/disable', async (req, res, next) => {
   try {
     // authorize client 
     if (!isAdmin(req.user)) {
-      const message = 'You do not have permission to access this resource.'
+      const message = 'You are not an admin.'
       return res.status(403).send({message})
     }
     // disable user in AD
@@ -84,7 +117,7 @@ router.post('/:username/enable', async (req, res, next) => {
   try {
     // authorize client 
     if (!isAdmin(req.user)) {
-      const message = 'You do not have permission to access this resource.'
+      const message = 'You are not an admin.'
       return res.status(403).send({message})
     }
     // disable user in AD

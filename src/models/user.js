@@ -60,8 +60,8 @@ module.exports = {
   async disable (username) {
     return ldap.disableUser(username)
   },
-  async create (username) {
-    return ldap.createUser(username)
+  async create (user) {
+    return ldap.createUser(user)
   },
   async extend (username, ms) {
     // calculate time
