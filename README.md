@@ -28,4 +28,4 @@ Do this once the first time you clone this project.
 
 ### Logging
 
-`journalctl -xef -u go-cms-api` to print current logs and follow new log entries for this service
+`journalctl -xef -u go-cms-api.service` to print current logs and follow new log entries for this service
