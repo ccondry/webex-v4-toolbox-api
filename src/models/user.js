@@ -132,5 +132,11 @@ module.exports = {
     } catch (e) {
       throw e
     }
+  },
+  async setPassword (username, newPassword) {
+    return ldap.resetPassword({
+      username,
+      newPassword
+    })
   }
 }

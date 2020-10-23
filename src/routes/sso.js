@@ -3,6 +3,7 @@ const router = express.Router()
 const model = require('../models/sso')
 const makeJwt = require('../models/make-jwt')
 const isAdmin = require('../models/is-admin')
+const teamsLogger = require('../models/teams-logger')
 
 // complete cisco SSO login
 router.post('/', async (req, res, next) => {
@@ -21,6 +22,7 @@ router.post('/', async (req, res, next) => {
       // log unexpected error
       const message = `Failed to complete SSO login: ${e.message}`
       console.log(message)
+      teamsLogger.log(message)
       return res.status(500).send({message})
     }
   }
@@ -38,6 +40,7 @@ router.post('/', async (req, res, next) => {
       message = 'Failed to get user profile from access token: ' + e.message
     }
     console.log(message)
+    teamsLogger.log(message)
     return res.status(500).send({message})
   }
   // remove memberof, which can be a long list of data
