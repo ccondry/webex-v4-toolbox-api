@@ -4,8 +4,8 @@
   "description": "REST API for the dCloud GoCMS instant demo web portal",
   "main": "src/index.js",
   "scripts": {
-    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 node src/index",
-    "test": "mocha --timeout 20000 test"
+    "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
+    "test:ldap": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/ldap"
   },
   "repository": "https://github.com/ccondry/go-cms-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",
