@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2020.10.23-3
+
+### Bug Fixes
+* **User Expiration:** When user is being manually extended or expired, add or
+remove them from the Active LDAP group
+
+
 # 2020.10.23-2
 
 ### Bug Fixes
