@@ -86,7 +86,7 @@ module.exports = {
 
       // set up changes we want to make to the user
       const changes = [
-        addMemberOf
+        changeAccountExpires
       ]
 
       // change the user expiration in ldap
