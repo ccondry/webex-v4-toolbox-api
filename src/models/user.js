@@ -1,4 +1,5 @@
 const ldap = require('../models/ldap')
+const ldapjs = require('ldapjs')
 
 // modify user object 
 function modUser (user) {
@@ -54,12 +55,32 @@ module.exports = {
     }
   },
   async enable (username) {
-    await ldap.enableUser(username)
+    return ldap.enableUser(username)
   },
   async disable (username) {
-    await ldap.disableUser(username)
+    return ldap.disableUser(username)
   },
   async create (username) {
-    await ldap.createUser(username)
+    return ldap.createUser(username)
+  },
+  async extend (username, ms) {
+    // calculate time
+    const nowUtc = Date.now()
+    const expiresUtc = nowUtc + ms
+    const accountExpires = (10000 * expiresUtc) + 116444736000000000
+    // create ldap change object
+    const changeAccountExpires = new ldapjs.Change({
+      operation: 'replace',
+      modification: {
+        accountExpires
+      }
+    })
+    // set up changes we want to make to the user
+    const changes = [changeAccountExpires]
+    // change the user in ldap
+    return ldap.changeUser({
+      username,
+      changes
+    })
   }
 }

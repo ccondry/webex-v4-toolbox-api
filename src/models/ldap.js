@@ -35,7 +35,9 @@ module.exports = {
   listUsers,
   enableUser,
   disableUser,
-  deleteUser
+  deleteUser,
+  client: ldap,
+  changeUser
 }
 
 async function deleteUser (cn) {
@@ -262,4 +264,13 @@ async function lockUser ({username, lock}) {
     console.log(e)
     throw new Error(e)
   }
+}
+
+async function changeUser ({username, changes}) {
+  return ldap.changeUser({
+    adminDn: process.env.LDAP_ADMIN_DN,
+    adminPassword: process.env.LDAP_ADMIN_PASSWORD,
+    username,
+    changes
+  })
 }

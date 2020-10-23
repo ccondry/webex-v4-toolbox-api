@@ -26,8 +26,8 @@ router.get('/', async (req, res, next) => {
 router.get('/:username', async (req, res, next) => {
   try {
     // authorize client 
-    if (!isAdmin(req.user)) {
-      const message = 'You do not have permission to access this resource.'
+    if (!isAdmin(req.user) && req.params.username !== req.user.sub) {
+      const message = 'This is not your account and you are not an admin.'
       return res.status(403).send({message})
     }
     // get user from AD
@@ -93,6 +93,25 @@ router.post('/:username/enable', async (req, res, next) => {
     return res.status(200).send()
   } catch (e) {
     const message = `Failed to enable active directory user ${req.params.username} for ${req.user.sub}: ${e.message}`
+    console.log(message)
+    return res.status(500).send({message})
+  }
+})
+
+// extend accountExpires on single active directory user
+router.post('/:username/extend', async (req, res, next) => {
+  try {
+    // authorize client 
+    if (!isAdmin(req.user) && req.params.username !== req.user.sub) {
+      const message = 'This is not your account and you are not an admin.'
+      return res.status(403).send({message})
+    }
+    // edit user in AD using time in milliseconds
+    await model.extend(req.params.username, req.body.hour * 60 * 60 * 1000)
+    // respond to client
+    return res.status(200).send()
+  } catch (e) {
+    const message = `Failed to extend accountExpires on active directory user ${req.params.username} for ${req.user.sub}: ${e.message}`
     console.log(message)
     return res.status(500).send({message})
   }
