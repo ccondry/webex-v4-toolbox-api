@@ -112,7 +112,7 @@ async function addToGroup (body) {
     return
   } catch (error) {
     // failed
-    console.log('failed to add LDAP user', userDn, 'to group', groupDn, ':', error.message)
+    // console.log('failed to add LDAP user', userDn, 'to group', groupDn, ':', error.message)
     throw error
   }
 }
@@ -160,7 +160,7 @@ async function resetPassword (body) {
   try {
     if (!body.newPassword) {
       const error = 'newPassword is required to reset a password'
-      console.log(error)
+      // console.log(error)
       throw new Error(error)
     }
     if (
@@ -170,7 +170,7 @@ async function resetPassword (body) {
       (!body.email || body.email === '')
     ) {
       const error = 'userDn, upn, username, or email is required to reset a password'
-      console.log(error)
+      // console.log(error)
       throw new Error(error)
     }
     const user = body.userDn || body.email || body.username || body.email
@@ -183,11 +183,11 @@ async function resetPassword (body) {
     // mix in credentials with user request data, and send request
     let params = Object.assign({}, adminCreds, body)
     await ldap.resetPassword(params)
-    console.log('password reset successfully for ' + user)
+    // console.log('password reset successfully for ' + user)
     return
   } catch (error) {
     // ... erroror checks
-    console.log(error)
+    // console.log(error)
     throw new Error(error)
   }
 }
@@ -204,7 +204,7 @@ async function changePassword (body) {
     console.log('password change successful for username ' + body.username)
     return
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     throw new Error(error)
   }
 }
