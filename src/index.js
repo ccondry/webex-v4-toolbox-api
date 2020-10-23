@@ -10,6 +10,8 @@ const requestIp = require('request-ip')
 const environment = require('./models/environment')
 const jwtCert = require('./models/jwt-certificate')
 const teamsLogger = require('./models/teams-logger')
+// start job scheduler
+const scheduler = require('./models/scheduler').start()
 // set up Node.js HTTP port
 const port = process.env.NODE_PORT
 

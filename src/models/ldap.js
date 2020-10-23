@@ -9,6 +9,7 @@ const attributes = [
   'sAMAccountName',
   'cn',
   'memberOf',
+  'memberof',
   'primaryGroupID',
   'description',
   'physicalDeliveryOfficeName',
@@ -31,6 +32,7 @@ module.exports = {
   changePassword,
   createUser,
   addToGroup,
+  removeFromGroup,
   lockUser,
   listUsers,
   enableUser,
@@ -112,6 +114,23 @@ async function addToGroup (body) {
     // failed
     console.log('failed to add LDAP user', userDn, 'to group', groupDn, ':', error.message)
     throw error
+  }
+}
+
+async function removeFromGroup ({userDn, groupDn}) {
+  try {
+    await ldap.removeFromGroup({
+      adminDn: process.env.LDAP_ADMIN_DN,
+      adminPassword: process.env.LDAP_ADMIN_PASSWORD,
+      userDn,
+      groupDn
+    })
+    // done
+    return
+  } catch (rejectMessage) {
+    // failed
+    // console.log('failed to remove LDAP user', userDn, 'from group', groupDn, ':', error.message)
+    throw Error(rejectMessage)
   }
 }
 

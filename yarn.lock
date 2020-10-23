@@ -774,10 +774,10 @@ setprototypeof@1.1.1:
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.1.1.tgz#7e95acb24aa92f5885e0abef5ba131330d4ae683"
   integrity sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==
 
-simple-ldap-client@^2020.10.21:
-  version "2020.10.21"
-  resolved "https://registry.yarnpkg.com/simple-ldap-client/-/simple-ldap-client-2020.10.21.tgz#1e07993a8b41c78ee2c6bf95a4236529b56cff16"
-  integrity sha512-7vIzNxvGjwQzDvtI0VNB+XDpR50LJdq9rrdyEZVJ0vTpENfdrvNrKT60r1iQ9boYAPWpGYzgG8P5YtnaIgjIvA==
+simple-ldap-client@^2020.10.23:
+  version "2020.10.23"
+  resolved "https://registry.yarnpkg.com/simple-ldap-client/-/simple-ldap-client-2020.10.23.tgz#8ae0f4c23cfdb4a767f0afd6fe87ef3fac4af5b3"
+  integrity sha512-HW1lDltm58ktPMZ2SF5DJ873mhk56XM2G9zvv3QHW9gkcSqr3IIg6TOKeWmnUzbZjATJc3/j7S1OU1VgEUUYjA==
   dependencies:
     ldapjs "^1.0.2"
 
