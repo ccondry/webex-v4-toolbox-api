@@ -83,24 +83,33 @@ module.exports = {
           accountExpires
         }
       })
-      const addMemberOf = new ldapjs.Change({
-        operation: 'add',
-        modification: {
-          memberOf: process.env.LDAP_ACTIVE_GROUP_DN
-        }
-      })
 
       // set up changes we want to make to the user
       const changes = [
-        changeAccountExpires,
         addMemberOf
       ]
 
-      // change the user in ldap and return the results
-      return ldap.changeUser({
+      // change the user expiration in ldap
+      await ldap.changeUser({
         username,
         changes
       })
+
+      // modify Active group to add user to it
+      try {
+        await ldap.addToGroup({
+          userDn: `CN=${username},${process.env.LDAP_BASE_DN}`,
+          groupDn: process.env.LDAP_ACTIVE_GROUP_DN
+        })
+      } catch (e) {
+        // check for EntryAlreadyExistsError
+        if (e.message.match(/DSID-031A11C4/)) {
+          console.log(`${username} is already in ${process.env.LDAP_BASE_DN}`)
+        } else {
+          throw e
+        }
+      }
+      
     } catch (e) {
       throw e
     }
