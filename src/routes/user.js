@@ -230,6 +230,12 @@ router.post('/:username/extend', async (req, res, next) => {
       const message = 'This is not your account and you are not an admin.'
       return res.status(403).send({message})
     }
+    // validate max hour = 12
+    const max = process.env.USER_EXTEND_HOURS_MAX || 12
+    if (!isAdmin(req.user) && req.body.hour > max) {
+      const message = `${req.body.hour} hours is too many. The max is 12.`
+      return res.status(400).send({message})
+    }
     // edit user in AD using time in milliseconds
     await model.extend(req.params.username, req.body.hour * 60 * 60 * 1000)
     // respond to client
