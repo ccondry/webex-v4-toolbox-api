@@ -4,10 +4,18 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2020.10.24-1
+
+### Bug Fixes
+* **Account Expiration:** Fix issues adding and removing users from the Active
+group when setting account expiration. Also validate the maximum hours a user
+can set for themselves.
+
+
 # 2020.10.24
 
 ### Features
-* **User Creation:** improve user creation and error handling when input is
+* **User Creation:** Improve user creation and error handling when input is
 invalid. Check that call ID is not in use before creating user.
 
 

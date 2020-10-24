@@ -1,6 +1,6 @@
 {
   "name": "go-cms-api",
-  "version": "2020.10.24",
+  "version": "2020.10.24-1",
   "description": "REST API for the dCloud GoCMS instant demo web portal",
   "main": "src/index.js",
   "scripts": {
