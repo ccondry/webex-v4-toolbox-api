@@ -90,7 +90,7 @@ module.exports = {
         // user is being extended 
         try {
           await ldap.addToGroup({
-            userDn: `CN=${username},${process.env.LDAP_BASE_DN}`,
+            username,
             groupDn: process.env.LDAP_ACTIVE_GROUP_DN
           })
         } catch (e) {
@@ -106,13 +106,13 @@ module.exports = {
         // remove them from the active group
         try {
           await ldap.removeFromGroup({
-            userDn: `CN=${username},${process.env.LDAP_BASE_DN}`,
+            username,
             groupDn: process.env.LDAP_ACTIVE_GROUP_DN
           })
         } catch (e) {
-          // check for error that user is in the group already
+          // check for error that user is already not in the group
           if (e.message.match(/DSID-031A1236/)) {
-            // console.log(`${username} is not in ${process.env.LDAP_BASE_DN}`)
+            // console.log(`${username} is not in ${process.env.LDAP_ACTIVE_GROUP_DN}`)
           } else {
              throw e
           }

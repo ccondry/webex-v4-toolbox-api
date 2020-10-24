@@ -81,15 +81,13 @@ async function listUsers ({
   })
 }
 
-async function addToGroup (body) {
-  const userDn = body.userDn
-  const groupDn = body.groupDn
-  // console.log('request to add LDAP user', userDn, 'to group', groupDn)
+async function addToGroup ({userDn, username, groupDn}) {
   try {
     await ldap.addToGroup({
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD,
       userDn,
+      username,
       groupDn
     })
     // done
@@ -101,12 +99,13 @@ async function addToGroup (body) {
   }
 }
 
-async function removeFromGroup ({userDn, groupDn}) {
+async function removeFromGroup ({userDn, username, groupDn}) {
   try {
     await ldap.removeFromGroup({
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD,
       userDn,
+      username,
       groupDn
     })
     // done
@@ -257,6 +256,21 @@ async function createUser (dn, body, newPassword) {
         accountExpires
       }
     })
+    // add user to the Active group
+    // user is being extended 
+    try {
+      await addToGroup({
+        userDn: dn,
+        groupDn: process.env.LDAP_ACTIVE_GROUP_DN
+      })
+    } catch (e) {
+      if (e.message.match(/DSID-031A11C4/)) {
+        // ignore user already in group error
+      } else {
+        // throw other errors
+        throw e
+      }
+    }
     return
   } catch (error) {
     // console.log('failed to create LDAP user:', error.message)
