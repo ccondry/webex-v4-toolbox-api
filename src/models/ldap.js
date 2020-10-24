@@ -133,9 +133,8 @@ async function getUser (username) {
     })
     return user
   } catch (e) {
-    console.log(e)
     // failed
-    console.log('failed to get LDAP user', username, e.message)
+    // console.log('failed to get LDAP user', username, e.message)
     throw new Error('failed to get LDAP user ' + username + ':' + e.message)
   }
 }
@@ -182,7 +181,7 @@ async function changePassword (body) {
       oldPassword: body.oldPassword
     })
 
-    console.log('password change successful for username ' + body.username)
+    // console.log('password change successful for username ' + body.username)
     return
   } catch (error) {
     // console.log(error)
@@ -196,22 +195,18 @@ function _createUser (adminCreds, dn, body) {
     const client = ldap.getClient()
     // catch LDAP connection errors
     client.on('connectError', function (err) {
-      console.log('Error connecting to LDAP:', err)
       reject(err)
     })
     // login to LDAP
     client.bind(adminCreds.adminDn, adminCreds.adminPassword, (err) => {
       if (err) {
-        console.log(err)
         client.destroy()
         return reject(err)
       }
       body.objectClass = body.objectClass || ["top", "person", "organizationalPerson", "user"]
-      console.log('really creating LDAP user', dn, body)
       // create new user
       client.add(dn, body, (err2, user) => {
         client.destroy()
-        console.log(err2)
         if (err2) reject(err2)
         resolve(user)
       })
@@ -220,7 +215,7 @@ function _createUser (adminCreds, dn, body) {
 }
 
 async function createUser (dn, body, newPassword) {
-  console.log('creating LDAP user', dn, body)
+  // console.log('creating LDAP user', dn, body)
   try {
     // console.log('creating new LDAP user', body.username, '...')
     const adminCreds = {
@@ -231,11 +226,9 @@ async function createUser (dn, body, newPassword) {
     // create the user
     try {
       await _createUser(adminCreds, dn, body)
-      // console.log('successfully created new LDAP user')
     } catch (e) {
       if (e.message.includes('ENTRY_EXISTS')) {
         // continue if ldap account exists
-        console.log('LDAP user already exists. continuing.')
       } else {
         throw e
       }
