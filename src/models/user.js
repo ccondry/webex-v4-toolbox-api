@@ -1,4 +1,4 @@
-const ldap = require('../models/ldap')
+const ldap = require('./ldap')
 const ldapjs = require('ldapjs')
 
 // modify user object return data
@@ -38,9 +38,9 @@ async function get (username) {
 module.exports = {
   get,
   // list all LDAP users
-  async list () {
+  async list (query = {}) {
     try {
-      const users = await ldap.listUsers({})
+      const users = await ldap.listUsers(query)
       return users.map(modUser)
     } catch (e) {
       throw e
@@ -65,8 +65,8 @@ module.exports = {
     return ldap.disableUser(username)
   },
   // create LDAP user
-  async create (user) {
-    return ldap.createUser(user)
+  async create (dn, body, password) {
+    return ldap.createUser(dn, body, password)
   },
   // set LDAP user accountExpires time to current time + ms milliseconds
   // also puts user back into the 'active' LDAP group, if they are not in it
@@ -77,22 +77,12 @@ module.exports = {
     const accountExpires = (10000 * expiresUtc) + 116444736000000000
     // create ldap change object
     try {
-      const changeAccountExpires = new ldapjs.Change({
+      await ldap.changeUser({
+        username,
         operation: 'replace',
         modification: {
           accountExpires
         }
-      })
-
-      // set up changes we want to make to the user
-      const changes = [
-        changeAccountExpires
-      ]
-
-      // change the user expiration in ldap
-      await ldap.changeUser({
-        username,
-        changes
       })
 
       // modify Active group to add user to it

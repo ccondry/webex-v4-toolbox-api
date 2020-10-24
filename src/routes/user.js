@@ -4,40 +4,81 @@ const isAdmin = require('../models/is-admin')
 const model = require('../models/user')
 const teamsLogger = require('../models/teams-logger')
 
+// make LDAP filter from JSON object
+function jsonToFilter (json) {
+  let ret = '('
+  if (typeof json.$and === 'object') {
+    const keys = Object.keys(json.$and)
+    if (keys.length) {
+      ret += `&`
+      for (const key of keys) {
+        const value = json.$and[key]
+        ret += `(${key}=${value})`
+      }
+    }
+  }
+  ret += ')'
+  return ret
+}
+
 // create active directory user for JWT user
 router.post('/', async (req, res, next) => {
   // console.log(`creating active directory for ${req.user.sub}`)
   try {
     if (!req.body.dn) {
-      const message = `'dn' is a required JSON property of the request body.`
+      const message = `You didn't provide a call ID.`
       return res.status(400).send({message})
     }
     if (!req.body.password) {
-      const message = `'password' is a required JSON property of the request body.`
+      const message = `You didn't provide a password.`
       return res.status(400).send({message})
     }
+    // check that the dn is not in use as a telephoneNumber already
+    try {
+      const filter = jsonToFilter({
+        $and: {
+          objectClass: 'user',
+          telephoneNumber: req.body.dn,
+          objectcategory: 'person'
+        }
+      })
+      const existing = await model.list({filter})
+      if (existing.length) {
+        const message = `The call ID '${req.body.dn}' is already in use.`
+        return res.status(409).send({message})
+      }
+    } catch (e) {
+      const message = `Failed during call ID conflict check: ${e.message}`
+      console.log(message)
+      teamsLogger.log(message)
+      return res.status(500).send({message: e.message})
+    }
+
+    const fullName = `${req.user.given_name} ${req.user.family_name}`
     const body = {
-      firstName: req.user.given_name,
-      lastName: req.user.family_name,
-      username: req.user.sub,
-      commonName: req.user.sub,
+      givenName: req.user.given_name,
+      sn: req.user.family_name,
+      name: fullName, 
+      samAccountName: req.user.sub,
+      userPrincipalName: `${req.user.sub}@${process.env.LDAP_DOMAIN}`,
+      cn: fullName,
+      displayName: fullName,
       domain: process.env.LDAP_DOMAIN,
       telephoneNumber: req.body.dn,
-      password: req.body.password,
+      objectClass: ["top", "person", "organizationalPerson", "user"],
       mail: req.user.email,
-      description: 'dCloud Demo User',
-      usersDn: process.env.LDAP_BASE_DN
+      description: 'dCloud Demo User'
     }
+    const dn = `CN=${fullName},${process.env.LDAP_BASE_DN}`
+
     // create new user in LDAP / AD
-    await model.create(body)
-    // set user expiration to 12 hours
-    await model.extend(req.user.sub, 12 * 60 * 60 * 1000)
+    await model.create(dn, body, req.body.password)
     return res.status(200).send()
   } catch (e) {
     const message = `Failed to create active directory account for ${req.user.sub}: ${e.message}`
     console.log(message)
     teamsLogger.log(message)
-    return res.status(500).send({message})
+    return res.status(500).send({message: e.message})
   }
 })
 
@@ -75,7 +116,7 @@ router.get('/:username', async (req, res, next) => {
     return res.status(200).send(user)
   } catch (e) {
     const message = `Failed to get active directory user ${req.params.username} for ${req.user.sub}: ${e.message}`
-    console.log(message)
+    console.log(message, e)
     teamsLogger.log(message)
     return res.status(500).send({message})
   }

@@ -25,23 +25,6 @@ const attributes = [
   'accountExpires'
 ]
 
-module.exports = {
-  // su,
-  getUser,
-  resetPassword,
-  changePassword,
-  createUser,
-  addToGroup,
-  removeFromGroup,
-  lockUser,
-  listUsers,
-  enableUser,
-  disableUser,
-  deleteUser,
-  client: ldap,
-  changeUser
-}
-
 async function deleteUser (cn) {
   // console.log('delete user', cn)
   try {
@@ -71,6 +54,7 @@ async function disableUser (username) {
     throw error
   }
 }
+
 async function enableUser (username) {
   try {
     const params = {
@@ -173,9 +157,6 @@ async function resetPassword (body) {
       // console.log(error)
       throw new Error(error)
     }
-    const user = body.userDn || body.email || body.username || body.email
-    // console.log('password reset request received for ' + user)
-
     const adminCreds = {
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD,
@@ -209,26 +190,47 @@ async function changePassword (body) {
   }
 }
 
-async function createUser (body) {
+function _createUser (adminCreds, dn, body) {
+  return new Promise((resolve, reject) => {
+    // create client connection
+    const client = ldap.getClient()
+    // catch LDAP connection errors
+    client.on('connectError', function (err) {
+      console.log('Error connecting to LDAP:', err)
+      reject(err)
+    })
+    // login to LDAP
+    client.bind(adminCreds.adminDn, adminCreds.adminPassword, (err) => {
+      if (err) {
+        console.log(err)
+        client.destroy()
+        return reject(err)
+      }
+      body.objectClass = body.objectClass || ["top", "person", "organizationalPerson", "user"]
+      console.log('really creating LDAP user', dn, body)
+      // create new user
+      client.add(dn, body, (err2, user) => {
+        client.destroy()
+        console.log(err2)
+        if (err2) reject(err2)
+        resolve(user)
+      })
+    })
+  })
+}
+
+async function createUser (dn, body, newPassword) {
+  console.log('creating LDAP user', dn, body)
   try {
     // console.log('creating new LDAP user', body.username, '...')
     const adminCreds = {
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD
     }
-    // mix in credentials with user request data, and send request
-    let params = Object.assign({}, adminCreds, body)
-    // remove any undefined or empty string values
-    const keys = Object.keys(params)
-    for (const key of keys) {
-      if (typeof params[key] === 'undefined' || params[key].length === 0) {
-        delete params[key]
-      }
-    }
-    // console.log('creating new LDAP user...')
+
     // create the user
     try {
-      await ldap.createUser(params)
+      await _createUser(adminCreds, dn, body)
       // console.log('successfully created new LDAP user')
     } catch (e) {
       if (e.message.includes('ENTRY_EXISTS')) {
@@ -238,58 +240,63 @@ async function createUser (body) {
         throw e
       }
     }
-    // console.log('resetting the LDAP user password...')
-    params.newPassword = params.password
-    await ldap.resetPassword(params)
-    // console.log('successfully reset password for LDAP user. enabling user account...')
-    await ldap.enableUser(params)
-    // console.log('successfully enabled LDAP user account. done creating user.')
+    // set new user password
+    await ldap.resetPassword({...adminCreds, newPassword})
+    // enable new user
+    await ldap.enableUser(adminCreds)
+    // set new user expiration to 12 hours from now
+    // await user.extend(body.sAMAccountName, 12 * 60 * 60 * 1000)
+    // calculate time
+    const nowUtc = Date.now()
+    const expiresUtc = nowUtc + 12 * 60 * 60 * 1000
+    const accountExpires = (10000 * expiresUtc) + 116444736000000000
+    // update user accountExpires attribute
+    await ldap.changeUser({
+      username,
+      operation: 'replace',
+      modification: {
+        accountExpires
+      }
+    })
     return
   } catch (error) {
-    console.log('failed to create LDAP user:', error.message)
+    // console.log('failed to create LDAP user:', error.message)
     throw error
   }
 }
 
-async function lockUser ({username, lock}) {
-  console.log('received request to lock/unlock user account')
-  // validate input
-  if (!username) {
-    // invalid input
-    const message = 'could not lock/unlock user account. username is a required query parameter.'
-    console.log(message, 'query =', query)
-    throw new Error(message)
-  }
-  try {
-    // lock or unlock?
-    const operation = lock ? 'lock' : 'unlock'
-    const options = {
-      adminDn: process.env.LDAP_ADMIN_DN,
-      adminPassword: process.env.LDAP_ADMIN_PASSWORD,
-      username
-    }
-    if (lock) {
-      // lock
-      await ldap.disable(options)
-      console.log('successfully locked (disabled) LDAP account for', username)
-      return
-    } else {
-      // unlock
-      await ldap.enable(options)
-      console.log('successfully unlocked (enabled) LDAP account for', username)
-      return
-    }
-  } catch (e) {
-    console.log(e)
-    throw new Error(e)
-  }
-}
+async function changeUser ({username, operation, modification}) {
+  // set up changes we want to make to the user
+  const change = new ldap.ldapjs.Change({
+    operation,
+    modification
+  })
 
-async function changeUser ({username, changes}) {
+  // change the user expiration in ldap
+  await ldap.changeUser({
+    username,
+    changes: [change]
+  })
+
   return ldap.changeUser({
     adminDn: process.env.LDAP_ADMIN_DN,
     adminPassword: process.env.LDAP_ADMIN_PASSWORD,
     username,
     changes
   })
+}
+
+module.exports = {
+  getUser,
+  resetPassword,
+  changePassword,
+  createUser,
+  addToGroup,
+  removeFromGroup,
+  listUsers,
+  enableUser,
+  disableUser,
+  deleteUser,
+  client: ldap,
+  changeUser
 }
