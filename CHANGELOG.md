@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2020.10.24
+
+### Features
+* **User Creation:** improve user creation and error handling when input is
+invalid. Check that call ID is not in use before creating user.
+
+
 # 2020.10.23-4
 
 ### Features
