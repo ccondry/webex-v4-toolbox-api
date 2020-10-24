@@ -76,7 +76,7 @@ router.post('/', async (req, res, next) => {
       telephoneNumber: req.body.dn,
       objectClass: ["top", "person", "organizationalPerson", "user"],
       mail: req.user.email,
-      description: 'dCloud Demo User'
+      description: req.user.email
     }
     const dn = `CN=${fullName},${process.env.LDAP_BASE_DN}`
 
