@@ -33,6 +33,15 @@ router.post('/', async (req, res, next) => {
       const message = `You didn't provide a password.`
       return res.status(400).send({message})
     }
+    // validate that the dn is a number
+    try {
+      if (typeof req.body.dn !== 'number' && !req.body.dn.match(/^[0-9]*$/)) {
+        throw Error()
+      }
+    } catch (e) {
+      const message = `The call ID '${req.body.dn}' is not a valid Call ID.`
+      return res.status(400).send({message})
+    }
     // check that the dn is not in use as a telephoneNumber already
     try {
       const filter = jsonToFilter({
@@ -59,11 +68,11 @@ router.post('/', async (req, res, next) => {
       givenName: req.user.given_name,
       sn: req.user.family_name,
       name: fullName, 
-      samAccountName: req.user.sub,
+      sAMAccountName: req.user.sub,
       userPrincipalName: `${req.user.sub}@${process.env.LDAP_DOMAIN}`,
       cn: fullName,
       displayName: fullName,
-      domain: process.env.LDAP_DOMAIN,
+      // domain: process.env.LDAP_DOMAIN,
       telephoneNumber: req.body.dn,
       objectClass: ["top", "person", "organizationalPerson", "user"],
       mail: req.user.email,
@@ -75,6 +84,10 @@ router.post('/', async (req, res, next) => {
     await model.create(dn, body, req.body.password)
     return res.status(200).send()
   } catch (e) {
+    // return 400 if they just had bad input
+    if (e.message.match(/Your new password/)) {
+      return res.status(400).send({message: e.message})
+    }
     const message = `Failed to create active directory account for ${req.user.sub}: ${e.message}`
     console.log(message)
     teamsLogger.log(message)

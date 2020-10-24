@@ -216,6 +216,7 @@ function _createUser (adminCreds, dn, body) {
 
 async function createUser (dn, body, newPassword) {
   // console.log('creating LDAP user', dn, body)
+  const username = body.sAMAccountName
   try {
     // console.log('creating new LDAP user', body.username, '...')
     const adminCreds = {
@@ -234,17 +235,22 @@ async function createUser (dn, body, newPassword) {
       }
     }
     // set new user password
-    await ldap.resetPassword({...adminCreds, newPassword})
+    try {
+      await ldap.resetPassword({...adminCreds, username, newPassword})
+    } catch (e) {
+      // invalid password
+      // delete the account we just created and throw an error to user
+      await ldap.deleteUser({...adminCreds, userDn: dn})
+      throw Error(`Your new password doesn't meet the minimum requirements. Try another password.`)
+    }
     // enable new user
-    await ldap.enableUser(adminCreds)
+    await ldap.enableUser({...adminCreds, username})
     // set new user expiration to 12 hours from now
-    // await user.extend(body.sAMAccountName, 12 * 60 * 60 * 1000)
-    // calculate time
     const nowUtc = Date.now()
     const expiresUtc = nowUtc + 12 * 60 * 60 * 1000
     const accountExpires = (10000 * expiresUtc) + 116444736000000000
     // update user accountExpires attribute
-    await ldap.changeUser({
+    await changeUser({
       username,
       operation: 'replace',
       modification: {
@@ -265,17 +271,11 @@ async function changeUser ({username, operation, modification}) {
     modification
   })
 
-  // change the user expiration in ldap
-  await ldap.changeUser({
-    username,
-    changes: [change]
-  })
-
   return ldap.changeUser({
     adminDn: process.env.LDAP_ADMIN_DN,
     adminPassword: process.env.LDAP_ADMIN_PASSWORD,
     username,
-    changes
+    changes: [change]
   })
 }
 
