@@ -90,6 +90,9 @@ app.use('/api/v1/user', require('./routes/user'))
 // demo environment info
 app.use('/api/v1/demo', require('./routes/demo'))
 
+// validate JWT
+app.use('/api/v1/valid', require('./routes/valid'))
+
 // start listening
 app.listen(port, () => {
   const message = `${environment.name} version ${environment.version} service started on ${environment.hostname}. Listening on port ${port}.`
