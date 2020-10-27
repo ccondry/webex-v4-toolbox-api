@@ -20,7 +20,8 @@ const attributes = [
   'sn',
   'telephoneNumber',
   'userAccountControl',
-  'accountExpires'
+  'accountExpires',
+  'lastLogonTimestamp'
 ]
 
 async function deleteUser (cn) {
