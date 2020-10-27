@@ -1,5 +1,5 @@
 const ldap = require('./ldap')
-const ldapjs = require('ldapjs')
+const cms = require('./cms')
 
 // modify user object return data
 function modUser (user) {
@@ -52,21 +52,30 @@ module.exports = {
       const user = await get(username)
       // delete user from AD
       await ldap.deleteUser(user.cn)
+      // start CMS LDAP sync 
+      cms.sync()
     } catch (e) {
       throw e
     }
   },
-  // enable LDAP user
-  async enable (username) {
-    return ldap.enableUser(username)
-  },
-  // disable LDAP user
-  async disable (username) {
-    return ldap.disableUser(username)
-  },
+  // // enable LDAP user
+  // async enable (username) {
+  //   return ldap.enableUser(username)
+  // },
+  // // disable LDAP user
+  // async disable (username) {
+  //   return ldap.disableUser(username)
+  // },
   // create LDAP user
   async create (dn, body, password) {
-    return ldap.createUser(dn, body, password)
+    try {
+      const response = await ldap.createUser(dn, body, password)
+      // start CMS LDAP sync 
+      cms.sync()
+      return response
+    } catch (e) {
+      throw e
+    }
   },
   // set LDAP user accountExpires time to current time + ms milliseconds
   // also puts user back into the 'active' LDAP group, if they are not in it
@@ -93,6 +102,8 @@ module.exports = {
             username,
             groupDn: process.env.LDAP_ACTIVE_GROUP_DN
           })
+          // start CMS LDAP sync 
+          cms.sync()
         } catch (e) {
           // check for EntryAlreadyExistsError
           if (e.message.match(/DSID-031A11C4/)) {
@@ -109,6 +120,8 @@ module.exports = {
             username,
             groupDn: process.env.LDAP_ACTIVE_GROUP_DN
           })
+          // start CMS LDAP sync 
+          cms.sync()
         } catch (e) {
           // check for error that user is already not in the group
           if (e.message.match(/DSID-031A1236/)) {

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
     "test:ldap": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/ldap",
-    "test:scheduler": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/scheduler"
+    "test:scheduler": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/scheduler",
+    "test:cms": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/cms"
   },
   "repository": "https://github.com/ccondry/go-cms-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@ccondry/mongo-wrapper": "^1.5.0",
     "body-parser": "^1.19.0",
+    "cms-api-client": "^2020.10.26",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
