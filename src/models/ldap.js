@@ -11,7 +11,6 @@ const attributes = [
   'memberOf',
   'primaryGroupID',
   'description',
-  'physicalDeliveryOfficeName',
   'distinguishedName',
   'mail',
   'userPrincipalName',
