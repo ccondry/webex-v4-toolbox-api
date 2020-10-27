@@ -4,11 +4,18 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2020.10.26-1
+
+### Features
+* **Environment:** Send this package's software version in environment info.
+
+
 # 2020.10.26
 
 ### Features
 * **CMS LDAP Sync:** Start CMS LDAP sync whenever activating, deactivating,
 creating, or deleting a user.
+
 
 # 2020.10.24-1
 
