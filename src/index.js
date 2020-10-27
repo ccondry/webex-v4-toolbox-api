@@ -53,14 +53,14 @@ app.use(function(err, req, res, next) {
       // return status to user
       res.status(err.status).send(err.message)
       // set up data for logging
-      const clientIp = req.clientIp
-      const method = req.method
-      const host = req.get('host')
-      const path = req.originalUrl
+      // const clientIp = req.clientIp
+      // const method = req.method
+      // const host = req.get('host')
+      // const path = req.originalUrl
       // const url = req.protocol + '://' + host + path
       // there was an error
-      console.log('client at IP', clientIp, 'attempting to', method, 'at path', path, 'error', err.status, err.name, err.message)
-      console.log('auth header was', req.headers.Authorization)
+      // console.log('client at IP', clientIp, 'attempting to', method, 'at path', path, 'error', err.status, err.name, err.message)
+      // console.log('auth header was', req.headers.authorization)
       // stop processing
       return
     } else {
