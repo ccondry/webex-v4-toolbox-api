@@ -9,7 +9,6 @@ const attributes = [
   'sAMAccountName',
   'cn',
   'memberOf',
-  'memberof',
   'primaryGroupID',
   'description',
   'physicalDeliveryOfficeName',
