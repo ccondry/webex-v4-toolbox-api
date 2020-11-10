@@ -1,4 +1,4 @@
-# go-cms-api Change Log
+# webex-v4-toolbox-api Change Log
 
 Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number

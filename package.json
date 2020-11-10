@@ -1,5 +1,5 @@
 {
-  "name": "go-cms-api",
+  "name": "webex-v4-toolbox-api",
   "version": "2020.10.26-1",
   "description": "REST API for the dCloud GoCMS instant demo web portal",
   "main": "src/index.js",
@@ -9,7 +9,7 @@
     "test:scheduler": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/scheduler",
     "test:cms": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/cms"
   },
-  "repository": "https://github.com/ccondry/go-cms-api.git",
+  "repository": "https://github.com/ccondry/webex-v4-toolbox-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",
   "license": "MIT",
   "dependencies": {

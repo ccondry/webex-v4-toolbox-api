@@ -1,4 +1,4 @@
-# go-cms-api
+# webex-v4-toolbox-api
 This is the REST API service for the dCloud GoCMS instant demo web portal.
 
 ## Development
@@ -20,12 +20,12 @@ Do this once the first time you clone this project.
 
 ### Start/Stop
 
-`systemctl start go-cms-api.service` to start the application as a systemd service in Linux
+`systemctl start webex-v4-toolbox-api.service` to start the application as a systemd service in Linux
 
-`systemctl stop go-cms-api.service` to stop the application systemd service in Linux
+`systemctl stop webex-v4-toolbox-api.service` to stop the application systemd service in Linux
 
-`systemctl restart go-cms-api.service` to restart the application systemd service in Linux
+`systemctl restart webex-v4-toolbox-api.service` to restart the application systemd service in Linux
 
 ### Logging
 
-`journalctl -xef -u go-cms-api.service` to print current logs and follow new log entries for this service
+`journalctl -xef -u webex-v4-toolbox-api.service` to print current logs and follow new log entries for this service

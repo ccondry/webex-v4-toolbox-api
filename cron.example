@@ -1,1 +1,1 @@
-*/2 * * * * /bin/sh -c 'cd /opt/dcloud/go-cms-api && ./update.sh' 2>&1 | /usr/bin/logger -t cron-update-go-cms-api
+*/2 * * * * /bin/sh -c 'cd /opt/dcloud/webex-v4-toolbox-api && ./update.sh' 2>&1 | /usr/bin/logger -t cron-update-webex-v4-toolbox-api

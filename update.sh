@@ -21,7 +21,7 @@ else
     yarn
     if [ $? -eq 0 ]; then
       echo "restarting systemd service..."
-      sudo /bin/systemctl restart go-cms-api.service
+      sudo /bin/systemctl restart webex-v4-toolbox-api.service
     else
       echo "yarn failed. help me."
     fi
