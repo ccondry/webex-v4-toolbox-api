@@ -14,7 +14,7 @@ const teamsLogger = require('./models/teams-logger')
 const port = process.env.NODE_PORT
 
 // JWT path exceptions - these paths can be used without a JWT required
-const urlBase = '/api/v1/webex-v4prod'
+const urlBase = '/api/v1/webex-v4'
 
 const exceptions = {
   path: [{
