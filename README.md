@@ -1,5 +1,5 @@
 # webex-v4-toolbox-api
-This is the REST API service for the dCloud GoCMS instant demo web portal.
+This is the REST API service for the dCloud Webex Contact Center v4 instant demo web portal.
 
 ## Development
 ### Install Dependencies

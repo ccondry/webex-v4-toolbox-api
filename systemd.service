@@ -1,6 +1,6 @@
 [Unit]
 # this is the daemon for running the webex-v4-toolbox-api REST API node.js service
-Description=GoCMS web portal REST API
+Description=dCloud Webex Contact Center v4 instant demo web portal REST API
 # make sure we have network connection before starting
 After=network.target
 

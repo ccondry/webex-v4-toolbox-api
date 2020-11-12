@@ -1,7 +1,7 @@
 {
   "name": "webex-v4-toolbox-api",
   "version": "2020.10.26-1",
-  "description": "REST API for the dCloud GoCMS instant demo web portal",
+  "description": "REST API for the dCloud Webex Contact Center v4 instant demo web portal",
   "main": "src/index.js",
   "scripts": {
     "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
