@@ -10,21 +10,17 @@ const requestIp = require('request-ip')
 const environment = require('./models/environment')
 const jwtCert = require('./models/jwt-certificate')
 const teamsLogger = require('./models/teams-logger')
-// start job scheduler
-const scheduler = require('./models/scheduler').start()
 // set up Node.js HTTP port
 const port = process.env.NODE_PORT
 
 // JWT path exceptions - these paths can be used without a JWT required
+const urlBase = '/api/v1/webex-v4prod'
+
 const exceptions = {
   path: [{
     // this application version
-    url: /\/api\/v1\/version/i,
+    url: new RegExp(urlBase + '/version', 'i'),
     methods: ['GET']
-  }, {
-    // cisco SSO
-    url: /\/api\/v1\/sso/i,
-    methods: ['POST']
   }]
 }
 
@@ -51,18 +47,7 @@ app.use(function(err, req, res, next) {
     if (err) {
       // console.error(err.message)
       // return status to user
-      res.status(err.status).send(err.message)
-      // set up data for logging
-      // const clientIp = req.clientIp
-      // const method = req.method
-      // const host = req.get('host')
-      // const path = req.originalUrl
-      // const url = req.protocol + '://' + host + path
-      // there was an error
-      // console.log('client at IP', clientIp, 'attempting to', method, 'at path', path, 'error', err.status, err.name, err.message)
-      // console.log('auth header was', req.headers.authorization)
-      // stop processing
-      return
+      return res.status(err.status).send(err.message)
     } else {
       // no errors
     }
@@ -79,19 +64,10 @@ Routes
 *****/
 
 // get this API version
-app.use('/api/v1/version', require('./routes/version'))
+app.use(urlBase + '/version', require('./routes/version'))
 
-// do SSO login
-app.use('/api/v1/sso', require('./routes/sso'))
-
-// ldap user accounts
-app.use('/api/v1/user', require('./routes/user'))
-
-// demo environment info
-app.use('/api/v1/demo', require('./routes/demo'))
-
-// validate JWT
-app.use('/api/v1/valid', require('./routes/valid'))
+// user provisioning in webex v4 demo
+app.use(urlBase + '/provision', require('./routes/provision'))
 
 // start listening
 app.listen(port, () => {
