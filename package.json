@@ -13,6 +13,7 @@
   "author": "Coty Condry <ccondry@cisco.com>",
   "license": "MIT",
   "dependencies": {
+    "@ccondry/mongo-wrapper": "^2020.10.21",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
