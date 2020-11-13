@@ -21,7 +21,7 @@ module.exports = async function (url, options = {}) {
     options.headers = options.headers || {}
     options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json'
     // stringify JSON body if it's not a string already
-    if (typeof options.body !== 'string') {
+    if (typeof options.body === 'object' && options.headers['Content-Type'] === 'application/json') {
       options.body = JSON.stringify(options.body)
     }
   }
