@@ -1,5 +1,0 @@
-require('dotenv').config()
-const cms = require('../src/models/cms')
-cms.sync()
-// .then(r => console.log('success', r.status))
-.catch(e => console.log('error', e))

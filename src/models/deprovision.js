@@ -1,7 +1,7 @@
 const fetch = require('./fetch')
 const client = require('./cjp/client')
 //Local Storage for access-token
-const localStorage = require('./cache')
+const cache = require('./cache')
 
 //Control Hub Org Id
 const orgId = process.env.ORG_ID
@@ -47,7 +47,7 @@ async function deleteVirtualTeam (name) {
 //Get the Chat Template ID needed for Cumulus Chat routing
 async function findTemplate (userId) {
   try {
-    const token = localStorage.getItem('acToken')
+    const token = cache.getItem('accessToken')
     const url = `https://chatc.produs1.ciscoccservice.com/chatc/v1/organization/${orgId}/template?mediaType=chat`
     const options = {
       headers: {
@@ -68,7 +68,7 @@ async function findTemplate (userId) {
 async function deleteChatTemplate (userId) {
   try {
     const template = await findTemplate(userId)
-    const token = localStorage.getItem('acToken')
+    const token = cache.getItem('accessToken')
     const url = `https://cmm.produs1.ciscoccservice.com/cmm/v1/organization/${orgId}/template/${template.templateId}`
 
     const options = {
@@ -84,12 +84,12 @@ async function deleteChatTemplate (userId) {
   }
 }
 
-//Delete Routing Strategies
+// Delete Routing Strategies
 async function deleteRS (name) {
   try {
     const strategies = await client.routingStrategy.list()
     const strategy = strategies.auxiliaryDataList.find(v => {
-      return v.attributes.name__s.includes(name + userId)
+      return v.attributes.name__s.includes(name)
     })
     await client.virtualTeam.delete(strategy.id)
   } catch (e) {

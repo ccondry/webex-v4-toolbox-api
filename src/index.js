@@ -10,6 +10,10 @@ const requestIp = require('request-ip')
 const environment = require('./models/environment')
 const jwtCert = require('./models/jwt-certificate')
 const teamsLogger = require('./models/teams-logger')
+
+// start access token refresh schedule
+require('./models/control-hub/token')
+
 // set up Node.js HTTP port
 const port = process.env.NODE_PORT
 
@@ -71,7 +75,8 @@ app.use(urlBase + '/provision', require('./routes/provision'))
 
 // start listening
 app.listen(port, () => {
-  const message = `${environment.name} version ${environment.version} service started on ${environment.hostname}. Listening on port ${port}.`
+  const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development'
+  const message = `${environment.name} version ${environment.version} service started on ${environment.hostname}. Listening on port ${port} in ${mode} mode.`
   console.log(message)
-  teamsLogger.log('service started on port ' + port)
+  teamsLogger.log(`service started on port ${port} in ${mode} mode.`)
 })

@@ -1,6 +1,6 @@
 const cache = require('../cache')
 // control hub org ID
-const chOrgId = process.env.ORG_ID
+const orgId = process.env.ORG_ID
 
 // email entry point ID
 const emailEntryPoint = process.env.EMAIL_ENTRY_POINT_ID
@@ -8,7 +8,7 @@ const emailEntryPoint = process.env.EMAIL_ENTRY_POINT_ID
 // find treatment rule for specified user ID
 async function list () {
   // get access token from cache
-  const token = cache.getItem('acToken')
+  const token = cache.getItem('accessToken')
   const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatment`
 
   const options = {
@@ -53,10 +53,10 @@ async function findRule (userId) {
 
 // Create Treatment for user
 async function create (userId) {
-  const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${chOrgId}/entrypoint/${emailEntryPoint}/treatment`
+  const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatment`
   
   // get access token from cache
-  const token = cache.getItem('acToken')
+  const token = cache.getItem('accessToken')
   
   //Send Body
   const body = {
@@ -102,7 +102,7 @@ async function listOrder (userId) {
 
 // Modify Treatment Order
 async function modifyOrder (treatmentsOrder) {
-  const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${chOrgId}/entrypoint/${emailEntryPoint}/treatmentOrder`
+  const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatmentOrder`
 
   const body = {
     treatmentsOrder,

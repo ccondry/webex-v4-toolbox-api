@@ -7,7 +7,7 @@
     "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
     "test:ldap": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/ldap",
     "test:scheduler": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/scheduler",
-    "test:cms": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/cms"
+    "test:webex": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/webex"
   },
   "repository": "https://github.com/ccondry/webex-v4-toolbox-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",

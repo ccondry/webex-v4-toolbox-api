@@ -1,43 +1,20 @@
+// this is a queue of provision operations. processed one at a time in order.
 const uuid = require('uuid')
-const db = require('./db')
-
-async function provisionUser (user) {
-  // TODO build actual provision code here
-  const query = {username: user.username}
-  // test
-  const queueId = '5678'
-  const templateId = 'c772f5c0-d8bd-11ea-874d-fb6069813361'
-  // database updates
-  const updates = {
-    $set: {
-      'demo.webex-v4': {
-        vertical: 'travel',
-        queueId,
-        templateId,
-        orgId: 'f889c62e-d43a-45bf-a74d-cca4e91e493e',
-        DC: 'produs1.ciscoccservice.com',
-        CiscoAppId: 'cisco-chat-bubble-app',
-        appPrefix: '',
-        async: true
-      }
-    }
-  }
-  try {
-    // update user database
-    await db.updateOne('toolbox', 'users', query, updates)
-  } catch (e) {
-    throw e
-  }
-}
+// the module to provision users
+const provision = require('./provision')
 
 // queue of users to provision, one at a time
 class Queue {
   constructor () {
+    // the queue of users to provision
     this.queue = []
+    // job IDs and their status
     this.jobs = {}
+    // whether the job runner is working right now
     this.isRunning = false
   }
 
+  // get the status of job by ID
   status (id) {
     return this.jobs[id]
   }
@@ -46,6 +23,7 @@ class Queue {
   push (user) {
     // generate a job ID
     const id = uuid.v4()
+    // queue the job
     this.queue.push({user, id})
     // start the runner if it's not running right now
     if (!this.isRunning) {
@@ -57,6 +35,7 @@ class Queue {
 
   // main job runner function
   async run () {
+    // start
     this.isRunning = true
     // any users in queue?
     while (this.queue.length) {
@@ -66,7 +45,7 @@ class Queue {
       this.jobs[current.id] = 'working'
       try {
         // do provision
-        await provisionUser(current.user)
+        await provision(current.user.id)
         // set job ID to done
         this.jobs[current.id] = 'success'
       } catch (e) {
@@ -74,10 +53,13 @@ class Queue {
         this.jobs[current.id] = 'error'
       }
     }
+    // done
     this.isRunning = false
   }
 }
 
+// single instance of the Queue class
 const queue = new Queue()
 
+// expose the single instance of Queue
 module.exports = queue

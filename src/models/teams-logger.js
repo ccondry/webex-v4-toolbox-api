@@ -1,5 +1,10 @@
 const fetch = require('./fetch')
-const env = require('./environment')
+const package = require('../../package.json')
+const os = require('os')
+const globals = require('./globals')
+
+// find env hostname
+const hostname = os.hostname()
 
 // trim message to 7439 bytes for Webex to accept it
 function trimMessage (message) {
@@ -18,25 +23,36 @@ function trimMessage (message) {
 }
 
 // main log method
-async function log (args) {
+async function log () {
   let text = ''
-  let markdown
-  if (typeof args === 'string') {
-    // user passed a single string
-    text = trimMessage(args)
-  } else if (typeof args === 'object') {
-    // user passed an object
-    // save trimmed text
-    text = trimMessage(args.text || '')
-    // trim markdown, if exists
-    if (args.markdown) {
-      markdown = trimMessage(args.markdown)
+  let markdown = ''
+
+  if (!arguments.length) {
+    // no arguments
+    return
+  }
+  // has arguments
+  for (const args of arguments) {
+    if (typeof args === 'string') {
+      // user passed a string
+      text += trimMessage(args) + ' '
+    } else if (typeof args === 'object') {
+      // user passed an object
+      // save trimmed text
+      text += trimMessage(args.text || '')  + ' '
+      // trim markdown, if exists
+      if (args.markdown) {
+        markdown += trimMessage(args.markdown) + ' '
+      }
     }
   }
+  // trim again
+  text = trimMessage(text)
+  markdown = trimMessage(markdown)
 
   if (!text && !markdown) {
     // empty or no log message, so do nothing
-    console.log('empty log message sent to Webex Teams logger. igoring it.')
+    console.log('empty log message passed to Teams Logger. noop.')
     return
   }
 
@@ -46,29 +62,38 @@ async function log (args) {
   }
 
   // define text prefix for this service
-  const datacenter = process.env.DCLOUD_DATACENTER || '(unknown)'
-  const textPrefix = `${env.name} ${env.version} on ${env.hostname} in ${datacenter}: `
-  const markdownPrefix = `**${env.name} ${env.version}** on **${env.hostname}** in **${datacenter}**: `
+  // const packageName = process.env.npm_package_name
+  const packageName = package.name
+  // const packageVersion = process.env.npm_package_version
+  const packageVersion = package.version
+  const textPrefix = `${packageName} ${packageVersion} on ${hostname}: `
+  const markdownPrefix = `**${packageName} ${packageVersion}** on **${hostname}**: `
   // add prefix to plaintext
   text = textPrefix + text
   // add prefix to markdown
   markdown = markdownPrefix + markdown
 
   // send message to room
-  const url = 'https://webexapis.com/v1/messages'
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: 'Bearer ' + process.env.WEBEX_BOT_TOKEN
-    },
-    body: {
-      roomId: process.env.LOGS_ROOM_ID,
-      text,
-      markdown
+  try {
+    const url = 'https://api.ciscospark.com/v1/messages'
+    // get roomId, hopefully from cache
+    const roomId = await globals.getRoomId()
+    const token = await globals.getBotToken()
+    const options = {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token
+      },
+      body: {
+        roomId,
+        text,
+        markdown
+      }
     }
-  }).catch(e => {
-    console.log('failed to send log message to Webex Teams room:', e.message)
-  })
+    await fetch(url, options)
+  } catch (e) {
+    console.log('failed to log to Webex Teams room:', e.message)
+  }
 }
 
 // define all levels as the same function for now
