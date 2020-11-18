@@ -1,0 +1,2 @@
+# Allow 'administrator' user to restart webex-v4-toolbox-api service
+administrator ALL=NOPASSWD: /bin/systemctl restart webex-v4-toolbox-api.service
