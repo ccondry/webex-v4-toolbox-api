@@ -4,7 +4,12 @@ const globals = require('./globals')
 // main log method
 async function send (user) {
   try {
-    const markdown = `***Hello ${user.firstName}***,<br>Your ***Cisco Webex Contact Center v4*** provisioning is now complete.!<br>Please go back the the dCloud Collaboration Toolbox to choose your vertical and access the demo. Please be sure to read the demo guide that details to run and use the demo.<br>Thank You!`
+    let markdown = `***Hello ${user.firstName}***,<br> `
+    markdown += `Your ***Cisco Webex Contact Center v4*** provisioning is now complete!<br><br> `
+    markdown += `Please return to the dCloud Collaboration Toolbox to choose your vertical and access the demo. `
+    markdown += `Please be sure to read the demo guide that details to run and use the demo. `
+    markdown += `<br>Thank You!`
+    
     const url = 'https://api.ciscospark.com/v1/messages'
     const token = await globals.getBotToken()
     const options = {
@@ -23,7 +28,6 @@ async function send (user) {
   }
 }
 
-// define all levels as the same function for now
 module.exports = {
   send
 }

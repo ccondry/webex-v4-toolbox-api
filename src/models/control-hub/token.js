@@ -11,10 +11,14 @@ async function refresh () {
     // store new access token in cache
     cache.setItem('accessToken', token)
   } catch (e) {
-		// call for help - this must be manually fixed
-    const message = 'help! my refresh token expired!'
-    console.log(message)
-    teamsLogger.log(message)
+		if (e.status === 401) {
+			// call for help - this must be manually fixed
+			const message = 'help! my refresh token expired!'
+			console.log(message)
+			teamsLogger.log(message)
+		} else {
+			console.log('failed to refresh access token:', e.message)
+		}
   }
 }
 
@@ -42,8 +46,11 @@ async function get () {
 		
 		// get the refresh token now
 		const response = await fetch(url, options)
-		// TODO remove this debug log
-		console.log(response)
+		// TODO remove this
+		// console.log('refresh token response:', response)
+		if (refreshToken !== response.refresh_token) {
+			console.log('got new refresh token:  ', response.refresh_token)
+		}
 		// return just the access_token part
 		return response.access_token
 	} catch (e) {
@@ -56,7 +63,9 @@ async function get () {
 refresh()
 
 // and get access token again every 7 days
-const throttle = 7 * 24 * 60 * 60 * 1000
+// const throttle = 7 * 24 * 60 * 60 * 1000
+// and get access token again every 1 minute
+const throttle = 1 * 60 * 1000
 setInterval(function () {
 	refresh()
 }, throttle)

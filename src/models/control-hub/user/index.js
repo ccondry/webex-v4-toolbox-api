@@ -2,7 +2,7 @@
 const readOnlyTemplate = require('./templates/read-only')
 const enableCcTemplate = require('./templates/enable-cc')
 // cache for the bearer token
-const cache = require('../cache')
+const cache = require('../../cache')
 
 const orgId = process.env.ORG_ID
 

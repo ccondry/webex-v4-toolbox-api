@@ -1,13 +1,7 @@
-const chat = require('./chat')
-const token = require('./token')
-const treatment = require('./treatment')
-const user = require('./user')
-const syncUsers = require('./sync-users')
-
 module.exports = {
-  chat,
-  token,
-  treatment,
-  user,
-  syncUsers
+  chatTemplate: require('./chat-template'),
+  token: require('./token'),
+  treatment: require('./treatment'),
+  user: require('./user'),
+  syncUsers: require('./sync-users')
 }

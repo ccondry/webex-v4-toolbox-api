@@ -1,4 +1,4 @@
-const client = require('../../client')
+const client = require('./client')
 const template = require('./templates').team
 
 async function list () {

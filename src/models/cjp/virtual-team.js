@@ -1,4 +1,4 @@
-const client = require('../../client')
+const client = require('./client')
 const templates = require('./templates')
 
 // find existing chat queue by name

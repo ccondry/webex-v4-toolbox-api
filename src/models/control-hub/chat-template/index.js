@@ -1,9 +1,10 @@
 // REST request library
-const fetch = require('../fetch')
+const fetch = require('../../fetch')
 // cache for the bearer token
-const cache = require('../cache')
+const cache = require('../../cache')
 // request body template for create function
-const template = require('./data-template')
+const template = require('./template')
+const tokenLib = require('../token')
 // webex org ID
 const orgId = process.env.ORG_ID
 
@@ -18,11 +19,14 @@ async function getToken () {
 
 async function list () {
   try {
-    const url = `https://chatc.produs1.ciscoccservice.com/chatc/v1/organization/${orgId}/template?mediaType=chat`
+    const url = `https://cmm.produs1.ciscoccservice.com/cmm/v1/organization/${orgId}/template`
     const token = await getToken()
     const options = {
       headers: {
-        authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`
+      },
+      query: {
+        mediaType: 'chat'
       }
     }
     return fetch(url, options)
@@ -43,15 +47,17 @@ async function get (name) {
 
 // create chat template
 async function create (name, entryPointId) {
+  console.log(`creating chat template "${name} with entry point ${entryPointId}`)
   try {
     const url = `https://cmm.produs1.ciscoccservice.com/cmm/v1/organization/${orgId}/template`
+    const body = template(name, entryPointId)
     const token = await getToken()
     const options = {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`
       },
-      body: template(name, entryPointId),
+      body,
       redirect: 'follow'
     }
 
@@ -65,15 +71,20 @@ async function create (name, entryPointId) {
 async function getOrCreate (userId, entryPointId) {
   try {
     const name = `EP_Chat_${userId}`
+    console.log(`searching for Control Hub chat template "${name}"...`)
     // look for existing chat template
     const existing = await get(name)
+    console.log(`done searching for Control Hub chat template "${name}".`)
     if (existing) {
+      console.log(`returning existing Control Hub chat template "${name}".`)
       // return the existing chat template
       return existing
     } else {
+      console.log(`Control Hub chat template "${name}" does not exist. Creating it now...`)
       // doesn't exist yet - create it
       await create(name, entryPointId)
       // and return the newly created template
+      console.log(`getting new Control Hub chat template "${name}"...`)
       return await get(name)
     }
   } catch (e) {
@@ -82,5 +93,6 @@ async function getOrCreate (userId, entryPointId) {
 }
 
 module.exports = {
+  list,
   getOrCreate
 }

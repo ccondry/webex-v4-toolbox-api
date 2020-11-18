@@ -10,7 +10,8 @@
     "test:webex": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/webex",
     "test:provision": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/provision",
     "test:rs": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/routing-strategy",
-    "test": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/test"
+    "test": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/test",
+    "test:chat": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/chat"
   },
   "repository": "https://github.com/ccondry/webex-v4-toolbox-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",

@@ -7,7 +7,7 @@ module.exports = function (name, entryPoint) {
       mediaSpecificConfiguration: {
         useOrgProfile: false,
         useAgentRealName: false,
-        displayText: 'dCloudProd2'
+        displayText: process.env.CJP_ENTERPRISE_NAME
       },
       proactivePrompt: {
         enabled: true,

@@ -13,7 +13,7 @@ async function getToken () {
 }
 
 // Sync CJP Users to Control Hub
-async function sync () {
+module.exports = async function () {
   try {
     const url = "https://ums.produs1.ciscoccservice.com/ums/users/synchronize"
 
@@ -35,5 +35,3 @@ async function sync () {
     throw e
   }
 }
-
-module.exports = sync

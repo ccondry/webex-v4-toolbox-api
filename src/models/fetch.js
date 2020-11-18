@@ -38,11 +38,11 @@ module.exports = async function (url, options = {}) {
       const json = JSON.parse(text)
       return json
     } else {
-      let message = text
+      let message = text || ''
       try {
         const json = JSON.parse(text)
         // message = json.message
-        message = json.error_description || json.error
+        message = json.error_description || json.error || ''
       } catch (e) {
         // continue
       }
