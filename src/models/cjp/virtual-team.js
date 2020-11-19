@@ -23,10 +23,13 @@ async function getOrCreate (type, name) {
     console.log(`found existing CJP ${type} virtual team named "${name}": ${vteam.id}`)
   } else {
     // vteam doesn't exist yet, so create it
-    console.log(`CJP ${type} virtual team "${name}" does not exist. Creating it now...`)
-    await create(name, data)
+    console.log(`CJP ${type} virtual team named "${name}" does not exist. Creating it now...`)
+    await create(data)
+    console.log(`created new CJP ${type} virtual team named "${name}"`)
+    // wait for it to be created
+    await sleep(4000)
     vteam = await get(name)
-    console.log(`created new CJP ${type} virtual team named "${name}": ${vteam.id}`)
+    console.log(`found new CJP ${type} virtual team named "${name}": ${vteam.id}`)
   }
   return vteam
 }
