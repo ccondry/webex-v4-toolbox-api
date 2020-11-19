@@ -28,16 +28,10 @@ async function list () {
 }
 
 // find treatment rule for specified user ID
-async function findRule (userId) {
+async function findRule (name) {
   try {
     const rules = await list()
-    const rule = rules.find(rule => rule.name.includes(`route${userId}`))
-    // find it?
-    if (rule) {
-      return rule
-    } else {
-      throw Error(`No treatment rule found for user ${userId}`)
-    }
+    return rules.find(rule => rule.name === name)
   } catch (e) {
     throw e
   }
@@ -119,7 +113,7 @@ async function modifyOrder (treatmentsOrder) {
 async function getOrCreate (userId) {
   try {
     // find existing email treatment rule for user
-    let existing = await findRule(userId)
+    let existing = await findRule(`route${userId}`)
     let treatmentId
     // create new email treatment rule if it doesn't exist
     if (existing) {
@@ -131,7 +125,7 @@ async function getOrCreate (userId) {
       console.log(`Control Hub email treatment rule for user ${userId} does not exist. Creating it now...`)
       await create(userId)
       // get the newly created rule
-      existing = await findRule(userId)
+      existing = await findRule(`route${userId}`)
       // get the email treatment ID from the treatment object
       treatmentId = existing.uri.split('/').pop()
       console.log(`created new Control Hub email treatment rule for user ${userId}: ${treatmentId}`)
