@@ -5,7 +5,7 @@ const templates = require('./templates')
 async function get (name) {
 	const virtualTeams = await client.virtualTeam.list()
 	return virtualTeams.auxiliaryDataList.find(c => {
-    return c.attributes.name__s.includes(name)
+    return c.attributes.name__s === name
 	})
 }
 
