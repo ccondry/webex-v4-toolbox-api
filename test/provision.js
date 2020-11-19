@@ -4,6 +4,7 @@ const cjp = require('../src/models/cjp')
 const controlHub = require('../src/models/control-hub')
 const teamsNotifier = require('../src/models/teams-notifier')
 const token = require('../src/models/control-hub/token')
+const toolbox = require('../src/models/toolbox')
 
 const domain = process.env.DOMAIN
 
@@ -18,6 +19,8 @@ main({
   username: 'ccondry',
   email: 'ccondry@cisco.com',
   firstName: 'Coty'
+}).then(r =>{
+  process.exit(0)
 }).catch(e => console.log(e))
 
 async function main (user) {
@@ -40,7 +43,9 @@ async function main (user) {
 
   try {
     // start provisioning user
-  
+    // make sure we have a token in cache first
+    await token.refresh()
+    console.log('got Control Hub refresh token')
     // get or create CJP chat queue
     const chatQueue = await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`)
     // await sleep(1000)
@@ -56,102 +61,118 @@ async function main (user) {
     const chatTemplate = await controlHub.chatTemplate.getOrCreate(userId, chatEntryPoint.id)
     // await sleep(3000)
   
-    console.log(chatTemplate)
     // Debug
+    // console.log(chatTemplate)
     // const chatTemplates = await controlHub.chatTemplate.list()
     // console.log(chatTemplates)
-    // // set Rick user to read-only in Webex Control Hub
-    // await controlHub.user.setReadOnly({
-    //   name: rick.name,
-    //   email: rick.email
-    // })
+
+    // set Rick user to read-only in Webex Control Hub
+    await controlHub.user.setReadOnly({
+      name: rick.name,
+      email: rick.email
+    })
+    console.log(`set Control Hub user ${rick.name} to Read Only`)
     // await sleep(1000)
   
-    // // enable Rick for Contact Center in Webex Control Hub
-    // await controlHub.user.enableContactCenter({
-    //   givenName: rick.firstName,
-    //   familyName: rick.lastName,
-    //   displayName: rick.name,
-    //   email: rick.email
-    // })
+    // enable Rick for Contact Center in Webex Control Hub
+    await controlHub.user.enableContactCenter({
+      givenName: rick.firstName,
+      familyName: rick.lastName,
+      displayName: rick.name,
+      email: rick.email
+    })
+    console.log(`enabled Control Hub user ${rick.name} for Contact Center`)
     // await sleep(3000)
   
-    // // get Rick user ID from Webex Control Hub
-    // rick.webexId = (await controlHub.user.get(rick.email)).id
+    // get Rick user object from Webex Control Hub
+    rick.webex = await controlHub.user.get(rick.email)
+    console.log(`got Control Hub user details for ${rick.name}: ${rick.webex.id}`)
+    // await sleep(1000)
+
+    // Debug
+    // const webexRick = await controlHub.user.get(rick.email)
+    // console.log(webexRick)
+    
+    // make Rick a supervisor in Webex Control Hub
+    await controlHub.user.makeSupervisor(rick.webex.id)
+    console.log(`set Control Hub user ${rick.name} role to Supervisor`)
+    
+    // get/create CJP voice queue
+    const voiceQueue = await cjp.virtualTeam.getOrCreate('voiceQueue', `Q_dCloud_${userId}`)
     // await sleep(1000)
     
-    // // make Rick a supervisor in Webex Control Hub
-    // await controlHub.user.makeSupervisor(rick.webexId)
-    
-    // // get/create CJP voice queue
-    // const voiceQueue = await cjp.virtualTeam.getOrCreate('voiceQueue', `Q_dCloud_${userId}`)
-    // await sleep(1000)
-    
-    // // get/create CJP email queue
-    // const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`)
+    // get/create CJP email queue
+    const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`)
     // await sleep(3000)
   
-    // await controlHub.user.enableContactCenter({
-    //   givenName: sandra.firstName,
-    //   familyName: sandra.lastName,
-    //   displayName: sandra.name,
-    //   email: sandra.email
-    // })
+    await controlHub.user.enableContactCenter({
+      givenName: sandra.firstName,
+      familyName: sandra.lastName,
+      displayName: sandra.name,
+      email: sandra.email
+    })
+    console.log(`enabled Control Hub user ${sandra.name} for Contact Center`)
     // await sleep(3000)
     
-    // // get/create CJP agent team
-    // const team = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
+    // get/create CJP agent team
+    const team = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
     // await sleep(3000)
-    
-    // // sync CJP users to Webex Control Hub
-    // await controlHub.syncUsers()
-  
-    // // get/create CJP skill profile
-    // const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
+    // sync CJP users to Webex Control Hub
+    await controlHub.syncUsers()
+    console.log('started CJP to Control Hub user sync')
+
+    // get/create CJP skill profile
+    const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
     // await sleep(1000)
   
-    // // get Rick's CJP user details
-    // rick.cjp = await cjp.user.get(`Barrows${userId}`)
+    // get Rick's CJP user details
+    rick.cjp = await cjp.user.get(`Barrows${userId}`)
+    console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id}`)
     // await sleep(1000)
   
-    // // assign skill profile to Rick
-    // await cjp.user.modify({
-    //   agent: 'rick',
-    //   id: rick.cjp.id,
-    //   userId,
-    //   teamId: team.id,
-    //   skillProfileId: skillProfile.id
-    // })
+    // assign skill profile to Rick
+    await cjp.user.modify({
+      agent: 'rick',
+      id: rick.cjp.id,
+      userId,
+      teamId: team.id,
+      skillProfileId: skillProfile.id
+    })
+    console.log(`assigned skill profile to CJP user ${rick.name}: ${skillProfile.id}`)
   
-    // // get Sandra's CJP user details
-    // sandra.cjp = await cjp.user.get(`Jefferson${userId}`)
-    
-    // // assign skill profile to Sandra
-    // await cjp.user.modify({
-    //   agent: 'sandra',
-    //   id: sandra.cjp.id,
-    //   userId,
-    //   teamId: team.id,
-    //   skillProfileId: skillProfile.id
-    // })
+    // get Sandra's CJP user details
+    sandra.cjp = await cjp.user.get(`Jefferson${userId}`)
+    console.log(`got CJP user details for ${sandra.name}: ${sandra.cjp.id}`)
+
+    // assign skill profile to Sandra
+    await cjp.user.modify({
+      agent: 'sandra',
+      id: sandra.cjp.id,
+      userId,
+      teamId: team.id,
+      skillProfileId: skillProfile.id
+    })
+    console.log(`assigned skill profile to CJP user ${sandra.name}: ${skillProfile.id}`)
   
-    // // TODO
-    // // set voice queueId and chat templateId on user details in toolbox db
-    // // "queueId":"${voiceQueId}","templateId":"${tId}"}`;
-    // // await updateUserIds(); // TOOLBOX
-    // console.log('update toolbox user:', voiceQueue.id, chatTemplate.id)
-  
-    // // get/create email treatment in Webex Control Hub
-    // await controlHub.treatment.getOrCreate(userId)
+    // set voice queueId and chat templateId on user details in toolbox db
+    await toolbox.updateUser(userId, voiceQueue.id, chatTemplate.templateId)
+    console.log(`updated toolbox user ${userId} demo.webex-v4prod configuration with queueId ${voiceQueue.id} and templateId ${chatTemplate.templateId}`)
     
-    // // get/create global email routing strategy in CJP
-    // await cjp.routingStrategy.globalEmail(userId)
+    // get/create email treatment in Webex Control Hub
+    await controlHub.treatment.getOrCreate(userId)
     
-    // // get/create user-specific routing strategies in CJP for chat, email, voice
-    // await cjp.routingStrategy.user(userId)
+    // debug
+    // console.log('emailQueue', emailQueue)
+
+    // get/create global email routing strategy in CJP, referencing the
+    // numerical ID of the user's email queue in CJP
+    await cjp.routingStrategy.globalEmail(userId, emailQueue.attributes.dbId__l)
+    
+    // get/create user-specific routing strategies in CJP for chat, email, voice
+    await cjp.routingStrategy.user(userId)
   
     // notify user on Teams
-    // await teamsNotifier.send(user)
+    await teamsNotifier.send(user)
   } catch (e) {
     throw e
   }

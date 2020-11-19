@@ -4,5 +4,7 @@ module.exports = {
   emailQueue: require('./email-queue'),
   skillProfile: require('./skill-profile'),
   team: require('./team'),
-  voiceQueue: require('./voice-queue')
+  voiceQueue: require('./voice-queue'),
+  rick: require('./user-rick'),
+  sandra: require('./user-sandra')
 }

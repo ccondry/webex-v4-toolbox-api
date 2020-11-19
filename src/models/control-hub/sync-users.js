@@ -2,6 +2,7 @@
 const orgId = process.env.ORG_ID
 // cache for the bearer token
 const cache = require('../cache')
+const fetch = require('../fetch')
 
 async function getToken () {
   try {
@@ -15,7 +16,7 @@ async function getToken () {
 // Sync CJP Users to Control Hub
 module.exports = async function () {
   try {
-    const url = "https://ums.produs1.ciscoccservice.com/ums/users/synchronize"
+    const url = 'https://ums.produs1.ciscoccservice.com/ums/users/synchronize'
 
     const token = await getToken()
 

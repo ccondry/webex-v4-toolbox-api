@@ -1,8 +1,9 @@
 const template = require('./templates').skillProfile
+const client = require('./client')
 
 async function create (name, userId) {
   try {
-    client.skillProfile.create(template(name, userId))
+    await client.skillProfile.create(template(name, userId))
   } catch (e) {
     throw e 
   }
@@ -21,18 +22,25 @@ async function get (name) {
 
 async function getOrCreate (name, userId) {
   try {
-    const existing = await get(name)
+    // look for existing skill profile
+    let existing = await get(name)
     if (existing) {
-      return existing
+      console.log(`found existing CJP skill profile named "${name}": ${existing.id}`)
     } else {
+      // skill profile doesn't exist yet, so create it
+      console.log(`CJP skill profile "${name}" does not exist. Creating it now...`)
       await create(name, userId)
-      return await get(name)
+      // get the new skill profile details
+      existing = await get(name)
+      console.log(`created new CJP skill profile named "${name}": ${existing.id}`)
     }
+    // return skill profile
+    return existing
   } catch (e) {
     throw e
   }
 }
-
+  
 module.exports = {
   getOrCreate
 }

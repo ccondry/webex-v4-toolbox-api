@@ -1,5 +1,6 @@
 // this file adds a user's email queue to the global email queue routing strategy
 const client = require('../client')
+const convert = require('xml-js')
 
 // gets the current email routing strategy
 async function get (name) {
@@ -15,10 +16,10 @@ async function getScript (strategy) {
 }
 
 // find queue for userId in the provided XML routing strategy script
-function findQueue (queues, userId) {
+function findQueue (queues, id) {
   // find the queue element in the routing strategy data
   return queues.find(element => {
-    return element.attributes.name === `Q_Email_dCloud_${userId}`
+    return element.attributes.value === String(id)
   })
 }
 
@@ -29,13 +30,13 @@ function parseQueues (script) {
   return json.elements[0].elements[8].elements
 }
 
-function addQueueXml (queues, userId, queueId) {
+function addQueueXml (queues, name, queueId) {
   const entry = {
     type: 'element',
     name: 'param',
     attributes: {
-      name: `Q_Email_dCloud_${userId}`,
-      value: `${queueId}`,
+      name,
+      value: String(queueId),
       valueDataType: 'string',
       qualifier: 'vteam',
       description: '',
@@ -47,7 +48,7 @@ function addQueueXml (queues, userId, queueId) {
 
 // Modify Email TAM
 async function modifyTAM (id, xml) {
-  const url = process.env.CJP_BASE_URL + '/api/auxiliary-data/resources/routing-strategy'
+  // const url = process.env.CJP_BASE_URL + '/api/auxiliary-data/resources/routing-strategy'
 
   const body = [{
     id,
@@ -56,42 +57,51 @@ async function modifyTAM (id, xml) {
     }
   }]
 
-  const options = {
-    method: 'PUT',
-    headers: {
-      Authorization: `${process.env.CJP_RS_API_KEY};tenantId=${process.env.CJP_TENANT_ID}`,
-      From: process.env.CJP_FROM_ADDRESS
-    },
-    body
-  }
+  // const options = {
+  //   method: 'PUT',
+  //   headers: {
+  //     Authorization: `${process.env.CJP_RS_API_KEY};tenantId=${process.env.CJP_TENANT_ID}`,
+  //     From: process.env.CJP_FROM_ADDRESS
+  //   },
+  //   body
+  // }
 
   try {
-    await fetch(url, options)
+    await client.routingStrategy.modify(body)
   } catch (e) {
     throw e
   }
 }
 
-module.exports = async function (userId) {
+module.exports = async function (userId, queueId) {
   try {
+    const name = `Q_Email_dCloud_${userId}`
+    console.log(`provisioning CJP user email queue named "${name}" with ID "${queueId}" into global email routing strategy... `)
     // name of the global email routing strategy (current)
     const strategyName = process.env.CJP_CURRENT_EMAIL_ROUTING_STRATEGY_NAME
+    // get the global email routing strategy
     const strategy = await get(strategyName)
     if (!strategy) {
-      throw Error(`No email routing strategy found matching ${strategyName}`)
+      // cannot continue without the global email routing strategy
+      throw Error(`No CJP global email routing strategy found named "${strategyName}"`)
     }
     // extract the routing strategy script
     const script = await getScript(strategy)
     // extract queues JSON array from routing strategy script
     const queues = parseQueues(script)
+    // console.log('CJP global email routing strategy queues:', queues)
     // look for user's email queue in the routing strategy script
-    const queue = findQueue(queues, userId)
+    const queue = findQueue(queues, queueId)
     if (!queue) {
+      console.log(`CJP global email routing strategy does not contain the email queue with ID "${queueId}". Adding it...`)
       // queue not in the existing routing strategy script
       // modify the existing routing strategy and current routing strategy
-      const xml = addQueueXml(queues, userId, queue.id)
+      const xml = addQueueXml(queues, name, queueId)
       await modifyTAM(process.env.CJP_EMAIL_ROUTING_STRATEGY_ID, xml)
       await modifyTAM(strategy.id, xml)
+      console.log(`added the email queue named "${name}" with ID "${queueId}" to the CJP global email routing strategy`)
+    } else {
+      console.log(`the email queue named "${name}" with ID "${queueId}" is already in the CJP global email routing strategy`)
     }
   } catch (e) {
     throw e

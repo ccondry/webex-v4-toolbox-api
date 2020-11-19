@@ -27,11 +27,12 @@ async function getRoutingStrategy (name) {
   }
 }
 
-//Chat EP
-async function getChatEpIds () {
+// Chat EP
+async function getChatEpIds (userId) {
   try {
-    const response = await client.virtualTeam.list()
-    return response.auxiliaryDataList.find(c => {
+    const entryPoints = await client.virtualTeam.list()
+    console.log('entryPoints', entryPoints)
+    return entryPoints.auxiliaryDataList.find(c => {
       return c.attributes.name__s === `EP_Chat_${userId}`
     })
   } catch (e) {
@@ -40,7 +41,7 @@ async function getChatEpIds () {
 }
 
 // Chat Queue
-async function getChatQueueIds () {
+async function getChatQueueIds (userId) {
   try {
     const response = await client.virtualTeam.list()
     return response.auxiliaryDataList.find(c => {
@@ -52,7 +53,7 @@ async function getChatQueueIds () {
 }
 
 // Email Queue
-async function getEmailQueueIds () {
+async function getEmailQueueIds (userId) {
   try {
     const response = await client.virtualTeam.list()
     return response.auxiliaryDataList.find((c) => {
@@ -64,7 +65,7 @@ async function getEmailQueueIds () {
 }
 
 // Voice Queue
-async function getVoiceQueueIds () {
+async function getVoiceQueueIds (userId) {
   try {
     const response = await client.virtualTeam.list()
     return response.auxiliaryDataList.find(c => {
@@ -76,7 +77,7 @@ async function getVoiceQueueIds () {
 }
 
 // Team
-async function getTeamIds () {
+async function getTeamIds (userId) {
   try {
     const response = await client.team.list()
     return response.auxiliaryDataList.find(c => {
@@ -455,8 +456,10 @@ async function createQVoiceCurrentRS({
 }
 
 module.exports = async function (userId) {
+  console.log(`provisioning CJP routing strategies for user ${userId}...`)
   // get chat entry point
   const chatEp = await getChatEpIds()
+  console.log('chatEp', chatEp)
   const virtualEPChatId = chatEp.id
   const virtualEPChatDbId = chatEp.attributes.dbId__l
   const virtualEPChatName = chatEp.attributes.name__s

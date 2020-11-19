@@ -2,6 +2,7 @@
 const readOnlyTemplate = require('./templates/read-only')
 const enableCcTemplate = require('./templates/enable-cc')
 // cache for the bearer token
+const fetch = require('../../fetch')
 const cache = require('../../cache')
 
 const orgId = process.env.ORG_ID
@@ -100,6 +101,8 @@ async function makeSupervisor (id) {
   try {
     const url = `https://identity.webex.com/identity/scim/${orgId}/v1/Users/${id}`
 
+    const token = await getToken()
+    
     const body = {
       schemas: [
         'urn:scim:schemas:core:1.0',

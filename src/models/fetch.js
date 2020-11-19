@@ -35,9 +35,17 @@ module.exports = async function (url, options = {}) {
     const response = await fetch(completeUrl, options)
     const text = await response.text()
     if (response.ok) {
-      const json = JSON.parse(text)
-      return json
+      // HTTP status 200 - 299
+      try {
+        // try to return JSON
+        const json = JSON.parse(text)
+        return json
+      } catch (e) {
+        // return raw text when JSON parsing fails
+        return text
+      }
     } else {
+      // HTTP status not 200 - 299
       let message = text || ''
       try {
         const json = JSON.parse(text)

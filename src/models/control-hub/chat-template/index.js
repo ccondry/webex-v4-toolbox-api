@@ -71,12 +71,13 @@ async function create (name, entryPointId) {
 async function getOrCreate (userId, entryPointId) {
   try {
     const name = `EP_Chat_${userId}`
-    console.log(`searching for Control Hub chat template "${name}"...`)
+    // console.log(`searching for Control Hub chat template "${name}"...`)
     // look for existing chat template
     const existing = await get(name)
-    console.log(`done searching for Control Hub chat template "${name}".`)
+    // console.log(`done searching for Control Hub chat template "${name}".`)
     if (existing) {
-      console.log(`returning existing Control Hub chat template "${name}".`)
+      // existing.entryPoint: 'AXPJaa0OTL-WqCpfkUAp'
+      console.log(`found existing Control Hub chat template named "${name}": ${existing.templateId}`)
       // return the existing chat template
       return existing
     } else {
