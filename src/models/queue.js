@@ -49,7 +49,7 @@ class Queue {
         // set job ID to done
         this.jobs[current.id] = 'success'
       } catch (e) {
-        console.log(`job ${current.id} error:` e)
+        console.log(`job ${current.id} error:`, e)
         // set job ID to error
         this.jobs[current.id] = 'error'
       }
