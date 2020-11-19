@@ -4,7 +4,8 @@ const templates = require('./templates')
 // find agent user by last name
 async function get (login) {
   try {
-    return client.user.getByLogin(login)
+    const response = await client.user.getByLogin(login)
+    return response.auxiliaryDataList
   } catch (e) {
     throw e
   }
