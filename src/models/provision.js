@@ -143,7 +143,7 @@ module.exports = async function (user) {
   
     // get Rick's CJP user details
     console.log(`getting CJP user details for ${rick.name}...`)
-    rick.cjp = await cjp.user.get(`Barrows${userId}`)
+    rick.cjp = await cjp.user.get(rick.email)
     console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id}`)
     // await sleep(1000)
   
@@ -158,7 +158,7 @@ module.exports = async function (user) {
     console.log(`assigned skill profile to CJP user ${rick.name}: ${skillProfile.id}`)
   
     // get Sandra's CJP user details
-    sandra.cjp = await cjp.user.get(`Jefferson${userId}`)
+    sandra.cjp = await cjp.user.get(sandra.email)
     console.log(`got CJP user details for ${sandra.name}: ${sandra.cjp.id}`)
 
     // assign skill profile to Sandra

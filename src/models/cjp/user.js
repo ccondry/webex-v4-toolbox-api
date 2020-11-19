@@ -2,12 +2,9 @@ const client = require('./client')
 const templates = require('./templates')
 
 // find agent user by last name
-async function get (lastName) {
+async function get (login) {
   try {
-    const response = await client.user.getByLogin()
-    return response.auxiliaryDataList.find(c => {
-      return c.attributes.lastName__s === lastName
-    })
+    return client.user.getByLogin(login)
   } catch (e) {
     throw e
   }
