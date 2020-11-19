@@ -69,7 +69,7 @@ async function modifyTAM (id, xml) {
   try {
     await client.routingStrategy.modify(body)
   } catch (e) {
-    throw e
+    throw e.message
   }
 }
 
