@@ -5,7 +5,7 @@ const templates = require('./templates')
 async function get (login) {
   try {
     const response = await client.user.getByLogin(login)
-    return response.auxiliaryDataList
+    return response.auxiliaryDataList[0]
   } catch (e) {
     throw e
   }

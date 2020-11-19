@@ -11,7 +11,7 @@ async function main (userId) {
   try {
     // go
     const user = await cjp.user.get('rbarrows0325@cc1.dc-01.com')
-    return 
+    return user 
   } catch (e) {
     console.log(e)
     // wait 10 seconds before trying again
