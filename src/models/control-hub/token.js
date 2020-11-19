@@ -9,7 +9,8 @@ async function refresh () {
     // get new access token using the refresh token
     const token = await get()
     // store new access token in cache
-    cache.setItem('accessToken', token)
+		cache.setItem('accessToken', token.access_token)
+		return token
   } catch (e) {
 		if (e.status === 401) {
 			// call for help - this must be manually fixed
@@ -46,8 +47,8 @@ async function get () {
 		
 		// get the refresh token now
 		const response = await fetch(url, options)
-		// return just the access_token part
-		return response.access_token
+		// return entire token object
+		return response
 	} catch (e) {
 		// rethrow all errors
 		throw e
