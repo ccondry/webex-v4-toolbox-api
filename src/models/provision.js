@@ -173,8 +173,8 @@ module.exports = async function (user) {
     console.log(`assigned skill profile to CJP user ${sandra.name}: ${skillProfile.id}`)
   
     // set voice queueId and chat templateId on user details in toolbox db
-    await toolbox.updateUser(userId, voiceQueue.id, chatTemplate.templateId)
-    console.log(`updated toolbox user ${userId} demo.webex-v4prod configuration with queueId ${voiceQueue.id} and templateId ${chatTemplate.templateId}`)
+    await toolbox.updateUser(userId, voiceQueue.attributes.dbId__l, chatTemplate.templateId)
+    console.log(`updated toolbox user ${userId} demo.webex-v4prod configuration with queueId ${voiceQueue.attributes.dbId__l} and templateId ${chatTemplate.templateId}`)
     
     // get/create email treatment in Webex Control Hub
     await controlHub.treatment.getOrCreate(userId)
