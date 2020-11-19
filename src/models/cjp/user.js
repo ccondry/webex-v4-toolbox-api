@@ -4,7 +4,11 @@ const templates = require('./templates')
 // find agent user by last name
 async function get (login) {
   try {
+    console.log('cjp.user.getByLogin', login, '...')
+    const list = await client.user.list()
+    console.log('user list', list)
     const response = await client.user.getByLogin(login)
+    console.log('response', response)
     return response.auxiliaryDataList[0]
   } catch (e) {
     // not found - just return null

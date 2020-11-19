@@ -30,14 +30,22 @@ module.exports = async function (user) {
   }
 
   try {
-    // make sure there is a valid access token in the cache
-    await token.refresh()
-
     // start provisioning user
     // make sure we have a Control Hub token in cache first
     await token.refresh()
     console.log('got Control Hub refresh token')
-
+    
+    const teamName = 'T_dCloud_' + dCloudUserId
+    // const agentUsername = 'sjeffers' + dCloudUserId + '@dcloud.cisco.com'
+    const supervisorUsername = 'rbarrows' + dCloudUserId + '@dcloud.cisco.com'
+    const virtualTeamName = 'Q_dCloud_' + dCloudUserId
+    // const virtualTeamChatName = 'EP_Chat_' + dCloudUserId
+    const routingStrategyName = 'RS_dCloud_' + dCloudUserId
+    const userProfileName = 'Supervisor ' + dCloudUserId
+    // voice queue
+    const virtualTeam = await upsertVirtualTeam({name: virtualTeamName})
+    // TODO copy the rest of the provision code from webex-v4prod-toolbox-api
+    
     // wait for LDAP sync to complete
     let agentUserExists
     let supervisorUserExists
@@ -45,7 +53,9 @@ module.exports = async function (user) {
       // try to find agent and supervisor users
       try {
         agentUserExists = await controlHub.user.get(sandra.email)
+        // console.log('agentUserExists', agentUserExists)
         supervisorUserExists = await controlHub.user.get(rick.email)
+        // console.log('supervisorUserExists', supervisorUserExists)
       } catch (e) {
         // wait 20 seconds before trying again
         await sleep(20 * 1000)
