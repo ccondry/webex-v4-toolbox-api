@@ -7,7 +7,8 @@ async function get (login) {
     const response = await client.user.getByLogin(login)
     return response.auxiliaryDataList[0]
   } catch (e) {
-    throw e
+    // not found - just return null
+    return null
   }
 }
 
