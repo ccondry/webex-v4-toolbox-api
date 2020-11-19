@@ -59,18 +59,21 @@ module.exports = async function (user) {
     const chatEntryPoint =  await cjp.virtualTeam.getOrCreate('chatEntryPoint', `EP_Chat_${userId}`)
     
     // wait for Webex Control Hub to sync the chat entry point from CJP
-    let entryPointExists
-    while (!entryPointExists) {
-      // try to find agent and supervisor users
-      try {
-        entryPointExists = await controlHub.virtualTeam.get(`EP_Chat_${userId}`)
-      } catch (e) {
-        // wait 10 seconds before trying again
-        console.log('waiting 10 seconds for Control Hub to sync the chat entry point')
-        await sleep(10 * 1000)
-      }
-    }
-    
+    // let entryPointExists
+    // while (!entryPointExists) {
+    //   // try to find agent and supervisor users
+    //   try {
+    //     entryPointExists = await controlHub.virtualTeam.get(`EP_Chat_${userId}`)
+    //   } catch (e) {
+    //     // wait 10 seconds before trying again
+    //     console.log('waiting 10 seconds for Control Hub to sync the chat entry point')
+    //     await sleep(10 * 1000)
+    //   }
+    // }
+
+    // wait for Webex Control Hub to sync the chat entry point from CJP
+    await sleep(10 * 1000)
+
     // get or create the Webex Control Hub chat template
     const chatTemplate = await controlHub.chatTemplate.getOrCreate(userId, chatEntryPoint.id)
   

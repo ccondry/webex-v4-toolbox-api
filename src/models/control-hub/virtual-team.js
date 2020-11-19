@@ -5,8 +5,13 @@ async function get (name) {
   try {
     const url = `https://cms.produs1.ciscoccservice.com/cms/api/v2/auxiliary-data/resources/virtual-team`
     const token = cache.getItem('accessToken')
+    // console.log('token', token)
     const options = {
       headers: {
+        method: 'GET',
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/plain, */*',
+        Referer: 'https://admin.webex.com/',
         Authorization: `Bearer ${token}`
       }
     }

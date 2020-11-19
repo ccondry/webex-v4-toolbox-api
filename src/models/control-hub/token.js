@@ -7,10 +7,11 @@ const globals = require('../globals')
 async function refresh () {
   try {
     // get new access token using the refresh token
-    const token = await get()
+		const token = await get()
+		// console.log('full token:', token)
     // store new access token in cache
 		cache.setItem('accessToken', token.access_token)
-		return token
+		return token.access_token
   } catch (e) {
 		if (e.status === 401) {
 			// call for help - this must be manually fixed
@@ -45,10 +46,8 @@ async function get () {
 			redirect: 'follow'
 		}
 		
-		// get the refresh token now
-		const response = await fetch(url, options)
 		// return entire token object
-		return response
+		return fetch(url, options)
 	} catch (e) {
 		// rethrow all errors
 		throw e
