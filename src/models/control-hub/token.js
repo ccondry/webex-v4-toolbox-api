@@ -46,11 +46,6 @@ async function get () {
 		
 		// get the refresh token now
 		const response = await fetch(url, options)
-		// TODO remove this
-		// console.log('refresh token response:', response)
-		if (refreshToken !== response.refresh_token) {
-			console.log('got new refresh token:  ', response.refresh_token)
-		}
 		// return just the access_token part
 		return response.access_token
 	} catch (e) {
