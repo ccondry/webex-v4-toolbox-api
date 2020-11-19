@@ -45,7 +45,7 @@ class Queue {
       this.jobs[current.id] = 'working'
       try {
         // do provision
-        await provision(current.user.id)
+        await provision(current.user)
         // set job ID to done
         this.jobs[current.id] = 'success'
       } catch (e) {

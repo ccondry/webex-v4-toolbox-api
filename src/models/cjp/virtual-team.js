@@ -1,6 +1,10 @@
 const client = require('./client')
 const templates = require('./templates')
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 // find existing chat queue by name
 async function get (name) {
 	const virtualTeams = await client.virtualTeam.list()

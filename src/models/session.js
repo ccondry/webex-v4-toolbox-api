@@ -1,0 +1,32 @@
+const fetch = require('./fetch')
+
+async function getDemo () {
+  const url = `https://mm.cxdemo.net/api/v1/demo`
+  const options = {
+    query: {
+      demo: 'webex',
+      version: 'v4prod',
+      instant: true
+    }
+  }
+  const demos = await fetch(url, options)
+  // there should be only 1
+  const demo = demos[0]
+  return demo
+}
+
+async function provision (token) {
+  const demo = await getDemo()
+  const url = `https://${demo.rp}/api/v1/cwcc`
+  const options = {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+  await fetch(url, options)
+}
+
+module.exports = {
+  provision
+}

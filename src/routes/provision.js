@@ -1,10 +1,15 @@
 const express = require('express')
 const router = express.Router()
 const model = require('../models/queue')
+const session = require('../models/session')
 
 // provision user account
 router.post('/', async (req, res, next) => {
   try {
+    // send message to the dCloud session to create the LDAP user and CUCM phone
+    const jwt = req.headers.authorization.split(' ').pop()
+    await session.provision(jwt)
+    // add to the queue to be provisioned in CJP and Control Hub
     const id = model.push(req.user)
     return res.status(200).send({id})
   } catch (e) {

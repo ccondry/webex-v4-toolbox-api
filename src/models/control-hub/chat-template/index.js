@@ -8,6 +8,10 @@ const tokenLib = require('../token')
 // webex org ID
 const orgId = process.env.ORG_ID
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 async function getToken () {
   try {
     const token = cache.getItem('accessToken')
@@ -84,6 +88,8 @@ async function getOrCreate (userId, entryPointId) {
       console.log(`Control Hub chat template "${name}" does not exist. Creating it now...`)
       // doesn't exist yet - create it
       await create(name, entryPointId)
+      // wait for it to be created
+      await sleep(4000)
       // and return the newly created template
       console.log(`getting new Control Hub chat template "${name}"...`)
       return await get(name)

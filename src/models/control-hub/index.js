@@ -3,5 +3,6 @@ module.exports = {
   token: require('./token'),
   treatment: require('./treatment'),
   user: require('./user'),
-  syncUsers: require('./sync-users')
+  syncUsers: require('./sync-users'),
+  virtualTeam: require('./virtual-team')
 }

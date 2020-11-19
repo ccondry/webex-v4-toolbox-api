@@ -5,6 +5,7 @@ const controlHub = require('../src/models/control-hub')
 const teamsNotifier = require('../src/models/teams-notifier')
 const token = require('../src/models/control-hub/token')
 const toolbox = require('../src/models/toolbox')
+const session = require('../src/models/session')
 
 const domain = process.env.DOMAIN
 
@@ -23,7 +24,7 @@ main({
   process.exit(0)
 }).catch(e => console.log(e))
 
-async function main (user) {
+async function main (user, userJwt) {
   // make sure there is a valid access token in the cache
   await token.refresh()
   const userId = user.id
@@ -43,13 +44,32 @@ async function main (user) {
 
   try {
     // start provisioning user
-    // make sure we have a token in cache first
+    // make sure we have a Control Hub token in cache first
     await token.refresh()
     console.log('got Control Hub refresh token')
+
+    // find the dCloud session and send it a message to create the LDAP user
+    // and CUCM phone
+    await session.provision(userJwt)
+
+    // wait for LDAP sync to complete
+    let agentUserExists
+    let supervisorUserExists
+    while (!agentUserExists || !supervisorUserExists) {
+      // try to find agent and supervisor users
+      try {
+        agentUserExists = await controlHub.user.get(sandra.email)
+        supervisorUserExists = await controlHub.user.get(rick.email)
+      } catch (e) {
+        // wait 20 seconds before trying again
+        await sleep(20 * 1000)
+      }
+    }
+
     // get or create CJP chat queue
-    const chatQueue = await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`)
+    await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`)
     // await sleep(1000)
-  
+    
     // get or create CJP chat entry point
     const chatEntryPoint =  await cjp.virtualTeam.getOrCreate('chatEntryPoint', `EP_Chat_${userId}`)
     
