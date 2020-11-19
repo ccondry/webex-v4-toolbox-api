@@ -31,7 +31,7 @@ async function getRoutingStrategy (name) {
 async function getChatEpIds (userId) {
   try {
     const entryPoints = await client.virtualTeam.list()
-    console.log('entryPoints', entryPoints)
+    // console.log('entryPoints', entryPoints.auxiliaryDataList)
     return entryPoints.auxiliaryDataList.find(c => {
       return c.attributes.name__s === `EP_Chat_${userId}`
     })
