@@ -17,7 +17,7 @@ async function getDemo () {
 
 async function provision (token) {
   const demo = await getDemo()
-  const url = `https://${demo.rp}/api/v1/cwcc`
+  const url = `https://${demo.rp}/api/v1/cwcc/provision`
   const options = {
     method: 'POST',
     headers: {
