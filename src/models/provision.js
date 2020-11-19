@@ -142,6 +142,7 @@ module.exports = async function (user) {
     // await sleep(1000)
   
     // get Rick's CJP user details
+    console.log(`getting CJP user details for ${rick.name}...`)
     rick.cjp = await cjp.user.get(`Barrows${userId}`)
     console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id}`)
     // await sleep(1000)
