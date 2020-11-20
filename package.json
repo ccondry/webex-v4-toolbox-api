@@ -1,6 +1,6 @@
 {
   "name": "webex-v4-toolbox-api",
-  "version": "2020.11.19",
+  "version": "2020.11.20",
   "description": "REST API for the dCloud Webex Contact Center v4 instant demo web portal",
   "main": "src/index.js",
   "scripts": {
