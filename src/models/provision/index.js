@@ -1,17 +1,23 @@
 require('dotenv').config()
 
-const cjp = require('./cjp')
-const controlHub = require('./control-hub')
-const teamsNotifier = require('./teams-notifier')
+const cjp = require('../cjp')
+const controlHub = require('../control-hub')
+const teamsNotifier = require('../teams-notifier')
 const token = controlHub.token
-const toolbox = require('./toolbox')
+const toolbox = require('../toolbox')
+
+const userTemplate = require('./templates/user')
+const userProfileTemplate = require('./templates/user-profile')
+const upsertUserProfile = require('./user-profile').upsert
+const upsertRoutingStrategy = require('./routing-strategy').upsert
+const upsertCurrentRoutingStrategy = require('./current-routing-strategy').upsert
+const upsertVirtualTeam = require('./virtual-team').upsert
+const upsertTeam = require('./team').upsert
+const upsertUser = require('./user').upsert
+
+const sleep = require('../sleep')
 
 const domain = process.env.DOMAIN
-
-// Sleep
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 module.exports = async function (user) {
   const userId = user.id
@@ -35,16 +41,87 @@ module.exports = async function (user) {
     await token.refresh()
     console.log('got Control Hub refresh token')
     
-    const teamName = 'T_dCloud_' + dCloudUserId
-    // const agentUsername = 'sjeffers' + dCloudUserId + '@dcloud.cisco.com'
-    const supervisorUsername = 'rbarrows' + dCloudUserId + '@dcloud.cisco.com'
-    const virtualTeamName = 'Q_dCloud_' + dCloudUserId
-    // const virtualTeamChatName = 'EP_Chat_' + dCloudUserId
-    const routingStrategyName = 'RS_dCloud_' + dCloudUserId
-    const userProfileName = 'Supervisor ' + dCloudUserId
+    const teamName = 'T_dCloud_' + userId
+    // const agentUsername = 'sjeffers' + userId + '@dcloud.cisco.com'
+    // const supervisorUsername = 'rbarrows' + userId + '@dcloud.cisco.com'
+    const virtualTeamName = 'Q_dCloud_' + userId
+    const virtualTeamChatName = 'EP_Chat_' + userId
+    const routingStrategyName = 'RS_dCloud_' + userId
+    const userProfileName = 'Supervisor ' + userId
     // voice queue
     const virtualTeam = await upsertVirtualTeam({name: virtualTeamName})
-    // TODO copy the rest of the provision code from webex-v4prod-toolbox-api
+    
+    // get voice queue ID
+    const virtualTeamId = virtualTeam.id
+
+    // create chat entry point
+    await upsertVirtualTeam({
+      name: virtualTeamChatName,
+      serviceLevelThreshold: 9999,
+      maxActiveCalls: 4,
+      channelType: 4
+    })
+
+    // get voice queue ID
+    // const virtualTeamChatId = virtualTeamChat.id
+
+    // create user profile template
+    const upt = userProfileTemplate({
+      name: userProfileName,
+      queueId: virtualTeamId
+    })
+
+    // create user profile
+    const userProfile = await upsertUserProfile(upt)
+
+    // get user-specific user profile ID for supervisor and agent
+    const supervisorProfileId = userProfile.id
+    const agentProfileId = userProfile.id
+
+    const team = await upsertTeam(teamName)
+
+    // create user template
+    const supervisorUserTemplate = userTemplate({
+      username: rick.email,
+      teamId: team.id,
+      firstName: 'Rick',
+      lastName: 'Barrows',
+      profileId: supervisorProfileId
+    })
+
+    // create user template
+    const agentUserTemplate = userTemplate({
+      username: sandra.email,
+      teamId: team.id,
+      firstName: 'Sandra',
+      lastName: 'Jefferson',
+      profileId: agentProfileId
+    })
+
+    // create supervisor
+    // const supervisor = 
+    await upsertUser(supervisorUserTemplate)
+
+    // agent
+    // const agent = 
+    await upsertUser(agentUserTemplate)
+
+    // extract usable queue ID as a string
+    // const queueId = virtualTeam.attributes.dbId__l + ''
+
+    // routing strategy
+    const routingStrategy = await upsertRoutingStrategy({
+      name: routingStrategyName,
+      virtualTeamId: virtualTeam.id,
+      virtualTeamName,
+      virtualTeamDbId: virtualTeam.attributes.dbId__l,
+      teamName,
+      teamId: team.attributes.dbId__l
+    })
+
+    // current routing strategy
+    // const currentRoutingStrategy = 
+    await upsertCurrentRoutingStrategy(routingStrategy)
     
     // wait for LDAP sync to complete
     let agentUserExists
@@ -141,11 +218,16 @@ module.exports = async function (user) {
     // await sleep(3000)
     
     // get/create CJP agent team
-    const team = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
+    // const team = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
     // await sleep(3000)
     // sync CJP users to Webex Control Hub
-    await controlHub.syncUsers()
-    console.log('started CJP to Control Hub user sync')
+    try {
+      await controlHub.syncUsers()
+      console.log('started CJP to Control Hub user sync')
+    } catch (e) {
+      console.log('failed to start CJP to Control Hub user sync:', e.message)
+      console.log('continuing...')
+    }
 
     // get/create CJP skill profile
     const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
@@ -182,10 +264,6 @@ module.exports = async function (user) {
     })
     console.log(`assigned skill profile to CJP user ${sandra.name}: ${skillProfile.id}`)
   
-    // set voice queueId and chat templateId on user details in toolbox db
-    await toolbox.updateUser(userId, voiceQueue.attributes.dbId__l, chatTemplate.templateId)
-    console.log(`updated toolbox user ${userId} demo.webex-v4prod configuration with queueId ${voiceQueue.attributes.dbId__l} and templateId ${chatTemplate.templateId}`)
-    
     // get/create email treatment in Webex Control Hub
     await controlHub.treatment.getOrCreate(userId)
     
@@ -198,7 +276,14 @@ module.exports = async function (user) {
     
     // get/create user-specific routing strategies in CJP for chat, email, voice
     await cjp.routingStrategy.user(userId)
-  
+    
+    // user profile to provisioning done
+    await toolbox.updateUser(userId, {
+      queueId: String(voiceQueue.attributes.dbId__l),
+      templateId: chatTemplate.templateId
+    })
+    console.log(`updated toolbox user ${userId} demo.webex-v4prod configuration with queueId ${voiceQueue.attributes.dbId__l} and templateId ${chatTemplate.templateId}`)
+    
     // notify user on Teams
     await teamsNotifier.send(user)
   } catch (e) {

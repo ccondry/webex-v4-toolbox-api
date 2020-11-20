@@ -31,7 +31,7 @@ async function getRoutingStrategy (name) {
 async function getChatEpIds (userId) {
   try {
     const entryPoints = await client.virtualTeam.list()
-    // console.log('entryPoints', entryPoints.auxiliaryDataList)
+    // console.log('entryPoints', entryPoints.auxiliaryDataList.map(v => v.attributes.name__s))
     return entryPoints.auxiliaryDataList.find(c => {
       return c.attributes.name__s === `EP_Chat_${userId}`
     })
@@ -456,142 +456,145 @@ async function createQVoiceCurrentRS({
 }
 
 module.exports = async function (userId) {
-  console.log(`provisioning CJP routing strategies for user ${userId}...`)
-  // get chat entry point
-  const chatEp = await getChatEpIds()
-  console.log('chatEp', chatEp)
-  const virtualEPChatId = chatEp.id
-  const virtualEPChatDbId = chatEp.attributes.dbId__l
-  const virtualEPChatName = chatEp.attributes.name__s
+  try {
+    console.log(`provisioning CJP routing strategies for user ${userId}...`)
+    // get chat entry point
+    const chatEp = await getChatEpIds(userId)
+    const virtualEPChatId = chatEp.id
+    const virtualEPChatDbId = chatEp.attributes.dbId__l
+    const virtualEPChatName = chatEp.attributes.name__s
+    
+    // get chat queue
+    const chatQueue = await getChatQueueIds(userId)
+    const virtualChatId = chatQueue.id
+    const virtualChatDbId = chatQueue.attributes.dbId__l
+    const virtualChatName = chatQueue.attributes.name__s
+    
+    // get email queue
+    const emailQueue = await getEmailQueueIds(userId)
+    const virtualEmailId = emailQueue.id
+    const virtualEmailDbId = emailQueue.attributes.dbId__l
+    const virtualEmailName = emailQueue.attributes.name__s
   
-  // get chat queue
-  const chatQueue = await getChatQueueIds()
-  const virtualChatId = chatQueue.id
-  const virtualChatDbId = chatQueue.attributes.dbId__l
-  const virtualChatName = chatQueue.attributes.name__s
+    // get voice queue
+    const voiceQueue = await getVoiceQueueIds(userId)
+    const virtualVoiceId = voiceQueue.id
+    const virtualVoiceDbId = voiceQueue.attributes.dbId__l
+    const virtualVoiceName = voiceQueue.attributes.name__s
   
-  // get email queue
-  const emailQueue = await getEmailQueueIds()
-  const virtualEmailId = emailQueue.id
-  const virtualEmailDbId = emailQueue.attributes.dbId__l
-  const virtualEmailName = emailQueue.attributes.name__s
-
-  // get voice queue
-  const voiceQueue = await getVoiceQueueIds()
-  const virtualVoiceId = voiceQueue.id
-  const virtualVoiceDbId = voiceQueue.attributes.dbId__l
-  const virtualVoiceName = voiceQueue.attributes.name__s
-
-  // get team IDs
-  const team = await getTeamIds()
-  // const virtualTeamId = team.id
-  const virtualTeamDbId = team.attributes.dbId__l
-  const virtualTeamName = team.attributes.name__s
-
-  // find existing routing strateg
-  const chatEpRs = await getRoutingStrategy(`RS_EP_Chat_${userId}`)
-  if (!chatEpRs) {
-    // chat EP RS does not exist yet. create chat RS and chat current RS
-    // CHAT Entry Point routing strategy
-    await sleep(1000)
-    await createEPChatRS({
-      nameRS: `RS_EP_Chat_${userId}`,
-      virtualDbId: virtualEPChatDbId,
-      virtualName: virtualEPChatName,
-      virtualId: virtualEPChatId,
-      virtualChatDbId: virtualChatDbId,
-    })
-    await sleep(1000)
-    const chatEpRsParent = await getParent(`RS_EP_Chat_${userId}`)
-    await sleep(1000)
-    await createEPCurrentChatRS({
-      nameRS: `RS_EP_Chat_${userId}`,
-      virtualDbId: virtualEPChatDbId,
-      virtualName: virtualEPChatName,
-      virtualId: virtualEPChatId,
-      virtualChatDbId: virtualChatDbId,
-      parentId: chatEpRsParent.id
-    })
-  }
-
-  const chatRs = await getRoutingStrategy(`RS_Chat_dCloud_${userId}`)
-  if (!chatRs) {
-    // chat RS does not exist yet. create it and current.
-    //CHAT QUEUE routing strategy
-    await sleep(1000)
-    await createQRS({
-      nameRS: `RS_Chat_dCloud_${userId}`,
-      virtualDbId: virtualChatDbId,
-      virtualName: virtualChatName,
-      virtualId: virtualChatId,
-      virtualTeamName: virtualTeamName,
-      virtualTeamDbId: virtualTeamDbId
-    })
-    await sleep(1000)
-    const chatQueueRsParent = await getParent(`RS_Chat_dCloud_${userId}`)
-    await sleep(1000)
-    await createQCurrentRS({
-      nameRS: `RS_Chat_dCloud_${userId}`,
-      virtualDbId: virtualChatDbId,
-      virtualName: virtualChatName,
-      virtualId: virtualChatId,
-      virtualTeamName: virtualTeamName,
-      virtualTeamDbId: virtualTeamDbId,
-      parentId: chatQueueRsParent.id
-    })
-  }
-
-  const emailRs = await getRoutingStrategy(`RS_Email_dCloud_${userId}`)
-  if (!emailRs) {
-    // email RS does not exist yet. create it and current.
-    //Email QUEUE routing strategy
-    await sleep(1000)
-    await createQRS({
-      nameRS: `RS_Email_dCloud_${userId}`,
-      virtualDbId: virtualEmailDbId,
-      virtualName: virtualEmailName,
-      virtualId: virtualEmailId,
-      virtualTeamName: virtualTeamName,
-      virtualTeamDbId: virtualTeamDbId
-    })
-    await sleep(1000)
-    const emailQueueRsParent = await getParent(`RS_Email_dCloud_${userId}`)
-    await sleep(1000)
-    await createQCurrentRS({
-      nameRS: `RS_Email_dCloud_${userId}`,
-      virtualDbId: virtualEmailDbId,
-      virtualName: virtualEmailName,
-      virtualId: virtualEmailId,
-      virtualTeamName: virtualTeamName,
-      virtualTeamDbId: virtualTeamDbId,
-      parentId: emailQueueRsParent.id
-    })
-  }
-
-  const voiceRs = await getRoutingStrategy(`RS_dCloud_${userId}`)
-  if (!voiceRs) {
-    // voice RS does not exist yet. create it and current.
-    //Voice QUEUE routing strategy
-    await sleep(1000)
-    await createQVoiceRS({
-      nameRS: `RS_dCloud_${userId}`,
-      virtualDbId: virtualVoiceDbId,
-      virtualName: virtualVoiceName,
-      virtualId: virtualVoiceId,
-      virtualTeamName: virtualTeamName,
-      virtualTeamDbId: virtualTeamDbId
-    })
-    await sleep(1000)
-    const voiceQueueRsParent = await getParent(`RS_dCloud_${userId}`)
-    await sleep(1000)
-    await createQVoiceCurrentRS({
-      nameRS: `RS_dCloud_${userId}`,
-      virtualDbId: virtualVoiceDbId,
-      virtualName: virtualVoiceName,
-      virtualId: virtualVoiceId,
-      virtualTeamName: virtualTeamName,
-      virtualTeamDbId: virtualTeamDbId,
-      parentId: voiceQueueRsParent.id
-    })
+    // get team IDs
+    const team = await getTeamIds(userId)
+    // const virtualTeamId = team.id
+    const virtualTeamDbId = team.attributes.dbId__l
+    const virtualTeamName = team.attributes.name__s
+  
+    // find existing routing strateg
+    const chatEpRs = await getRoutingStrategy(`RS_EP_Chat_${userId}`)
+    if (!chatEpRs) {
+      // chat EP RS does not exist yet. create chat RS and chat current RS
+      // CHAT Entry Point routing strategy
+      await sleep(1000)
+      await createEPChatRS({
+        nameRS: `RS_EP_Chat_${userId}`,
+        virtualDbId: virtualEPChatDbId,
+        virtualName: virtualEPChatName,
+        virtualId: virtualEPChatId,
+        virtualChatDbId: virtualChatDbId,
+      })
+      await sleep(1000)
+      const chatEpRsParent = await getParent(`RS_EP_Chat_${userId}`)
+      await sleep(1000)
+      await createEPCurrentChatRS({
+        nameRS: `RS_EP_Chat_${userId}`,
+        virtualDbId: virtualEPChatDbId,
+        virtualName: virtualEPChatName,
+        virtualId: virtualEPChatId,
+        virtualChatDbId: virtualChatDbId,
+        parentId: chatEpRsParent.id
+      })
+    }
+  
+    const chatRs = await getRoutingStrategy(`RS_Chat_dCloud_${userId}`)
+    if (!chatRs) {
+      // chat RS does not exist yet. create it and current.
+      //CHAT QUEUE routing strategy
+      await sleep(1000)
+      await createQRS({
+        nameRS: `RS_Chat_dCloud_${userId}`,
+        virtualDbId: virtualChatDbId,
+        virtualName: virtualChatName,
+        virtualId: virtualChatId,
+        virtualTeamName: virtualTeamName,
+        virtualTeamDbId: virtualTeamDbId
+      })
+      await sleep(1000)
+      const chatQueueRsParent = await getParent(`RS_Chat_dCloud_${userId}`)
+      await sleep(1000)
+      await createQCurrentRS({
+        nameRS: `RS_Chat_dCloud_${userId}`,
+        virtualDbId: virtualChatDbId,
+        virtualName: virtualChatName,
+        virtualId: virtualChatId,
+        virtualTeamName: virtualTeamName,
+        virtualTeamDbId: virtualTeamDbId,
+        parentId: chatQueueRsParent.id
+      })
+    }
+  
+    const emailRs = await getRoutingStrategy(`RS_Email_dCloud_${userId}`)
+    if (!emailRs) {
+      // email RS does not exist yet. create it and current.
+      //Email QUEUE routing strategy
+      await sleep(1000)
+      await createQRS({
+        nameRS: `RS_Email_dCloud_${userId}`,
+        virtualDbId: virtualEmailDbId,
+        virtualName: virtualEmailName,
+        virtualId: virtualEmailId,
+        virtualTeamName: virtualTeamName,
+        virtualTeamDbId: virtualTeamDbId
+      })
+      await sleep(1000)
+      const emailQueueRsParent = await getParent(`RS_Email_dCloud_${userId}`)
+      await sleep(1000)
+      await createQCurrentRS({
+        nameRS: `RS_Email_dCloud_${userId}`,
+        virtualDbId: virtualEmailDbId,
+        virtualName: virtualEmailName,
+        virtualId: virtualEmailId,
+        virtualTeamName: virtualTeamName,
+        virtualTeamDbId: virtualTeamDbId,
+        parentId: emailQueueRsParent.id
+      })
+    }
+  
+    const voiceRs = await getRoutingStrategy(`RS_dCloud_${userId}`)
+    if (!voiceRs) {
+      // voice RS does not exist yet. create it and current.
+      //Voice QUEUE routing strategy
+      await sleep(1000)
+      await createQVoiceRS({
+        nameRS: `RS_dCloud_${userId}`,
+        virtualDbId: virtualVoiceDbId,
+        virtualName: virtualVoiceName,
+        virtualId: virtualVoiceId,
+        virtualTeamName: virtualTeamName,
+        virtualTeamDbId: virtualTeamDbId
+      })
+      await sleep(1000)
+      const voiceQueueRsParent = await getParent(`RS_dCloud_${userId}`)
+      await sleep(1000)
+      await createQVoiceCurrentRS({
+        nameRS: `RS_dCloud_${userId}`,
+        virtualDbId: virtualVoiceDbId,
+        virtualName: virtualVoiceName,
+        virtualId: virtualVoiceId,
+        virtualTeamName: virtualTeamName,
+        virtualTeamDbId: virtualTeamDbId,
+        parentId: voiceQueueRsParent.id
+      })
+    }
+  } catch (e) {
+    throw e
   }
 }

@@ -1,14 +1,16 @@
 const db = require('./db')
 
-async function updateUser (userId, queueId, templateId) {
+async function updateUser (userId, data) {
+
   try {
     const query = {id: userId}
     const updates = {
-      $set: {
-        'demo.webex-v4prod.queueId': queueId,
-        'demo.webex-v4prod.templateId': templateId
-      }
+      $set: {}
     }
+    for (const key of Object.keys(data)) {
+      updates.$set['demo.webex-v4prod.' + key] = data[key]
+    }
+
     db.updateOne('toolbox', 'users', query, updates)
   } catch (e) {
     throw e

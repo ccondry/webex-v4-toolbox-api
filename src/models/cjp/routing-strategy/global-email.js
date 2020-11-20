@@ -69,7 +69,9 @@ async function modifyTAM (id, xml) {
   try {
     await client.routingStrategy.modify(body)
   } catch (e) {
-    throw e.message
+    // TODO fix this
+    console.log(`Failed to modify routing strategy: ${e.message}`)
+    // throw Error(`Failed to modify routing strategy: ${e.message}`)
   }
 }
 
