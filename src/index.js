@@ -20,9 +20,10 @@ require('./models/schedule')
 // set up Node.js HTTP port
 const port = process.env.NODE_PORT
 
-// JWT path exceptions - these paths can be used without a JWT required
+// the base URL path (after dns name) for this REST api
 const urlBase = '/api/v1/webex-v4'
 
+// JWT path exceptions - these paths can be used without a JWT required
 const exceptions = {
   path: [{
     // this application version
@@ -33,23 +34,18 @@ const exceptions = {
 
 // init express app, and configure it
 const app = express()
-// parse JSON body into req.body, up to 256kb
+// parse JSON body into req.body, limit raw body size to 256kb
 app.use(bodyParser.json({limit: '256kb'}))
 // enable CORS
 app.use(cors())
 // get remote IP address of request client as req.clientIp
 app.use(requestIp.mw())
-// require valid JWT for all paths unless in the exceptins list, and parse JWT payload into req.user
+// require valid JWT for all paths unless in the exceptions list, and parse JWT payload into req.user
+// this will automatically return 401 for invalid/expired/missing JWT using the function below
 app.use(expressJwt({ secret: jwtCert }).unless(exceptions))
 
-// run this code on every request
-app.use(async function (req, res, next) {
-  // continue processing
-  next()
-})
-
 // error handling when JWT validation fails
-app.use(function(err, req, res, next) {
+function handleJwtError (err, req, res, next) {
   try {
     if (err) {
       // console.error(err.message)
@@ -64,13 +60,20 @@ app.use(function(err, req, res, next) {
 
   // continue processing
   next()
-})
+}
+app.use(handleJwtError)
+
+// this code would run at the beginning of every request
+// app.use(async function (req, res, next) {
+//   // continue processing
+//   next()
+// })
 
 /*****
 Routes
 *****/
 
-// get this API version
+// get this API software version and package name
 app.use(urlBase + '/version', require('./routes/version'))
 
 // user provisioning in webex v4 demo
