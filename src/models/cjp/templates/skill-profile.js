@@ -8,6 +8,7 @@ module.exports = function (name, id) {
   }
   
   const profileData = [{
+    // dCloud_Default_Skill ID
     id: 'AXOXS4Npqu_2NSrhawvu',
     type: 'Text',
     value: id

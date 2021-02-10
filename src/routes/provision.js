@@ -1,22 +1,17 @@
 const express = require('express')
 const router = express.Router()
-const session = require('../models/session')
-const toolbox = require('../models/toolbox')
+const provision = require('../models/provision')
 
 // provision user account
 router.post('/', async (req, res, next) => {
   try {
     // get request JWT
     const jwt = req.headers.authorization.split(' ').pop()
-    // send message to the dCloud session to create the LDAP user and CUCM phone
-    await session.provision(jwt)
-    // mark user profile as provision started
-    await toolbox.updateUser(req.user.id, {
-      CiscoAppId: 'cisco-chat-bubble-app',
-      DC: 'produs1.ciscoccservice.com',
-      async: true,
-      orgId: process.env.ORG_ID
-    })
+
+    // start provision actions
+    provision(jwt)
+
+    // return OK
     return res.status(200).send()
   } catch (e) {
     console.log(`Failed to start user provision:`, e.message)

@@ -1,11 +1,9 @@
-require('dotenv').config()
-
-const cjp = require('../src/models/cjp')
-const controlHub = require('../src/models/control-hub')
-const teamsNotifier = require('../src/models/teams-notifier')
-const token = require('../src/models/control-hub/token')
-const toolbox = require('../src/models/toolbox')
-const session = require('../src/models/session')
+const cjp = require('./cjp')
+const controlHub = require('./control-hub')
+const teamsNotifier = require('./teams-notifier')
+const token = require('./control-hub/token')
+const toolbox = require('./toolbox')
+const session = require('./session')
 
 const domain = process.env.DOMAIN
 
@@ -14,17 +12,16 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-// go
-main({
-  id: '0325',
-  username: 'ccondry',
-  email: 'ccondry@cisco.com',
-  firstName: 'Coty'
-}).then(r =>{
-  process.exit(0)
-}).catch(e => console.log(e))
+// parse a JWT into a JSON object
+function parseJwt (token) {
+  const base64Url = token.split('.')[1]
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+  return JSON.parse(Buffer.from(base64, 'base64').toString())
+}
 
-async function main (user, userJwt) {
+module.exports = async function (userJwt) {
+  const user = parseJwt(userJwt)
+
   // make sure there is a valid access token in the cache
   await token.refresh()
   const userId = user.id
@@ -46,6 +43,14 @@ async function main (user, userJwt) {
   }
 
   try {
+    // mark user profile as provision started
+    await toolbox.updateUser(user.id, {
+      CiscoAppId: 'cisco-chat-bubble-app',
+      DC: 'produs1.ciscoccservice.com',
+      async: true,
+      orgId: process.env.ORG_ID
+    })
+        
     // start provisioning user
     // make sure we have a Control Hub token in cache first
     await token.refresh()

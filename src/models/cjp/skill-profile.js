@@ -11,10 +11,19 @@ async function create (name, userId) {
 
 async function get (name) {
   try {
-    const skillProfiles = await client.skillProfile.list()
-    return skillProfiles.auxiliaryDataList.find(v => {
+    const skillProfiles = await list()
+    return skillProfiles.find(v => {
       return v.attributes.name__s === name
     })
+  } catch (e) {
+    throw e 
+  }
+}
+
+async function list () {
+  try {
+    const skillProfiles = await client.skillProfile.list()
+    return skillProfiles.auxiliaryDataList
   } catch (e) {
     throw e 
   }
@@ -42,5 +51,8 @@ async function getOrCreate (name, userId) {
 }
   
 module.exports = {
-  getOrCreate
+  getOrCreate,
+  get,
+  create,
+  list
 }

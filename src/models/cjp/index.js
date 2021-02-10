@@ -1,4 +1,5 @@
 module.exports = {
+  skill: require('./skill'),
   skillProfile: require('./skill-profile'),
   team: require('./team'),
   user: require('./user'),

@@ -16,6 +16,7 @@ async function getDemo () {
 }
 
 async function provision (token) {
+  // send POST to dCloud session reverse proxy to start provision
   const demo = await getDemo()
   const url = `https://${demo.rp}/api/v1/cwcc/provision`
   const options = {
