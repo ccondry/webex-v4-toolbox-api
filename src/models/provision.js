@@ -4,6 +4,7 @@ const teamsNotifier = require('./teams-notifier')
 const token = require('./control-hub/token')
 const toolbox = require('./toolbox')
 const session = require('./session')
+const utils = require('../utils')
 
 const domain = process.env.DOMAIN
 
@@ -12,15 +13,8 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-// parse a JWT into a JSON object
-function parseJwt (token) {
-  const base64Url = token.split('.')[1]
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-  return JSON.parse(Buffer.from(base64, 'base64').toString())
-}
-
 module.exports = async function (userJwt) {
-  const user = parseJwt(userJwt)
+  const user = utils.parseJwt(userJwt)
 
   // make sure there is a valid access token in the cache
   await token.refresh()

@@ -7,7 +7,7 @@ router.post('/', async (req, res, next) => {
   try {
     // get request JWT
     const jwt = req.headers.authorization.split(' ').pop()
-
+    console.log('jwt', jwt)
     // start provision actions
     provision(jwt)
 
