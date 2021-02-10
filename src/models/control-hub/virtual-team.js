@@ -1,10 +1,10 @@
-const cache = require('../cache')
+const globals = require('../globals')
 const fetch = require('../fetch')
 
 async function get (name) {
   try {
     const url = `https://cms.produs1.ciscoccservice.com/cms/api/v2/auxiliary-data/resources/virtual-team`
-    const token = cache.getItem('accessToken')
+    const token = globals.get('webexV4ControlHubAccessToken')
     // console.log('token', token)
     const options = {
       headers: {

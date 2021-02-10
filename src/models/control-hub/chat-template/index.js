@@ -1,10 +1,10 @@
 // REST request library
 const fetch = require('../../fetch')
 // cache for the bearer token
-const cache = require('../../cache')
+const globals = require('../../globals')
 // request body template for create function
 const template = require('./template')
-const tokenLib = require('../token')
+// const tokenLib = require('../token')
 // webex org ID
 const orgId = process.env.ORG_ID
 
@@ -14,7 +14,7 @@ function sleep(ms) {
 
 async function getToken () {
   try {
-    const token = cache.getItem('accessToken')
+    const token = globals.get('webexV4ControlHubAccessToken')
     return token
   } catch (e) {
     throw e

@@ -1,12 +1,12 @@
 // control hub org ID
 const orgId = process.env.ORG_ID
 // cache for the bearer token
-const cache = require('../cache')
+const globals = require('../globals')
 const fetch = require('../fetch')
 
 async function getToken () {
   try {
-    const token = cache.getItem('accessToken')
+    const token = globals.get('webexV4ControlHubAccessToken')
     return token
   } catch (e) {
     throw e

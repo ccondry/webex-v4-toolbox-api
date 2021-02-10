@@ -13,7 +13,7 @@ router.post('/', async (req, res, next) => {
 
     // find the dCloud session and send it a message to create the LDAP user
     // and CUCM phone
-    await session.provision(userJwt)
+    await session.provision(jwt)
 
     // mark user profile as provision started so scheduler will find it
     await toolbox.updateUser(req.user.id, {

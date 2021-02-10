@@ -11,7 +11,7 @@ async function send (user) {
     markdown += `<br>Thank You!`
     
     const url = 'https://api.ciscospark.com/v1/messages'
-    const token = await globals.getBotToken()
+    const token = globals.get('toolbotToken')
     const options = {
       method: 'POST',
       headers: {

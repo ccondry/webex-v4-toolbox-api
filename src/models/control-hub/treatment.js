@@ -1,4 +1,4 @@
-const cache = require('../cache')
+const globals = require('../globals')
 const fetch = require('../fetch')
 // control hub org ID
 const orgId = process.env.ORG_ID
@@ -9,7 +9,7 @@ const emailEntryPoint = process.env.CJP_EMAIL_ENTRY_POINT_ID
 // find treatment rule for specified user ID
 async function list () {
   // get access token from cache
-  const token = cache.getItem('accessToken')
+  const token = globals.get('webexV4ControlHubAccessToken')
   const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatment`
 
   const options = {
@@ -42,7 +42,7 @@ async function create (userId) {
   const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatment`
   
   // get access token from cache
-  const token = cache.getItem('accessToken')
+  const token = globals.get('webexV4ControlHubAccessToken')
   
   //Send Body
   const body = {
@@ -72,7 +72,7 @@ async function listOrder () {
     const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatmentOrder`
 
     // get access token from cache
-    const token = cache.getItem('accessToken')
+    const token = globals.get('webexV4ControlHubAccessToken')
     
     const options = {
       headers: {
@@ -92,7 +92,7 @@ async function modifyOrder (treatmentsOrder) {
   const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatmentOrder`
 
   // get access token from cache
-  const token = cache.getItem('accessToken')
+  const token = globals.get('webexV4ControlHubAccessToken')
   
   const body = {
     treatmentsOrder,

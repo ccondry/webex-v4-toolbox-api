@@ -1,7 +1,7 @@
 const fetch = require('./fetch')
 const client = require('./cjp/client')
-//Local Storage for access-token
-const cache = require('./cache')
+// storage for access-token
+const globals = require('./globals')
 
 //Control Hub Org Id
 const orgId = process.env.ORG_ID
@@ -47,7 +47,7 @@ async function deleteVirtualTeam (name) {
 //Get the Chat Template ID needed for Cumulus Chat routing
 async function findTemplate (userId) {
   try {
-    const token = cache.getItem('accessToken')
+    const token =  globals.get('webexV4ControlHubAccessToken')
     const url = `https://chatc.produs1.ciscoccservice.com/chatc/v1/organization/${orgId}/template?mediaType=chat`
     const options = {
       headers: {
@@ -68,7 +68,7 @@ async function findTemplate (userId) {
 async function deleteChatTemplate (userId) {
   try {
     const template = await findTemplate(userId)
-    const token = cache.getItem('accessToken')
+    const token =  globals.get('webexV4ControlHubAccessToken')
     const url = `https://cmm.produs1.ciscoccservice.com/cmm/v1/organization/${orgId}/template/${template.templateId}`
 
     const options = {

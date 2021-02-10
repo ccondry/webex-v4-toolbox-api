@@ -4,72 +4,51 @@ const db = require('./db')
 const cache = {}
 
 // gets global value from database
-async function getGlobal (name) {
-  const query = {name}
-  return db.findOne('toolbox', 'globals', query)
-}
-
-// get a value from cache. if not found in cache, try to find it in the database
-function getCache (name) {
-  return new Promise((resolve, reject) => {
-    if (cache[name]) {
-      resolve(cache[name])
-    } else {
-      // cache miss - get from database
-      getGlobal(name)
-      .then(r => {
-        if (r) {
-          resolve(r.value)
-          // set cache
-          cache[name] = r.value
-        } else {
-          reject(`could not find ${name} in toolbox.globals`)
-        }
-      })
-      .catch(e => {
-        reject(`failed to find ${name} in toolbox.globals: ${e.message}`)
-      })
+async function refresh () {
+  // update cache
+  try {
+    const globals = await db.find('toolbox', 'globals', {})
+    for (const global of globals) {
+      cache[global.name] = global.value
     }
-  })
-}
-
-// get production or development Teams room ID for logging
-function getRoomId () {
-  if (process.env.NODE_ENV === 'production') {
-    return getCache('productionLogRoomId')
-  } else {
-    return getCache('developmentLogRoomId')
+  } catch (e) {
+    console.log('error updating globals cache:', e.message)
   }
 }
 
-// gets the toolbot bearer token for logging to Temas
-function getBotToken () {
-  return getCache('toolbotToken')
-}
-
-// gets the control hub refresh token for provision/deprovision Webex CC users
-function getRefreshToken () {
-  return getCache('webexV4RefreshToken')
-}
-
 // prime the cache now:
-// get room ID into cache now
-getRoomId()
-// get bot token into cache now
-getBotToken()
-// get control hub refresh token into cache now
-getRefreshToken()
+const initialLoad = refresh()
 
 // update cache values every 5 minutes
 const throttle = 1000 * 60 * 5
-setInterval(getRoomId, throttle)
-setInterval(getBotToken, throttle)
-setInterval(getRefreshToken, throttle)
+setInterval(refresh, throttle)
 
+function get (name) {
+  return cache[name]
+}
+
+async function set (name, value) {
+  try {
+    const existing = await db.findOne('toolbox', 'globals', {name})
+    if (existing) {
+      // update existing global
+      const updates = {$set: {}}
+      updates.$set[name] = {value}
+      await db.updateOne('toolbox', 'globals', {name}, updates)
+    } else {
+      // insert new global
+      await db.insertOne('toolbox', 'globals', {name, value})
+    }
+    // set in cache
+    cache[name] = value
+  } catch (e) {
+    throw e
+  }
+}
 // export our specific cache value methods and the generic getCache method
 module.exports = {
-  getCache,
-  getRoomId,
-  getBotToken,
-  getRefreshToken
+  refresh,
+  initialLoad,
+  get,
+  set
 }

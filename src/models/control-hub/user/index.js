@@ -1,19 +1,14 @@
 // control hub org ID
 const readOnlyTemplate = require('./templates/read-only')
-const enableCcTemplate = require('./templates/enable-cc')
+// const enableCcTemplate = require('./templates/enable-cc')
 // cache for the bearer token
 const fetch = require('../../fetch')
-const cache = require('../../cache')
+const globals = require('../../globals')
 
 const orgId = process.env.ORG_ID
 
-async function getToken () {
-  try {
-    const token = cache.getItem('accessToken')
-    return token
-  } catch (e) {
-    throw e
-  }
+function getToken () {
+  return globals.get('webexV4ControlHubAccessToken')
 }
 
 // set user to read-only
@@ -157,6 +152,74 @@ async function makeSupervisor (id) {
   }
 }
 
+async function list () {
+  const token = await getToken()
+  console.log('token', token)
+  const url = `https://identity.webex.com/identity/scim/${orgId}/v1/Users`
+  const attributes = [
+    'name',
+    'userName',
+    'userStatus',
+    'entitlements',
+    'displayName',
+    'photos',
+    'roles',
+    'active',
+    'adminTrainSiteNames',
+    'trainSiteNames',
+    'linkedTrainSiteNames',
+    'licenseID',
+    'userSettings',
+    'userPreferences'
+  ]
+  // const filter = '(userType eq "user") and (roles eq "id_full_admin" or roles eq "id_device_admin" or roles eq "id_readonly_admin" or roles eq "id_user_admin" or roles eq "cjp.admin")'
+  const filter = '(userType eq "user")'
+  const options = {
+    query: {
+      attributes: attributes.join(','), 
+      count: 100,
+      filter,
+      sortBy: 'name',
+      sortOrder: 'ascending',
+      startIndex: 0
+    },
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+  return fetch(url, options)
+}
+
+async function onboard (email) {
+  const token = getToken()
+  const url = `https://license-a.wbx2.com/license/api/v1/organization/${orgId}/users/onboard`
+  const options = {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: [{
+      email,
+      licenses: [
+        {
+          id: 'MS_fe3cfc81-8469-4929-8944-23e79e5d0d53',
+          idOperation: 'ADD',
+          properties: {}
+        },
+        {
+          id: 'CJPPRM_1cf76371-2fde-4f72-8122-b6a9d2f89c73',
+          idOperation: 'ADD',
+          properties: {}
+        }
+      ],
+      userEntitlements: [],
+      extendedSiteAccounts: [],
+      onboardMethod: null
+    }]
+  }
+  return fetch(url, options)
+}
+
 module.exports = {
   enableContactCenterAgent,
   enableContactCenterSupervisor,
@@ -165,5 +228,7 @@ module.exports = {
   setRoles,
   setReadOnly,
   get,
-  makeSupervisor
+  makeSupervisor,
+  list,
+  onboard
 }

@@ -77,8 +77,8 @@ async function log () {
   try {
     const url = 'https://api.ciscospark.com/v1/messages'
     // get roomId, hopefully from cache
-    const roomId = await globals.getRoomId()
-    const token = await globals.getBotToken()
+    const roomId = globals.get('webexV4RoomId')
+    const token = globals.get('toolbotToken')
     const options = {
       method: 'POST',
       headers: {

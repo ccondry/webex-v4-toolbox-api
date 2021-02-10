@@ -1,6 +1,5 @@
 const fetch = require('../fetch')
 const teamsLogger = require('../teams-logger')
-const cache = require('../cache')
 const globals = require('../globals')
 
 // refresh access token in cache
@@ -10,7 +9,7 @@ async function refresh () {
 		const token = await get()
 		// console.log('full token:', token)
     // store new access token in cache
-		cache.setItem('accessToken', token.access_token)
+		globals.set('webexV4ControlHubAccessToken', token.access_token)
 		return token.access_token
   } catch (e) {
 		if (e.status === 401) {
@@ -29,7 +28,8 @@ async function get () {
 	const url = 'https://api.ciscospark.com/v1/access_token'
 	try {
 		// get refresh token from cache/database
-		const refreshToken = await globals.getRefreshToken()
+		await globals.initialLoad
+		const refreshToken = globals.get('webexV4RefreshToken')
 		const urlencoded = new URLSearchParams()
 		urlencoded.append('grant_type', 'refresh_token')
 		// client ID and secret are in .env file. hopefully they don't change often.
