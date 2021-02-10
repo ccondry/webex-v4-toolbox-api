@@ -41,9 +41,9 @@ async function modify ({
 // list agent users
 async function list (login) {
   try {
-    const list = await client.user.list()
+    const users = await client.user.list()
     // console.log('user list', list)
-    return list 
+    return users.details.users 
   } catch (e) {
     // not found - just return null
     return null
