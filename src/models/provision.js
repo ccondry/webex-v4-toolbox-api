@@ -80,14 +80,11 @@ module.exports = async function (user) {
     // })
     // console.log(`set Control Hub user ${rick.name} to Read Only`)
     // await sleep(1000)
-  
+    
+    // reset control hub user license
+    await controlHub.user.enableStandardContactCenterAgent({email: rick.email})
     // enable Rick for Contact Center Supervisor in Webex Control Hub
-    await controlHub.user.enableContactCenterSupervisor({
-      givenName: rick.firstName,
-      familyName: rick.lastName,
-      displayName: rick.name,
-      email: rick.email
-    })
+    await controlHub.user.enableContactCenterSupervisor({email: rick.email})
     console.log(`enabled Control Hub user ${rick.name} as Contact Center Supervisor`)
     // await sleep(3000)
   
@@ -107,13 +104,11 @@ module.exports = async function (user) {
     // get/create CJP email queue
     const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`)
     // await sleep(3000)
-  
-    await controlHub.user.enableContactCenterAgent({
-      givenName: sandra.firstName,
-      familyName: sandra.lastName,
-      displayName: sandra.name,
-      email: sandra.email
-    })
+    
+    // reset control hub user license
+    await controlHub.user.enableStandardContactCenterAgent({email: sandra.email})
+    // enable Sandra for Contact Center Agent 
+    await controlHub.user.enableContactCenterAgent({email: sandra.email})
     console.log(`enabled Control Hub user ${sandra.name} for Contact Center Agent`)
     // await sleep(3000)
     
