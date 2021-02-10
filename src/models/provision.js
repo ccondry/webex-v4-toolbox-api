@@ -129,10 +129,15 @@ module.exports = async function (user) {
     // await sleep(1000)
     // const allCjpUsers = await cjp.user.list()
     // console.log('allCjpUsers', allCjpUsers.details.users)
+
     // get Rick's CJP user details
     rick.cjp = await cjp.user.get(rick.email)
-    if (!rick.cjp) {
-      console.log('could not find Rick agent user in CJP!')
+    while (!rick.cjp) {
+      console.log('did not find', rick.email, 'in CJP. Waiting and trying again...')
+      // wait
+      await sleep(1000 * 20)
+      // try again
+      rick.cjp = await cjp.user.get(rick.email)
     }
     console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id}`)
     // await sleep(1000)
@@ -149,6 +154,13 @@ module.exports = async function (user) {
   
     // get Sandra's CJP user details
     sandra.cjp = await cjp.user.get(sandra.email)
+    while (!sandra.cjp) {
+      console.log('did not find', sandra.email, 'in CJP. Waiting and trying again...')
+      // wait
+      await sleep(1000 * 20)
+      // try again
+      sandra.cjp = await cjp.user.get(sandra.email)
+    }
     console.log(`got CJP user details for ${sandra.name}: ${sandra.cjp.id}`)
 
     // assign skill profile and team to Sandra
