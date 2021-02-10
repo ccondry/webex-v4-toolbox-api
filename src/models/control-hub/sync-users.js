@@ -25,7 +25,6 @@ module.exports = async function () {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      body,
       redirect: 'follow'
     }
   
