@@ -127,10 +127,10 @@ module.exports = async function (user) {
     // get/create CJP voice skill profile for this user
     const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
     // await sleep(1000)
-    const allCjpUsers = await cjp.user.list()
-    console.log('allCjpUsers', allCjpUsers)
+    // const allCjpUsers = await cjp.user.list()
+    // console.log('allCjpUsers', allCjpUsers.details.users)
     // get Rick's CJP user details
-    rick.cjp = await cjp.user.get(rick.lastName)
+    rick.cjp = await cjp.user.get(rick.email)
     if (!rick.cjp) {
       console.log('could not find Rick agent user in CJP!')
     }
@@ -148,7 +148,7 @@ module.exports = async function (user) {
     console.log(`assigned skill profile to CJP user ${rick.name}: ${skillProfile.id}`)
   
     // get Sandra's CJP user details
-    sandra.cjp = await cjp.user.get(`Jefferson${userId}`)
+    sandra.cjp = await cjp.user.get(sandra.email)
     console.log(`got CJP user details for ${sandra.name}: ${sandra.cjp.id}`)
 
     // assign skill profile and team to Sandra

@@ -1,0 +1,5 @@
+require('dotenv').config()
+const cjp = require('../src/models/cjp')
+cjp.user.list()
+.then(allCjpUsers => console.log('allCjpUsers', allCjpUsers.details.users))
+.catch(e => console.log('error', e))
