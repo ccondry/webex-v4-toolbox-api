@@ -15,10 +15,7 @@ router.post('/', async (req, res, next) => {
     // and CUCM phone
     await session.provision(userJwt)
 
-    // start provision actions
-    provision(req.user)
-
-    // mark user profile as provision started
+    // mark user profile as provision started so scheduler will find it
     await toolbox.updateUser(req.user.id, {
       CiscoAppId: 'cisco-chat-bubble-app',
       DC: 'produs1.ciscoccservice.com',

@@ -16,9 +16,6 @@ async function getProvisionStartedUsers () {
       {'demo.webex-v4prod.orgId': process.env.ORG_ID},
       {
         $or: [
-          {'demo.webex-v4prod.queueId': {exists: false}},
-          {'demo.webex-v4prod.queueId': {$eq: ''}},
-          {'demo.webex-v4prod.queueId': {$eq: null}},
           {'demo.webex-v4prod.templateId': {exists: false}},
           {'demo.webex-v4prod.templateId': {$eq: ''}},
           {'demo.webex-v4prod.templateId': {$eq: null}}
