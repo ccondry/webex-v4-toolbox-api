@@ -42,29 +42,20 @@ async function setReadOnly ({
   }
 }
 
-// enable user for Contact Center features
-async function enableContactCenter ({
-  givenName,
-  familyName,
-  displayName,
-  email
-}) {
+async function setRoles ({email, roles}) {
   try {
-    const url = `https://atlas-a.wbx2.com/admin/api/v1/organization/${orgId}/users/onboard?migrateUsers=true`
+    const url = `https://atlas-a.wbx2.com/admin/api/v1/organization/${orgId}/users/contactCenterRoles`
     
     const token = await getToken()
 
-    const body = enableCcTemplate({
-      givenName,
-      familyName,
-      displayName,
-      email,
-      msId: process.env.MS_ID,
-      cjpPrmId: process.env.CJP_PRM_ID
-    })
-
+    const body = {
+      users: [{
+        userRoles: roles,
+        email
+      }]
+    }
     const options = {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -75,6 +66,43 @@ async function enableContactCenter ({
   } catch (e) {
     throw e
   }
+}
+
+// enable sjeffers for Contact Center role
+async function enableContactCenterSupervisor ({email}) {
+  const roles = [
+    {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'ACTIVE'},
+    {roleName: 'CJP_SUPERVISOR', 'roleState': 'ACTIVE'}
+  ]
+  return setRoles({email, roles})
+}
+
+// enable sjeffers for Contact Center role
+async function enableContactCenterAgent ({email}) {
+  const roles = [
+    {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'ACTIVE'},
+    {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'}
+  ]
+  return setRoles({email, roles})
+}
+
+// enable user for Standard Contact Center role (used to reset role and try again)
+async function enableStandardContactCenter ({email}) {
+  const roles = [
+    {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'INACTIVE'},
+    {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'},
+    {roleName: 'CJP_STANDARD_AGENT', 'roleState': 'ACTIVE'}
+  ]
+  return setRoles({email, roles})
+}
+
+// enable user for Contact Center features
+async function disableContactCenter ({email}) {
+  const roles = [
+    {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'INACTIVE'},
+    {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'}
+  ]
+  return setRoles({email, roles})
 }
 
 // get user info
@@ -130,7 +158,10 @@ async function makeSupervisor (id) {
 }
 
 module.exports = {
-  enableContactCenter,
+  enableContactCenterAgent,
+  enableContactCenterSupervisor,
+  enableStandardContactCenter,
+  setRoles,
   setReadOnly,
   get,
   makeSupervisor

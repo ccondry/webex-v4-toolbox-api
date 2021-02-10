@@ -74,21 +74,21 @@ module.exports = async function (user) {
     // console.log(chatTemplates)
 
     // set Rick user to read-only in Webex Control Hub
-    await controlHub.user.setReadOnly({
-      name: rick.name,
-      email: rick.email
-    })
-    console.log(`set Control Hub user ${rick.name} to Read Only`)
+    // await controlHub.user.setReadOnly({
+    //   name: rick.name,
+    //   email: rick.email
+    // })
+    // console.log(`set Control Hub user ${rick.name} to Read Only`)
     // await sleep(1000)
   
-    // enable Rick for Contact Center in Webex Control Hub
-    await controlHub.user.enableContactCenter({
+    // enable Rick for Contact Center Supervisor in Webex Control Hub
+    await controlHub.user.enableContactCenterSupervisor({
       givenName: rick.firstName,
       familyName: rick.lastName,
       displayName: rick.name,
       email: rick.email
     })
-    console.log(`enabled Control Hub user ${rick.name} for Contact Center`)
+    console.log(`enabled Control Hub user ${rick.name} as Contact Center Supervisor`)
     // await sleep(3000)
   
     // get Rick user object from Webex Control Hub
@@ -101,20 +101,20 @@ module.exports = async function (user) {
     // console.log(webexRick)
     
     // make Rick a supervisor in Webex Control Hub
-    await controlHub.user.makeSupervisor(rick.webex.id)
-    console.log(`set Control Hub user ${rick.name} role to Supervisor`)
+    // await controlHub.user.makeSupervisor(rick.webex.id)
+    // console.log(`set Control Hub user ${rick.name} role to Supervisor`)
     
     // get/create CJP email queue
     const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`)
     // await sleep(3000)
   
-    await controlHub.user.enableContactCenter({
+    await controlHub.user.enableContactCenterAgent({
       givenName: sandra.firstName,
       familyName: sandra.lastName,
       displayName: sandra.name,
       email: sandra.email
     })
-    console.log(`enabled Control Hub user ${sandra.name} for Contact Center`)
+    console.log(`enabled Control Hub user ${sandra.name} for Contact Center Agent`)
     // await sleep(3000)
     
     // get CJP global agent team
@@ -132,14 +132,16 @@ module.exports = async function (user) {
 
     // get Rick's CJP user details
     rick.cjp = await cjp.user.get(rick.email)
+    let retryCount = 0
     while (!rick.cjp) {
-      console.log('did not find', rick.email, 'in CJP. Waiting and trying again...')
+      console.log(`did not find ${rick.email} in CJP after ${retryCount} retries. Waiting and trying again...`)
       // wait
       await sleep(1000 * 20)
       // try again
       rick.cjp = await cjp.user.get(rick.email)
+      retryCount++
     }
-    console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id}`)
+    console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id} after ${retryCount} retries`)
     // await sleep(1000)
   
     // assign skill profile and team to Rick
