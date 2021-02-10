@@ -4,7 +4,6 @@ const teamsNotifier = require('./teams-notifier')
 const token = require('./control-hub/token')
 const toolbox = require('./toolbox')
 const session = require('./session')
-const utils = require('../utils')
 
 const domain = process.env.DOMAIN
 
@@ -13,9 +12,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-module.exports = async function (userJwt) {
-  const user = utils.parseJwt(userJwt)
-
+module.exports = async function (user) {
   // make sure there is a valid access token in the cache
   await token.refresh()
   const userId = user.id
@@ -37,22 +34,10 @@ module.exports = async function (userJwt) {
   }
 
   try {
-    // mark user profile as provision started
-    await toolbox.updateUser(user.id, {
-      CiscoAppId: 'cisco-chat-bubble-app',
-      DC: 'produs1.ciscoccservice.com',
-      async: true,
-      orgId: process.env.ORG_ID
-    })
-        
     // start provisioning user
     // make sure we have a Control Hub token in cache first
     await token.refresh()
     console.log('got Control Hub refresh token')
-
-    // find the dCloud session and send it a message to create the LDAP user
-    // and CUCM phone
-    await session.provision(userJwt)
 
     // wait for LDAP sync to complete
     let agentUserExists

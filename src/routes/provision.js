@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const provision = require('../models/provision')
+const toolbox = require('../models/toolbox')
+const session = require('../models/session')
 
 // provision user account
 router.post('/', async (req, res, next) => {
@@ -8,9 +10,21 @@ router.post('/', async (req, res, next) => {
     // get request JWT
     const jwt = req.headers.authorization.split(' ').pop()
     console.log('jwt', jwt)
-    // start provision actions
-    provision(jwt)
 
+    // find the dCloud session and send it a message to create the LDAP user
+    // and CUCM phone
+    await session.provision(userJwt)
+
+    // start provision actions
+    provision(req.user)
+
+    // mark user profile as provision started
+    await toolbox.updateUser(req.user.id, {
+      CiscoAppId: 'cisco-chat-bubble-app',
+      DC: 'produs1.ciscoccservice.com',
+      async: true,
+      orgId: process.env.ORG_ID
+    })
     // return OK
     return res.status(200).send()
   } catch (e) {
