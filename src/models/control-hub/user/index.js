@@ -87,7 +87,7 @@ async function enableContactCenterAgent ({email}) {
 }
 
 // enable user for Standard Contact Center role (used to reset role and try again)
-async function enableStandardContactCenter ({email}) {
+async function enableStandardContactCenterAgent ({email}) {
   const roles = [
     {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'INACTIVE'},
     {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'},
@@ -160,7 +160,8 @@ async function makeSupervisor (id) {
 module.exports = {
   enableContactCenterAgent,
   enableContactCenterSupervisor,
-  enableStandardContactCenter,
+  enableStandardContactCenterAgent,
+  disableContactCenter,
   setRoles,
   setReadOnly,
   get,
