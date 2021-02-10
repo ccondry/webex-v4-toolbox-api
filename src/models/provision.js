@@ -127,9 +127,13 @@ module.exports = async function (user) {
     // get/create CJP voice skill profile for this user
     const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
     // await sleep(1000)
-  
+    const allCjpUsers = await cjp.user.list()
+    console.log('allCjpUsers', allCjpUsers)
     // get Rick's CJP user details
-    rick.cjp = await cjp.user.get(`Barrows${userId}`)
+    rick.cjp = await cjp.user.get(rick.lastName)
+    if (!rick.cjp) {
+      console.log('could not find Rick agent user in CJP!')
+    }
     console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id}`)
     // await sleep(1000)
   

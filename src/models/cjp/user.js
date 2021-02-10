@@ -38,7 +38,20 @@ async function modify ({
   }
 }
 
+// list agent users
+async function list (login) {
+  try {
+    const list = await client.user.list()
+    // console.log('user list', list)
+    return list 
+  } catch (e) {
+    // not found - just return null
+    return null
+  }
+}
+
 module.exports = {
   get,
-  modify
+  modify,
+  list
 }
