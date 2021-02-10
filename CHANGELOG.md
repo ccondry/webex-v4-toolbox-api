@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.10
+
+### Features
+* **Provision:** Update provision script for skill-based voice routing.
+
+
 # 2020.11.20
 
 ### Features
