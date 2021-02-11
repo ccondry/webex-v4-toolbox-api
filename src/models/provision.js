@@ -45,8 +45,12 @@ module.exports = async function (user) {
     while (!agentUserExists || !supervisorUserExists) {
       // try to find agent and supervisor users
       try {
+        console.log('searching for', sandra.email, 'in Control Hub...')
         agentUserExists = await controlHub.user.get(sandra.email)
+        console.log('found', sandra.email, 'in Control Hub.')
+        console.log('searching for', rick.email, 'in Control Hub...')
         supervisorUserExists = await controlHub.user.get(rick.email)
+        console.log('found', rick.email, 'in Control Hub.')
       } catch (e) {
         // wait 20 seconds before trying again
         await sleep(20 * 1000)
