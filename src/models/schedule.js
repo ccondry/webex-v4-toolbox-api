@@ -11,12 +11,7 @@ let running = false
 async function getProvisionStartedUsers () {
   // users need to be provisioned if they have org ID set but queue ID
   // and template ID have not been set (or have been unset)
-  const query = {
-    $and: [
-      {'demo.webex-v4prod.orgId': process.env.ORG_ID},
-      {'demo.webex-v4prod.provision': {$ne: 'complete'}}
-    ]
-  }
+  const query = {'demo.webex-v4prod.provision': 'started'}
   const projection = {
     demo: false,
     password: false
