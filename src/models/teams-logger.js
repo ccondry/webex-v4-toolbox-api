@@ -75,6 +75,7 @@ async function log () {
 
   // send message to room
   try {
+    await globals.initialLoad
     const url = 'https://api.ciscospark.com/v1/messages'
     // get roomId, hopefully from cache
     const roomId = globals.get('webexV4RoomId')
