@@ -358,7 +358,7 @@ module.exports = async function (userId) {
   
     // get team IDs
     const team = await getOrCreateTeam(userId)
-    console.log('routing strategy provision - found team?', team)
+    // console.log('routing strategy provision - found team?', team)
     // const virtualTeamId = team.id
     const virtualTeamDbId = team.attributes.dbId__l
     const virtualTeamName = team.attributes.name__s
