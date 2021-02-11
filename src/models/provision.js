@@ -59,7 +59,7 @@ module.exports = async function (user) {
     }
 
     // get or create CJP user team for chat and email routing
-    const userTeam = await cjp.team.getOrCreate(`User_${userId}`)
+    const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
 
     // get or create CJP chat queue
     await cjp.virtualTeam.getOrCreate('chatQueue', {
