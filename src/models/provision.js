@@ -196,7 +196,7 @@ module.exports = async function (user) {
     
     // set provision done in toolbox db
     await toolbox.updateUser(userId, {
-      provisionStatus: 'complete'
+      provision: 'complete'
     })
 
     // notify user on Teams
