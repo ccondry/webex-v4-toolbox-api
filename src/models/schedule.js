@@ -2,7 +2,7 @@
 const provision = require('./provision')
 const db = require('./db')
 
-// TODO increase this and add check for currently running 
+// TODO increase this
 const throttle = 10 * 1000
 
 // running state
