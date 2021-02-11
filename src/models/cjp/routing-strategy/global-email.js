@@ -73,28 +73,19 @@ async function modifyRoutingStrategy (id, newXml) {
   const body = [strategy]
   // replace properties with correct name convention for the API
   strategy.attributes.tid__s = strategy.attributes.tid
-  delete strategy.attributes.tid
-  
   strategy.attributes.sid__s = strategy.attributes.sid
-  delete strategy.attributes.sid
-
   strategy.attributes.cstts__l = strategy.attributes.cstts
+  
+  delete strategy.attributes.tid
+  delete strategy.attributes.sid
   delete strategy.attributes.cstts
-
-  // set parent ID
-  strategy.attributes.parentStrategyId__s = strategy.id
-
-  // remove extra data
-  delete strategy.auxiliaryDataType
-  delete strategy.attributes._lmts__l
-  delete strategy.attributes.sid__s
 
   // set script xml
   strategy.attributes.script__s = newXml
 
   try {
-    console.log('new strategy body:\r\n', body)
-    await client.routingStrategy.modify(body)
+    // console.log('new strategy body:\r\n', body)
+    await client.routingStrategy.modify(id, body)
   } catch (e) {
     // TODO fix this
     console.log(`Failed to modify routing strategy: ${e.message}`)
@@ -131,8 +122,7 @@ async function provision (userId, queueId) {
       const xml = addQueueXml(script, name, queueId)
       // console.log('new XML:', xml)
       await modifyRoutingStrategy(process.env.CJP_EMAIL_ROUTING_STRATEGY_ID, xml)
-      // TODO enable this
-      // await modifyRoutingStrategy(strategy.id, xml)
+      await modifyRoutingStrategy(strategy.id, xml)
       console.log(`added the email queue named "${name}" with ID "${queueId}" to the CJP global email routing strategy`)
     } else {
       console.log(`the email queue named "${name}" with ID "${queueId}" is already in the CJP global email routing strategy`)
