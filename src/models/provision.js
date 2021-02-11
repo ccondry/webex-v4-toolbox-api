@@ -62,10 +62,7 @@ module.exports = async function (user) {
     const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
 
     // get or create CJP chat queue
-    await cjp.virtualTeam.getOrCreate('chatQueue', {
-      name: `Q_Chat_dCloud_${userId}`,
-      teamId: userTeam.id
-    })
+    await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`, userTeam.id)
     // await sleep(1000)
     
     // get or create CJP chat entry point
@@ -113,10 +110,7 @@ module.exports = async function (user) {
     // console.log(`set Control Hub user ${rick.name} role to Supervisor`)
     
     // get/create CJP email queue
-    const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', {
-      name: `Q_Email_dCloud_${userId}`,
-      teamId: userTeam.id
-    })
+    const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`, userTeam.id)
     // await sleep(3000)
     
     // reset control hub user license

@@ -1,4 +1,4 @@
-module.exports = function ({name, teamId}) {
+module.exports = function (name, teamId) {
 	return [{
     type: 'virtual-team',
     attributes: {

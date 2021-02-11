@@ -18,9 +18,9 @@ async function create (data) {
   await client.virtualTeam.create(data)
 }
 
-async function getOrCreate (type, name) {
+async function getOrCreate (type, name, teamId) {
   // build data from template and input name
-  const data = templates[type](name)
+  const data = templates[type](name, teamId)
   // find existing vteam
   let vteam = await get(name)
   if (vteam) {
