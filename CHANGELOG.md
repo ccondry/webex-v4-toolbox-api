@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.11-1
+
+### Bug Fixes
+* **Provision:** Fix global email routing strategy provisioning. Fix queue
+provisioning again. Wait for user team to exist after creating it.
+
+
 # 2021.2.11
 
 ### Bug Fixes
