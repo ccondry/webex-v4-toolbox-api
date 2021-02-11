@@ -38,7 +38,7 @@ async function go () {
       const users = await getProvisionStartedUsers()
       console.log(users)
     } catch (e) {
-      console.log('provision error:', e)      
+      console.log('provision error:', e.message)      
     } finally {
       running = false
     }
