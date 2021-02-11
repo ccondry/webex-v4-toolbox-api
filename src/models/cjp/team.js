@@ -45,5 +45,7 @@ async function getOrCreate (name) {
 
 module.exports = {
   getOrCreate,
-  get
+  get,
+  list,
+  create
 }
