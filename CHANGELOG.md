@@ -4,6 +4,14 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.11
+
+### Bug Fixes
+* **Provision:** Add user team back to provision. Remove chat and email routing
+strategy from user provision, instead using the queue's distribution group 
+property to route to the user's agent.
+
+
 # 2021.2.10-1
 
 ### Bug Fixes
