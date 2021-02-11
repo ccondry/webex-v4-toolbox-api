@@ -187,7 +187,7 @@ async function main (user, userJwt) {
 
     // get/create global email routing strategy in CJP, referencing the
     // numerical ID of the user's email queue in CJP
-    await cjp.routingStrategy.globalEmail(userId, emailQueue.attributes.dbId__l)
+    await cjp.routingStrategy.globalEmail.provision(userId, emailQueue.attributes.dbId__l)
     
     // get/create user-specific routing strategies in CJP for chat and email
     await cjp.routingStrategy.user(userId)
