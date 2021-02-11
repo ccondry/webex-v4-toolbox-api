@@ -9,7 +9,6 @@ router.post('/', async (req, res, next) => {
   try {
     // get request JWT
     const jwt = req.headers.authorization.split(' ').pop()
-    console.log('jwt', jwt)
 
     // find the dCloud session and send it a message to create the LDAP user
     // and CUCM phone
