@@ -67,6 +67,7 @@ async function getEmailQueueIds (userId) {
 // Team
 async function getOrCreateTeam (userId) {
   const name = `T_dCloud_${userId}`
+  console.log('searching for team', name)
   try {
     const response = await client.team.list()
     const existing = response.auxiliaryDataList.find(c => {
@@ -75,7 +76,7 @@ async function getOrCreateTeam (userId) {
     if (existing) {
       return existing
     } else {
-      await client.team.create({name})
+      await client.team.create(name)
       const newList = await client.team.list()
       return newList.auxiliaryDataList.find(c => {
         return c.attributes.name__s === name
@@ -357,7 +358,7 @@ module.exports = async function (userId) {
   
     // get team IDs
     const team = await getOrCreateTeam(userId)
-    console.log('routing strategy provisoin - found team?', team)
+    console.log('routing strategy provision - found team?', team)
     // const virtualTeamId = team.id
     const virtualTeamDbId = team.attributes.dbId__l
     const virtualTeamName = team.attributes.name__s
