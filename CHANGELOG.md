@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.11-3
+
+### Bug Fixes
+* **Token:** Fix updating refresh token value in database.
+
+
 # 2021.2.11-2
 
 ### Bug Fixes
