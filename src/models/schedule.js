@@ -14,13 +14,7 @@ async function getProvisionStartedUsers () {
   const query = {
     $and: [
       {'demo.webex-v4prod.orgId': process.env.ORG_ID},
-      {
-        $or: [
-          {'demo.webex-v4prod.templateId': {exists: false}},
-          {'demo.webex-v4prod.templateId': {$eq: ''}},
-          {'demo.webex-v4prod.templateId': {$eq: null}}
-        ]
-      }
+      {'provisionStatus': {$neq: 'complete'}}
     ]
   }
   const projection = {

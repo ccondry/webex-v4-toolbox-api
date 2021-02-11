@@ -188,7 +188,12 @@ module.exports = async function (user) {
     
     // get/create user-specific routing strategies in CJP for chat and email
     await cjp.routingStrategy.user(userId)
-  
+    
+    // set provision done in toolbox db
+    await toolbox.updateUser(userId, {
+      provisionStatus: 'complete'
+    })
+
     // notify user on Teams
     await teamsNotifier.send(user)
   } catch (e) {
