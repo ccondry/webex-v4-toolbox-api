@@ -101,26 +101,80 @@ async function main(userId) {
   try {
     console.log(`deprovisioning user ${userId}...`)
     // chat queue
-    await deleteVirtualTeam(`Q_Chat_dCloud_${userId}`)
-    // voice queue
-    await deleteVirtualTeam(`Q_dCloud_${userId}`)
-    // email queue
-    await deleteVirtualTeam(`Q_Email_dCloud_${userId}`)
-    // chat entry point
-    await deleteVirtualTeam(`EP_Chat_${userId}`)
+    try {
+      await deleteVirtualTeam(`Q_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_Chat_dCloud_${userId}:`, e.message)
+    }
 
-    await deleteTeam(`T_dCloud_${userId}`)
+    // voice queue
+    try {
+      await deleteVirtualTeam(`Q_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_dCloud_${userId}:`, e.message)
+    }
+
+    // email queue
+    try {
+      await deleteVirtualTeam(`Q_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_Email_dCloud_${userId}:`, e.message)
+    }
+    
+    // chat entry point
+    try {
+      await deleteVirtualTeam(`EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team EP_Chat_${userId}:`, e.message)
+    }
+    
+    
+    try {
+      await deleteTeam(`T_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete team T_dCloud_${userId}:`, e.message)
+    }
+    
 
     //Chat Template *************************
-    await deleteChatTemplate(userId)
+    try {
+      await deleteChatTemplate(userId)
+    } catch (e) {
+      console.log('failed to delete chat template:', e.message)
+    }
+    
 
     //Routing Strategies *************************
-    await deleteRS(`RS_Chat_${userId}`)
-    await deleteRS(`RS_EP_Chat_${userId}`)
-    await deleteRS(`RS_Chat_dCloud_${userId}`)
-    await deleteRS(`RS_Email_dCloud_${userId}`)
-    await deleteRS(`RS_dCloud_${userId}`)
+    try {
+      await deleteRS(`RS_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Chat_${userId}:`, e.message)
+    }
     
+    try {
+      await deleteRS(`RS_EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_EP_Chat_${userId}:`, e.message)
+    }
+    
+    try {
+      await deleteRS(`RS_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Chat_dCloud_${userId}:`, e.message)
+    }
+    
+    try {
+      await deleteRS(`RS_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Email_dCloud_${userId}:`, e.message)
+    }
+    
+    try {
+      await deleteRS(`RS_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_dCloud_${userId}:`, e.message)
+    }
+
     console.log(`finished deprovisioning user ${userId}`)
   } catch (e) {
     console.log(`failed to deprovision user ${userId}:`, e.message)
