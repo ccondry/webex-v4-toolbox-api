@@ -65,12 +65,22 @@ async function getEmailQueueIds (userId) {
 }
 
 // Team
-async function getTeamIds (userId) {
+async function getOrCreateTeam (userId) {
+  const name = `T_dCloud_${userId}`
   try {
     const response = await client.team.list()
-    return response.auxiliaryDataList.find(c => {
-      return c.attributes.name__s === `T_dCloud_${userId}`
+    const existing = response.auxiliaryDataList.find(c => {
+      return c.attributes.name__s === name
     })
+    if (existing) {
+      return existing
+    } else {
+      await client.team.create({name})
+      const newList = await client.team.list()
+      return newList.auxiliaryDataList.find(c => {
+        return c.attributes.name__s === name
+      })
+    }
   } catch (error) {
     console.log(error)
   }
@@ -346,7 +356,8 @@ module.exports = async function (userId) {
     const virtualEmailName = emailQueue.attributes.name__s
   
     // get team IDs
-    const team = await getTeamIds(userId)
+    const team = await getOrCreateTeam(userId)
+    console.log('routing strategy provisoin - found team?', team)
     // const virtualTeamId = team.id
     const virtualTeamDbId = team.attributes.dbId__l
     const virtualTeamName = team.attributes.name__s
