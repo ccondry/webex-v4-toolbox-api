@@ -1,6 +1,11 @@
 const client = require('./client')
 const template = require('./templates').team
 
+// Sleep
+function sleep (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 async function list () {
 	try {
     return client.team.list()
@@ -33,10 +38,18 @@ async function getOrCreate (name) {
   try {
     const existing = await get(name)
     if (existing) {
+      console.log('found existing user team', name)
       return existing
     } else {
+      console.log('creating user team', name, '...')
       await create(name)
-      return await get(name)
+      // wait for it to exist
+      let team
+      while (!team) {
+        await sleep(1000 * 4)
+        team = await get(name)
+      }
+      return team
     }
   } catch (e) {
     throw e
