@@ -52,6 +52,7 @@ module.exports = async function (user) {
         supervisorUserExists = await controlHub.user.get(rick.email)
         console.log('found', rick.email, 'in Control Hub.')
       } catch (e) {
+        console.log('failed to find one of', sandra.email, 'or', rick.email, ':', e.message)
         // wait 20 seconds before trying again
         await sleep(20 * 1000)
       }
