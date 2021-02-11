@@ -33,7 +33,7 @@ async function set (name, value) {
     if (existing) {
       // update existing global
       const updates = {$set: {}}
-      updates.$set[name] = {value}
+      updates.$set[name] = value
       await db.updateOne('toolbox', 'globals', {name}, updates)
     } else {
       // insert new global
