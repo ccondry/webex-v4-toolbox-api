@@ -1,4 +1,4 @@
-module.exports = function (name) {
+module.exports = function ({name, teamId}) {
 	return [{
     type: 'virtual-team',
     attributes: {
@@ -38,7 +38,12 @@ module.exports = function (name) {
       maximumDnRetries__i: 3,
       recordAllCalls__i: 0,
       description__s: '',
-      blockAreaCodes__i: 0
+      blockAreaCodes__i: 0,
+      callDistributionGroups__s: JSON.stringify([{
+        order: 1,
+        duration: 0,
+        agentGroups:[{ teamId }]
+      }])
     }
   }]
 }

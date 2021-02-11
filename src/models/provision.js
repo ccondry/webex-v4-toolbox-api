@@ -58,8 +58,14 @@ module.exports = async function (user) {
       }
     }
 
+    // get or create CJP user team for chat and email routing
+    const userTeam = await cjp.team.getOrCreate(`User_${userId}`)
+
     // get or create CJP chat queue
-    await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`)
+    await cjp.virtualTeam.getOrCreate('chatQueue', {
+      name: `Q_Chat_dCloud_${userId}`,
+      teamId: userTeam.id
+    })
     // await sleep(1000)
     
     // get or create CJP chat entry point
@@ -107,7 +113,10 @@ module.exports = async function (user) {
     // console.log(`set Control Hub user ${rick.name} role to Supervisor`)
     
     // get/create CJP email queue
-    const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`)
+    const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', {
+      name: `Q_Email_dCloud_${userId}`,
+      teamId: userTeam.id
+    })
     // await sleep(3000)
     
     // reset control hub user license
@@ -190,9 +199,6 @@ module.exports = async function (user) {
     // get/create global email routing strategy in CJP, referencing the
     // numerical ID of the user's email queue in CJP
     await cjp.routingStrategy.globalEmail(userId, emailQueue.attributes.dbId__l)
-    
-    // get/create user-specific routing strategies in CJP for chat and email
-    await cjp.routingStrategy.user(userId)
     
     // set provision done in toolbox db
     await toolbox.updateUser(userId, {
