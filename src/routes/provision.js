@@ -19,7 +19,8 @@ router.post('/', async (req, res, next) => {
       CiscoAppId: 'cisco-chat-bubble-app',
       DC: 'produs1.ciscoccservice.com',
       async: true,
-      orgId: process.env.ORG_ID
+      orgId: process.env.ORG_ID,
+      provision: 'started'
     })
     // return OK
     return res.status(200).send()
