@@ -35,7 +35,7 @@ async function go () {
         await provision(user)
       }
     } catch (e) {
-      console.log('provision error:', e)      
+      console.log('provision error:', e.message)      
     } finally {
       running = false
     }
