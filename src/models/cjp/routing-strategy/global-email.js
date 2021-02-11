@@ -30,6 +30,7 @@ function parseQueues (script) {
   return json.elements[0].elements[8].elements
 }
 
+// add new user email queue to the global email routing strategy queues list in XML
 function addQueueXml (queues, name, queueId) {
   const entry = {
     type: 'element',
@@ -47,24 +48,13 @@ function addQueueXml (queues, name, queueId) {
 }
 
 // Modify Email TAM
-async function modifyTAM (id, xml) {
-  // const url = process.env.CJP_BASE_URL + '/api/auxiliary-data/resources/routing-strategy'
-
+async function modifyRoutingStrategy (id, xml) {
   const body = [{
     id,
     attributes: {
       script__s: xml
     }
   }]
-
-  // const options = {
-  //   method: 'PUT',
-  //   headers: {
-  //     Authorization: `${process.env.CJP_RS_API_KEY};tenantId=${process.env.CJP_TENANT_ID}`,
-  //     From: process.env.CJP_FROM_ADDRESS
-  //   },
-  //   body
-  // }
 
   try {
     await client.routingStrategy.modify(body)
@@ -99,8 +89,8 @@ module.exports = async function (userId, queueId) {
       // queue not in the existing routing strategy script
       // modify the existing routing strategy and current routing strategy
       const xml = addQueueXml(queues, name, queueId)
-      await modifyTAM(process.env.CJP_EMAIL_ROUTING_STRATEGY_ID, xml)
-      await modifyTAM(strategy.id, xml)
+      await modifyRoutingStrategy(process.env.CJP_EMAIL_ROUTING_STRATEGY_ID, xml)
+      await modifyRoutingStrategy(strategy.id, xml)
       console.log(`added the email queue named "${name}" with ID "${queueId}" to the CJP global email routing strategy`)
     } else {
       console.log(`the email queue named "${name}" with ID "${queueId}" is already in the CJP global email routing strategy`)
