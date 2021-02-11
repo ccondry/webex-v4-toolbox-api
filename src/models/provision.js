@@ -74,10 +74,10 @@ module.exports = async function (user) {
     // console.log(chatTemplates)
 
     // set Rick user to read-only in Webex Control Hub
-    // await controlHub.user.setReadOnly({
-    //   name: rick.name,
-    //   email: rick.email
-    // })
+    await controlHub.user.setReadOnly({
+      name: rick.name,
+      email: rick.email
+    })
     // console.log(`set Control Hub user ${rick.name} to Read Only`)
     // await sleep(1000)
     
