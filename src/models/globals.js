@@ -27,13 +27,17 @@ function get (name) {
   return cache[name]
 }
 
-async function set (name, value) {
+async function set (name, value, expiresIn) {
   try {
     const existing = await db.findOne('toolbox', 'globals', {name})
     if (existing) {
-      // update existing global
-      const updates = {$set: {}}
-      updates.$set[name] = {value}
+      // update existing global value and expires (if set)
+      const updates = {$set: {value}}
+      if (expiresIn) {
+        const expires = new Date()
+        expires.setTime(expires.getTime() + (expiresIn * 1000))
+        updates.$set.expires = expires
+      }
       await db.updateOne('toolbox', 'globals', {name}, updates)
     } else {
       // insert new global

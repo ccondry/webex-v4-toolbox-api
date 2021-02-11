@@ -9,7 +9,7 @@ async function refresh () {
 		const token = await get()
 		// console.log('full token:', token)
     // store new access token in cache
-		globals.set('webexV4ControlHubAccessToken', token.access_token)
+		globals.set('webexV4ControlHubAccessToken', token.access_token, token.expires_in)
 		return token.access_token
   } catch (e) {
 		if (e.status === 401) {
