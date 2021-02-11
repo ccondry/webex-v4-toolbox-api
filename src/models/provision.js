@@ -3,7 +3,7 @@ const controlHub = require('./control-hub')
 const teamsNotifier = require('./teams-notifier')
 const token = require('./control-hub/token')
 const toolbox = require('./toolbox')
-const session = require('./session')
+// const session = require('./session')
 
 const domain = process.env.DOMAIN
 
