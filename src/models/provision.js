@@ -1,7 +1,6 @@
 const cjp = require('./cjp')
 const controlHub = require('./control-hub')
 const teamsNotifier = require('./teams-notifier')
-const token = require('./control-hub/token')
 const toolbox = require('./toolbox')
 // const session = require('./session')
 
@@ -13,8 +12,6 @@ function sleep(ms) {
 }
 
 module.exports = async function (user) {
-  // make sure there is a valid access token in the cache
-  await token.refresh()
   const userId = user.id
 
   // create Rick user details
@@ -35,10 +32,6 @@ module.exports = async function (user) {
 
   try {
     // start provisioning user
-    // make sure we have a Control Hub token in cache first
-    await token.refresh()
-    console.log('got Control Hub refresh token')
-
     // wait for LDAP sync to complete
     let agentUserExists
     let supervisorUserExists

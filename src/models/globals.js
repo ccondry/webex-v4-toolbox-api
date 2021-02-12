@@ -8,6 +8,7 @@ async function refresh () {
   // update cache
   try {
     const globals = await db.find('toolbox', 'globals', {})
+    // reduce to key: value pairs
     for (const global of globals) {
       cache[global.name] = global.value
     }
@@ -27,32 +28,9 @@ function get (name) {
   return cache[name]
 }
 
-async function set (name, value, expiresIn) {
-  try {
-    const existing = await db.findOne('toolbox', 'globals', {name})
-    if (existing) {
-      // update existing global value and expires (if set)
-      const updates = {$set: {value}}
-      if (expiresIn) {
-        const expires = new Date()
-        expires.setTime(expires.getTime() + (expiresIn * 1000))
-        updates.$set.expires = expires
-      }
-      await db.updateOne('toolbox', 'globals', {name}, updates)
-    } else {
-      // insert new global
-      await db.insertOne('toolbox', 'globals', {name, value})
-    }
-    // set in cache
-    cache[name] = value
-  } catch (e) {
-    throw e
-  }
-}
 // export our specific cache value methods and the generic getCache method
 module.exports = {
   refresh,
   initialLoad,
-  get,
-  set
+  get
 }
