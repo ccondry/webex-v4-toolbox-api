@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.12
+
+### Features
+* **Token:** Move token management code to separate project.
+
+
 # 2021.2.11-3
 
 ### Bug Fixes
