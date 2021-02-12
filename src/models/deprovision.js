@@ -47,11 +47,11 @@ async function deleteVirtualTeam (name) {
 //Get the Chat Template ID needed for Cumulus Chat routing
 async function findTemplate (userId) {
   try {
-    const token =  globals.get('webexV4ControlHubAccessToken')
+    const token = globals.get('webexV4ControlHubToken')
     const url = `https://chatc.produs1.ciscoccservice.com/chatc/v1/organization/${orgId}/template?mediaType=chat`
     const options = {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       },
       referrer: 'https://admin.webex.com/services/cjp/features'
     }
@@ -68,13 +68,13 @@ async function findTemplate (userId) {
 async function deleteChatTemplate (userId) {
   try {
     const template = await findTemplate(userId)
-    const token =  globals.get('webexV4ControlHubAccessToken')
+    const token =  globals.get('webexV4ControlHubToken')
     const url = `https://cmm.produs1.ciscoccservice.com/cmm/v1/organization/${orgId}/template/${template.templateId}`
 
     const options = {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       }
     }
 

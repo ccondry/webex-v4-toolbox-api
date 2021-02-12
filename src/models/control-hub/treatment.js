@@ -9,12 +9,12 @@ const emailEntryPoint = process.env.CJP_EMAIL_ENTRY_POINT_ID
 // find treatment rule for specified user ID
 async function list () {
   // get access token from cache
-  const token = globals.get('webexV4ControlHubAccessToken')
+  const token = globals.get('webexV4ControlHubToken')
   const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatment`
 
   const options = {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token.access_token}`,
     }
   }
 
@@ -42,7 +42,7 @@ async function create (userId) {
   const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatment`
   
   // get access token from cache
-  const token = globals.get('webexV4ControlHubAccessToken')
+  const token = globals.get('webexV4ControlHubToken')
   
   //Send Body
   const body = {
@@ -58,7 +58,7 @@ async function create (userId) {
   const options = {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token.access_token}`
     },
     body
   }
@@ -72,11 +72,11 @@ async function listOrder () {
     const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatmentOrder`
 
     // get access token from cache
-    const token = globals.get('webexV4ControlHubAccessToken')
+    const token = globals.get('webexV4ControlHubToken')
     
     const options = {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       }
     }
 
@@ -92,7 +92,7 @@ async function modifyOrder (treatmentsOrder) {
   const url = `https://treatment.produs1.ciscoccservice.com/treatment/v1/organization/${orgId}/entrypoint/${emailEntryPoint}/treatmentOrder`
 
   // get access token from cache
-  const token = globals.get('webexV4ControlHubAccessToken')
+  const token = globals.get('webexV4ControlHubToken')
   
   const body = {
     treatmentsOrder,
@@ -102,7 +102,7 @@ async function modifyOrder (treatmentsOrder) {
   const options = {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token.access_token}`
     },
     body
   }

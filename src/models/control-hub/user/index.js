@@ -8,7 +8,7 @@ const globals = require('../../globals')
 const orgId = process.env.ORG_ID
 
 function getToken () {
-  return globals.get('webexV4ControlHubAccessToken')
+  return globals.get('webexV4ControlHubToken')
 }
 
 // set user to read-only
@@ -26,7 +26,7 @@ async function setReadOnly ({
     const options = {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       },
       body
     }

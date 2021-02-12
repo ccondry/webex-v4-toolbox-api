@@ -6,8 +6,8 @@ const fetch = require('../fetch')
 
 async function getToken () {
   try {
-    const token = globals.get('webexV4ControlHubAccessToken')
-    return token
+    const token = globals.get('webexV4ControlHubToken')
+    return token.access_token
   } catch (e) {
     throw e
   }

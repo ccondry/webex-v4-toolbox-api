@@ -14,7 +14,7 @@ function sleep(ms) {
 
 async function getToken () {
   try {
-    const token = globals.get('webexV4ControlHubAccessToken')
+    const token = globals.get('webexV4ControlHubToken')
     return token
   } catch (e) {
     throw e
@@ -27,7 +27,7 @@ async function list () {
     const token = await getToken()
     const options = {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       },
       query: {
         mediaType: 'chat'

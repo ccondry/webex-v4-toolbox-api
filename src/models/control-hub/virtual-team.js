@@ -4,7 +4,7 @@ const fetch = require('../fetch')
 async function get (name) {
   try {
     const url = `https://cms.produs1.ciscoccservice.com/cms/api/v2/auxiliary-data/resources/virtual-team`
-    const token = globals.get('webexV4ControlHubAccessToken')
+    const token = globals.get('webexV4ControlHubToken')
     // console.log('token', token)
     const options = {
       headers: {
@@ -12,7 +12,7 @@ async function get (name) {
         'Content-Type': 'application/json',
         Accept: 'application/json, text/plain, */*',
         Referer: 'https://admin.webex.com/',
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       }
     }
     const response = await fetch(url, options)
