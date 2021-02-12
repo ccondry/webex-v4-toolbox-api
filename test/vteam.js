@@ -8,8 +8,6 @@ function sleep(ms) {
 }
 
 async function main (userId) {
-  // wait for access token
-  await controlHub.token.refresh()
   // wait for Webex Control Hub to sync the chat entry point from CJP
   let entryPointExists
   while (!entryPointExists) {

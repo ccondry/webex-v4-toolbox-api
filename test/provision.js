@@ -25,8 +25,6 @@ main({
 }).catch(e => console.log(e))
 
 async function main (user, userJwt) {
-  // make sure there is a valid access token in the cache
-  await token.refresh()
   const userId = user.id
 
   // create Rick user details
@@ -47,8 +45,6 @@ async function main (user, userJwt) {
 
   try {
     // start provisioning user
-    // make sure we have a Control Hub token in cache first
-    await token.refresh()
     console.log('got Control Hub refresh token')
 
     // find the dCloud session and send it a message to create the LDAP user
