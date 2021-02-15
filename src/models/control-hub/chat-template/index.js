@@ -59,7 +59,7 @@ async function create (name, entryPointId) {
     const options = {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       },
       body,
       redirect: 'follow'

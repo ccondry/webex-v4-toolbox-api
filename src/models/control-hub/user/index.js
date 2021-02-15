@@ -52,7 +52,7 @@ async function setRoles ({email, roles}) {
     const options = {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       },
       body
     }
@@ -109,7 +109,7 @@ async function get (email) {
 
     const options = {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       }
     }
 
@@ -141,7 +141,7 @@ async function makeSupervisor (id) {
     const options = {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.access_token}`
       },
       body
     }
@@ -184,7 +184,7 @@ async function list () {
       startIndex: 0
     },
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token.access_token}`
     }
   }
   return fetch(url, options)
@@ -196,7 +196,7 @@ async function onboard (email) {
   const options = {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token.access_token}`
     },
     body: [{
       email,
