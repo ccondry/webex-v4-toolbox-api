@@ -68,7 +68,7 @@ function addQueueXml (script, name, queueId) {
 async function modifyRoutingStrategy (id, newXml) {
   // get the current data
   const strategy = await getById(id)
-  console.log('current strategy body:\r\n', strategy)
+  // console.log('current strategy body:\r\n', strategy)
   // build body for the modify request
   const body = [strategy]
   // replace properties with correct name convention for the API
