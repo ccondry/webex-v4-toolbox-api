@@ -11,9 +11,6 @@ const environment = require('./models/environment')
 const jwtCert = require('./models/jwt-certificate')
 const teamsLogger = require('./models/teams-logger')
 
-// start access token refresh schedule
-require('./models/control-hub/token')
-
 // start user provision loop
 require('./models/schedule')
 
