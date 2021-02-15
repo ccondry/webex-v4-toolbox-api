@@ -203,18 +203,19 @@ async function onboard (email) {
     },
     body: [{
       email,
-      licenses: [
-        {
-          id: 'MS_fe3cfc81-8469-4929-8944-23e79e5d0d53',
-          idOperation: 'ADD',
-          properties: {}
-        },
-        {
-          id: 'CJPPRM_1cf76371-2fde-4f72-8122-b6a9d2f89c73',
-          idOperation: 'ADD',
-          properties: {}
-        }
-      ],
+      licenses: [{
+        id: 'MS_fe3cfc81-8469-4929-8944-23e79e5d0d53',
+        idOperation: 'ADD',
+        properties: {}
+      }, {
+        id: 'CJPPRM_1cf76371-2fde-4f72-8122-b6a9d2f89c73',
+        idOperation: 'ADD',
+        properties: {}
+      }, {
+        id: 'CJPSTD_878e22e8-30e4-4d8e-8309-78f17f6c7240',
+        idOperation: 'REMOVE',
+        properties: {}
+      }],
       userEntitlements: [],
       extendedSiteAccounts: [],
       onboardMethod: null
