@@ -1,5 +1,6 @@
 const template = require('./templates').skillProfile
 const client = require('./client')
+const utils = require('../../utils')
 
 async function create (name, userId) {
   try {
@@ -39,8 +40,13 @@ async function getOrCreate (name, userId) {
       // skill profile doesn't exist yet, so create it
       console.log(`CJP skill profile "${name}" does not exist. Creating it now...`)
       await create(name, userId)
-      // get the new skill profile details
-      existing = await get(name)
+      // wait for new skill profile to exist
+      while (!existing) {
+        // wait a moment
+        await utils.sleep(5000)
+        // get the new skill profile details
+        existing = await get(name)
+      }
       console.log(`created new CJP skill profile named "${name}": ${existing.id}`)
     }
     // return skill profile

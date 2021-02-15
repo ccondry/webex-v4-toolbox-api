@@ -5,6 +5,12 @@ function parseJwt (token) {
   return JSON.parse(Buffer.from(base64, 'base64').toString())
 }
 
+// Sleep
+function sleep (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 module.exports = {
-  parseJwt
+  parseJwt,
+  sleep
 }
