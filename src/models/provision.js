@@ -88,7 +88,9 @@ module.exports = async function (user) {
     await controlHub.user.enableContactCenterSupervisor({email: rick.email})
     console.log(`enabled Control Hub user ${rick.name} as Contact Center Supervisor`)
     // await sleep(3000)
-  
+    // enable user contact center licenses
+    await controlHub.user.onboard(rick.email)
+
     // get Rick user object from Webex Control Hub
     rick.webex = await controlHub.user.get(rick.email)
     console.log(`got Control Hub user details for ${rick.name}: ${rick.webex.id}`)
@@ -106,11 +108,14 @@ module.exports = async function (user) {
     const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`, userTeam.id)
     // await sleep(3000)
     
-    // reset control hub user license
+    // reset control hub user roles
     await controlHub.user.enableStandardContactCenterAgent({email: sandra.email})
-    // enable Sandra for Contact Center Agent 
+    // enable Sandra for Contact Center Agent role
     await controlHub.user.enableContactCenterAgent({email: sandra.email})
     console.log(`enabled Control Hub user ${sandra.name} for Contact Center Agent`)
+
+    // enable user contact center licenses
+    await controlHub.user.onboard(sandra.email)
     // await sleep(3000)
     
     // get CJP global agent team
