@@ -67,7 +67,8 @@ async function setRoles ({email, roles}) {
 async function enableContactCenterSupervisor ({email}) {
   const roles = [
     {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'ACTIVE'},
-    {roleName: 'CJP_SUPERVISOR', 'roleState': 'ACTIVE'}
+    {roleName: 'CJP_SUPERVISOR', 'roleState': 'ACTIVE'},
+    {roleName: 'CJP_STANDARD_AGENT', 'roleState': 'INACTIVE'}
   ]
   return setRoles({email, roles})
 }
@@ -76,7 +77,8 @@ async function enableContactCenterSupervisor ({email}) {
 async function enableContactCenterAgent ({email}) {
   const roles = [
     {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'ACTIVE'},
-    {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'}
+    {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'},
+    {roleName: 'CJP_STANDARD_AGENT', 'roleState': 'INACTIVE'}
   ]
   return setRoles({email, roles})
 }
@@ -95,7 +97,8 @@ async function enableStandardContactCenterAgent ({email}) {
 async function disableContactCenter ({email}) {
   const roles = [
     {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'INACTIVE'},
-    {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'}
+    {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'},
+    {roleName: 'CJP_STANDARD_AGENT', 'roleState': 'INACTIVE'}
   ]
   return setRoles({email, roles})
 }
