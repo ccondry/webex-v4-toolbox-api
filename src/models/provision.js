@@ -81,7 +81,7 @@ module.exports = async function (user) {
     const ch = await controlHub.client.getClient()
     ch.user.modify({
       userId: chRick.id,
-      roles = ['id_readonly_admin']
+      roles: ['id_readonly_admin']
     })
     console.log(`set Control Hub user ${rick.name} to Read-Only Admin`)
     
