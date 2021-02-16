@@ -18,8 +18,10 @@ async function provision ({
     entryPointId
   })
   // console.log(rsTemplate)
-  let list = await client.routingStrategy.list()
-  let rs = list.find(v => v.attributes.name__s === name)
+  let strategies = await client.routingStrategy.list()
+  let rs = strategies.auxiliaryDataList.find(strategy => {
+    return strategy.attributes.name__s === name
+  })
   if (!rs) {
     // create
     const response = await client.routingStrategy.create(rsTemplate)
@@ -29,8 +31,10 @@ async function provision ({
     // wait for it to be created
     await sleep(4000)
     // try to find it
-    list = await client.routingStrategy.list()
-    rs = list.find(v => v.attributes.name__s === name)
+    strategies = await client.routingStrategy.list()
+    rs = strategies.auxiliaryDataList.find(strategy => {
+      return strategy.attributes.name__s === name
+    })
   }
   
   // create current RS body
@@ -44,7 +48,9 @@ async function provision ({
     parentId: rs.id
   })
   // search for current routing strategy
-  let currentRs = list.find(v => v.attributes.name__s === 'Current_' + name)
+  let currentRs = strategies.auxiliaryDataList.find(strategy => {
+    return strategy.attributes.name__s === 'Current_' + name
+  })
   if (!currentRs) {
     // create
     const response = await client.routingStrategy.create(currentRsTemplate)
@@ -54,8 +60,10 @@ async function provision ({
     // wait for it to be created
     await sleep(4000)
     // try to find it
-    list = await client.routingStrategy.list()
-    currentRs = list.find(v => v.attributes.name__s === 'Current_' + name)
+    strategies = await client.routingStrategy.list()
+    currentRs = strategies.auxiliaryDataList.find(strategy => {
+      return strategy.attributes.name__s === 'Current_' + name
+    })
   }
   
   // done
