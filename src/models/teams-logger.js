@@ -92,7 +92,6 @@ async function log () {
         markdown
       }
     }
-    console.log('log to webex teams:', url, options)
     await fetch(url, options)
   } catch (e) {
     console.log('failed to log to Webex Teams room:', e.message)
