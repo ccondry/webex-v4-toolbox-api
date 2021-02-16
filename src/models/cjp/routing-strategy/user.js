@@ -1,5 +1,6 @@
 const client = require('../client')
 const epTemplate = require('./template')
+const sleep = require('../../sleep')
 
 async function provision ({
   name,
