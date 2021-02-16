@@ -63,7 +63,7 @@ function epTemplate ({
   
   const scriptXml = js2xml(scriptJson)
 
-  return {
+  return [{
     "auxiliaryDataType": "RESOURCES",
     "type": "routing-strategy",
     "attributes": {
@@ -102,7 +102,7 @@ function epTemplate ({
       "startTime__l": 18000000,
       "endTime__l": 18000000
     }
-  }
+  }]
 }
 
 module.exports = epTemplate
