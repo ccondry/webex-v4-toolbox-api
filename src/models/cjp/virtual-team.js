@@ -30,9 +30,11 @@ async function getOrCreate (type, name, teamId) {
     console.log(`CJP ${type} virtual team named "${name}" does not exist. Creating it now...`)
     await create(data)
     console.log(`created new CJP ${type} virtual team named "${name}"`)
-    // wait for it to be created
-    await sleep(4000)
-    vteam = await get(name)
+    while (!vteam) {
+      // wait for it to be created
+      await sleep(4000)
+      vteam = await get(name)
+    }
     console.log(`found new CJP ${type} virtual team named "${name}": ${vteam.id}`)
   }
   return vteam
