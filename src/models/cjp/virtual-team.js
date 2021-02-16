@@ -59,7 +59,7 @@ async function addTeam (queueName, teamId) {
     existing.attributes.callDistributionGroups__s = JSON.stringify(groups)
     // console.log('new', JSON.stringify(existing, null, 2))
     // update queue on CJP
-    const response = await cjp.client.virtualTeam.modify(existing.id, [existing])
+    const response = await client.virtualTeam.modify(existing.id, [existing])
     return response
   } catch (e) {
     throw e
