@@ -76,7 +76,7 @@ async function log () {
   // send message to room
   try {
     await Promise.resolve(globals.initialLoad)
-    const url = 'https://api.ciscospark.com/v1/messages'
+    const url = 'https://webexapis.com/v1/messages'
     // get roomId, hopefully from cache
     const roomId = globals.get('webexV4RoomId')
     const token = globals.get('toolbotToken')
