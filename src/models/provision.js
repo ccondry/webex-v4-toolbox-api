@@ -79,7 +79,6 @@ module.exports = async function (user) {
 
     // add read-only admin role to Rick user in Webex Control Hub
     const ch = await controlHub.client.getClient()
-    const chRick = await ch.user.get(rick.email)
     ch.user.modify({
       userId: chRick.id,
       roles = ['id_readonly_admin']
