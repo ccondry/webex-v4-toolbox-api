@@ -77,8 +77,9 @@ async function log () {
   try {
     await Promise.resolve(globals.initialLoad)
     const url = 'https://webexapis.com/v1/messages'
+    const roomIdVar = process.env.NODE_ENV === 'production' ? 'productionLogRoomId' : 'developmentLogRoomId'
     // get roomId, hopefully from cache
-    const roomId = globals.get('webexV4RoomId')
+    const roomId = globals.get(roomIdVar)
     const token = globals.get('toolbotToken')
     const options = {
       method: 'POST',
@@ -91,6 +92,7 @@ async function log () {
         markdown
       }
     }
+    console.log('log to webex teams:', url, options)
     await fetch(url, options)
   } catch (e) {
     console.log('failed to log to Webex Teams room:', e.message)
