@@ -18,7 +18,7 @@ async function provision ({
     entryPointId
   })
   // console.log(rsTemplate)
-  let list = client.routingStrategy.list()
+  let list = await client.routingStrategy.list()
   let rs = list.find(v => v.attributes.name__s === name)
   if (!rs) {
     // create
