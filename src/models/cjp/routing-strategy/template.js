@@ -105,6 +105,4 @@ function epTemplate ({
   }
 }
 
-module.exports = {
-  epTemplate
-}
+module.exports = epTemplate
