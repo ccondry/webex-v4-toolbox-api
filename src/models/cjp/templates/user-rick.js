@@ -1,7 +1,7 @@
 module.exports = function ({
   id,
   userId,
-  teamId,
+  teamIds,
   skillProfileId
 }) {
   return {
@@ -34,10 +34,7 @@ module.exports = function ({
       firstName__s: 'Rick',
       defaultDn__s: '',
       callCenterEnabled__i: 1,
-      teamIds__sa: [
-        'AXP3w-_zvzzZ5gULgAvh',
-        teamId
-      ],
+      teamIds__sa: teamIds,
       skillProfileId__s: skillProfileId
     }
   }

@@ -153,7 +153,7 @@ module.exports = async function (user) {
       agent: 'rick',
       id: rick.cjp.id,
       userId,
-      teamId: team.id,
+      teamIds: [team.id, userTeam.id],
       skillProfileId: skillProfile.id
     })
     console.log(`assigned skill profile to CJP user ${rick.name}: ${skillProfile.id}`)
@@ -174,7 +174,7 @@ module.exports = async function (user) {
       agent: 'sandra',
       id: sandra.cjp.id,
       userId,
-      teamId: team.id,
+      teamIds: [team.id, userTeam.id],
       skillProfileId: skillProfile.id
     })
     console.log(`assigned skill profile to CJP user ${sandra.name}: ${skillProfile.id}`)

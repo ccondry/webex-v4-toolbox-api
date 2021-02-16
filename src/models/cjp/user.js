@@ -16,19 +16,19 @@ async function get (login) {
   }
 }
 
-// set skill profile ID and team ID on agent
+// set skill profile ID and team IDs on agent
 async function modify ({
   agent,
   id,
   userId,
-  teamId,
+  teamIds,
   skillProfileId
 }) {
   try {
     const body = templates[agent]({
       id,
       userId,
-      teamId,
+      teamIds,
       skillProfileId
     })
     // id is actually ignored in this modify method
