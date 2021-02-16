@@ -33,16 +33,16 @@ module.exports = async function (user) {
   try {
     // start provisioning user
     // wait for LDAP sync to complete
-    let agentUserExists
-    let supervisorUserExists
-    while (!agentUserExists || !supervisorUserExists) {
+    let chSandra
+    let chRick
+    while (!chSandra || !chRick) {
       // try to find agent and supervisor users
       try {
         console.log('searching for', sandra.email, 'in Control Hub...')
-        agentUserExists = await controlHub.user.get(sandra.email)
+        chSandra = await controlHub.user.get(sandra.email)
         console.log('found', sandra.email, 'in Control Hub.')
         console.log('searching for', rick.email, 'in Control Hub...')
-        supervisorUserExists = await controlHub.user.get(rick.email)
+        chRick = await controlHub.user.get(rick.email)
         console.log('found', rick.email, 'in Control Hub.')
       } catch (e) {
         console.log('failed to find one of', sandra.email, 'or', rick.email, ':', e.message)
@@ -77,13 +77,14 @@ module.exports = async function (user) {
     // const chatTemplates = await controlHub.chatTemplate.list()
     // console.log(chatTemplates)
 
-    // set Rick user to read-only in Webex Control Hub
-    await controlHub.user.setReadOnly({
-      name: rick.name,
-      email: rick.email
+    // add read-only admin role to Rick user in Webex Control Hub
+    const ch = await controlHub.client.getClient()
+    const chRick = await ch.user.get(rick.email)
+    ch.user.modify({
+      userId: chRick.id,
+      roles = ['id_readonly_admin']
     })
-    // console.log(`set Control Hub user ${rick.name} to Read Only`)
-    // await sleep(1000)
+    console.log(`set Control Hub user ${rick.name} to Read-Only Admin`)
     
     // reset control hub user license
     await controlHub.user.enableStandardContactCenterAgent({email: rick.email})

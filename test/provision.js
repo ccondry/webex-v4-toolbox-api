@@ -52,13 +52,13 @@ async function main (user, userJwt) {
     await session.provision(userJwt)
 
     // wait for LDAP sync to complete
-    let agentUserExists
-    let supervisorUserExists
-    while (!agentUserExists || !supervisorUserExists) {
+    let chSandra
+    let chRick
+    while (!chSandra || !chRick) {
       // try to find agent and supervisor users
       try {
-        agentUserExists = await controlHub.user.get(sandra.email)
-        supervisorUserExists = await controlHub.user.get(rick.email)
+        chSandra = await controlHub.user.get(sandra.email)
+        chRick = await controlHub.user.get(rick.email)
       } catch (e) {
         // wait 20 seconds before trying again
         await sleep(20 * 1000)
@@ -85,12 +85,14 @@ async function main (user, userJwt) {
     // const chatTemplates = await controlHub.chatTemplate.list()
     // console.log(chatTemplates)
 
-    // set Rick user to read-only in Webex Control Hub
-    await controlHub.user.setReadOnly({
-      name: rick.name,
-      email: rick.email
+    // add read-only admin role to Rick user in Webex Control Hub
+    const ch = await controlHub.client.getClient()
+    const chRick = await ch.user.get(rick.email)
+    ch.user.modify({
+      userId: chRick.id,
+      roles = ['id_readonly_admin']
     })
-    console.log(`set Control Hub user ${rick.name} to Read Only`)
+    console.log(`set Control Hub user ${rick.name} to Read-Only Admin`)
     // await sleep(1000)
   
     // enable Rick for Contact Center in Webex Control Hub

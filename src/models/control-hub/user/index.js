@@ -3,6 +3,7 @@ const readOnlyTemplate = require('./templates/read-only')
 // const enableCcTemplate = require('./templates/enable-cc')
 // cache for the bearer token
 const fetch = require('../../fetch')
+const client = require('../client')
 const globals = require('../../globals')
 
 const orgId = process.env.ORG_ID
@@ -16,22 +17,20 @@ async function setReadOnly ({
   name,
   email
 }) {
+  const ch = client.getClient()
+  // get existing user object
+  const user = await ch.user.get(email)
+  if (!user) {
+    throw Error(`Control Hub user "${name}" with email "${email}" not found.`)
+  }
+  // determine which roles to give
+  let roles = []
+  const username = user.userName.split('@').shift()
   try {
-    const url = `https://atlas-a.wbx2.com/admin/api/v1/organization/${orgId}/users/roles`
-
-    const token = await getToken()
-    
-    const body = readOnlyTemplate(name, email)
-
-    const options = {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${token.access_token}`
-      },
-      body
-    }
-
-    await fetch(url, options)
+    return ch.contactCenter.role.modify({
+      email: user.userName,
+      roles
+    })
   } catch (e) {
     throw e
   }
