@@ -58,11 +58,11 @@ module.exports = async function (user) {
     await cjp.virtualTeam.addTeam('Q_Voice_dCloud', userTeam.id)
 
     // get or create CJP chat queue
-    await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`, userTeam.id)
+    const chatQueue = await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`, userTeam.id)
     // await sleep(1000)
     
     // get or create CJP chat entry point
-    const chatEntryPoint =  await cjp.virtualTeam.getOrCreate('chatEntryPoint', `EP_Chat_${userId}`)
+    const chatEntryPoint = await cjp.virtualTeam.getOrCreate('chatEntryPoint', `EP_Chat_${userId}`)
     
     // wait for Webex Control Hub to sync the chat entry point from CJP
     // console.log('waiting 10 seconds for Control Hub to sync the chat entry point')
@@ -190,6 +190,16 @@ module.exports = async function (user) {
     
     // debug
     // console.log('emailQueue', emailQueue)
+
+    // provision chat entry point routing strategy and current routing strategy
+    await cjp.routingStrategy.user.provision({
+      name: 'EP_Chat_' + userId,
+      entryPointDbId: chatEntryPoint.attributes.dbId__l,
+      queueDbId: chatQueue.attributes.dbId__l,
+      tenantId: process.env.CJP_TENANT_ID,
+      tenantName: process.env.CJP_ENTERPRISE_NAME,
+      entryPointId: chatEntryPoint.id
+    })
 
     // get/create global email routing strategy in CJP, referencing the
     // numerical ID of the user's email queue in CJP

@@ -1,3 +1,4 @@
 module.exports = {
-  globalEmail: require('./global-email')
+  globalEmail: require('./global-email'),
+  user: require('./user')
 }
