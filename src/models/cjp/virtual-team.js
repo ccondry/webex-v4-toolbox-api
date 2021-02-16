@@ -38,8 +38,37 @@ async function getOrCreate (type, name, teamId) {
   return vteam
 }
 
+async function addTeam (queueName, teamId) {
+  try {
+    const existing = await get(queueName)
+    // fix attributes from GET data for using in PUT operation
+    existing.attributes.tid__s = existing.attributes.tid
+    existing.attributes.sid__s = existing.attributes.sid
+    existing.attributes.cstts__l = existing.attributes.cstts
+    
+    delete existing.attributes.tid
+    delete existing.attributes.sid
+    delete existing.attributes.cstts
+    
+    // get existing call distribution groups
+    const groups = JSON.parse(existing.attributes.callDistributionGroups__s)
+    // console.log('groups', groups)
+    const group = groups.find(v => v.order === 1)
+    // add user team ID to distribution groups
+    group.agentGroups.push({teamId})
+    existing.attributes.callDistributionGroups__s = JSON.stringify(groups)
+    // console.log('new', JSON.stringify(existing, null, 2))
+    // update queue on CJP
+    const response = await cjp.client.virtualTeam.modify(existing.id, [existing])
+    return response
+  } catch (e) {
+    throw e
+  }
+}
+
 module.exports = {
   create,
   get,
-  getOrCreate
+  getOrCreate,
+  addTeam
 }

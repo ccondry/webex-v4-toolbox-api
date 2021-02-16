@@ -54,6 +54,9 @@ module.exports = async function (user) {
     // get or create CJP user team for chat and email routing
     const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
 
+    // add user team to main voice queue Q_Voice_dCloud
+    await cjp.virtualTeam.addTeam('Q_Voice_dCloud', userTeam.id)
+
     // get or create CJP chat queue
     await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`, userTeam.id)
     // await sleep(1000)
