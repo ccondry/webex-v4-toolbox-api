@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.17
+
+### Features
+* **Provision:** Complete provision changes for Webex Calling, licenses, roles.
+
+
 # 2021.2.12
 
 ### Features
