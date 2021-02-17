@@ -93,7 +93,6 @@ async function modifyOrder (treatmentsOrder) {
 
   // get access token from cache
   const token = globals.get('webexV4ControlHubToken')
-  
   const body = {
     treatmentsOrder,
     defaultQueue: globals.get('webexV4EmailQueueName'),
@@ -130,7 +129,7 @@ async function getOrCreate (userId) {
       treatmentId = existing.uri.split('/').pop()
       console.log(`created new Control Hub email treatment rule for user ${userId}: ${treatmentId}`)
     }
-    // get the existing email treamtent ID order list
+    // get the existing email treatment ID order list
     const treatmentOrder = await listOrder()
     console.log(`got Control Hub email treatment order list: ${treatmentOrder.length} treatments`)
     // check if email treatment ID is already in the order list
