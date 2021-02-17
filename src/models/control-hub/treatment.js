@@ -96,7 +96,7 @@ async function modifyOrder (treatmentsOrder) {
   
   const body = {
     treatmentsOrder,
-    defaultQueue: process.env.CJP_EMAIL_QUEUE_NAME,
+    defaultQueue: globals.get('webexV4EmailQueueName'),
   }
 
   const options = {
