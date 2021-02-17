@@ -235,7 +235,7 @@ module.exports = async function (user) {
         idOperation: 'ADD',
         properties: {
           broadCloudSiteId: siteId,
-          internalExtension: '81' + userId
+          internalExtension: '82' + userId
         }
       }]
     })
