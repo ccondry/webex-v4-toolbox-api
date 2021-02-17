@@ -40,7 +40,7 @@ async function provision ({
   
   // create current RS body
   const currentRsTemplate = epTemplate({
-    name: 'Current_' + name,
+    name: 'Current-' + name,
     entryPointDbId,
     queueDbId,
     tenantId,
@@ -50,7 +50,7 @@ async function provision ({
   })
   // search for current routing strategy
   let currentRs = strategies.auxiliaryDataList.find(strategy => {
-    return strategy.attributes.name__s === 'Current_' + name
+    return strategy.attributes.name__s === 'Current-' + name
   })
   if (!currentRs) {
     // create
@@ -63,7 +63,7 @@ async function provision ({
     // try to find it
     strategies = await client.routingStrategy.list()
     currentRs = strategies.auxiliaryDataList.find(strategy => {
-      return strategy.attributes.name__s === 'Current_' + name
+      return strategy.attributes.name__s === 'Current-' + name
     })
   }
   
