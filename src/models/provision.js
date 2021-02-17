@@ -2,7 +2,7 @@ const cjp = require('./cjp')
 const controlHub = require('./control-hub')
 const teamsNotifier = require('./teams-notifier')
 const toolbox = require('./toolbox')
-// const session = require('./session')
+const globals = require('./globals')
 
 const domain = process.env.DOMAIN
 
@@ -205,6 +205,41 @@ module.exports = async function (user) {
     // numerical ID of the user's email queue in CJP
     await cjp.routingStrategy.globalEmail.provision(userId, emailQueue.attributes.dbId__l)
     
+    // create/set agent extensions
+    const siteId = globals.get('webexV4BroadCloudSiteId')
+
+    await ch.user.onboard({
+      email: sandra.email,
+      licenses: [{
+        id: 'MS_fe3cfc81-8469-4929-8944-23e79e5d0d53',
+        idOperation: 'ADD',
+        properties: {}
+      }, {
+        id: 'BCSTD_2849849c-4384-4493-94e9-98ff206eaad6',
+        idOperation: 'ADD',
+        properties: {
+          broadCloudSiteId: siteId,
+          internalExtension: '80' + userId
+        }
+      }]
+    })
+
+    await ch.user.onboard({
+      email: rick.email,
+      licenses: [{
+        id: 'MS_fe3cfc81-8469-4929-8944-23e79e5d0d53',
+        idOperation: 'ADD',
+        properties: {}
+      }, {
+        id: 'BCSTD_2849849c-4384-4493-94e9-98ff206eaad6',
+        idOperation: 'ADD',
+        properties: {
+          broadCloudSiteId: siteId,
+          internalExtension: '81' + userId
+        }
+      }]
+    })
+
     // set provision done in toolbox db
     await toolbox.updateUser(userId, {
       provision: 'complete'
