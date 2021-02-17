@@ -87,7 +87,6 @@ async function modifyRoutingStrategy (id, newXml) {
     // console.log('new strategy body:\r\n', body)
     await client.routingStrategy.modify(id, body)
   } catch (e) {
-    // TODO fix this
     console.log(`Failed to modify routing strategy: ${e.message}`)
     // throw Error(`Failed to modify routing strategy: ${e.message}`)
   }
