@@ -1,10 +1,9 @@
-require('dotenv').config()
-const globals = require('../src/models/globals')
-const fetch = require('../src/models/fetch')
+const globals = require('./globals')
+const fetch = require('./fetch')
 
 const baseUrl = 'https://rialto.broadcloudpbx.com/enterpriseportalapi/v1.0/customers'
 
-// get array of phone numbers
+// get array of external phone numbers
 async function getPhoneNumbers ({siteId, query}) {
   const defaultQuery = {
     // filter: 'status=unassigned',
@@ -17,6 +16,29 @@ async function getPhoneNumbers ({siteId, query}) {
   const customerId = globals.get('webexV4BroadCloudCustomerId')
   const token = globals.get('webexV4ControlHubToken').access_token
   const url = `${baseUrl}/${customerId}/sites/${siteId}/phoneassignments`
+  const options = {
+    query: {...defaultQuery, ...query},
+    headers: {
+      Authorization: 'Bearer ' + token
+    }
+  }
+  return fetch(url, options)
+}
+
+// get array of internal extensions assigned to users
+async function getExtensions ({siteId, query}) {
+  // TODO get all, not just first 200
+  const defaultQuery = {
+    // filter: 'status=unassigned',
+    limit: 200,
+    offset: 0,
+    sort: 'firstName'
+  }
+  // wait for globals to exist
+  await Promise.resolve(globals.initialLoad)
+  const customerId = globals.get('webexV4BroadCloudCustomerId')
+  const token = globals.get('webexV4ControlHubToken').access_token
+  const url = `${baseUrl}/${customerId}/sites/${siteId}/userassignments`
   const options = {
     query: {...defaultQuery, ...query},
     headers: {
@@ -79,10 +101,18 @@ async function getSite (name) {
   }
 }
 
-getSite('Office')
-.then(site => isAvailable({siteId: site.id, extension: '10325'}))
-.then(r => {
-  console.log(r)
-  process.exit(0)
-})
-.catch(e => console.log(e.message))
+// getSites()
+// .then(site => isAvailable({siteId: site.id, extension: '10325'}))
+// .then(r => {
+//   console.log(r)
+//   process.exit(0)
+// })
+// .catch(e => console.log(e.message))
+
+module.exports = {
+  getSite,
+  getSites,
+  isAvailable,
+  getPhoneNumbers,
+  getExtensions
+}
