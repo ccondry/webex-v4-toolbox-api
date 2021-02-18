@@ -275,7 +275,7 @@ async function createUsers ({
   }
 }
 
-async function deleteLdapUser (cn) {
+async function deleteUser (cn) {
   return ldap.deleteUser({
     adminDn: process.env.LDAP_ADMIN_DN,
     adminPassword: process.env.LDAP_ADMIN_PASSWORD,
@@ -283,10 +283,10 @@ async function deleteLdapUser (cn) {
   })
 }
 
-async function deleteLdapUsers (userId) {
+async function deleteUsers (userId) {
   try {
     try {
-      await deleteLdapUser('Rick ' + req.params.id)
+      await deleteUser('Rick ' + req.params.id)
     } catch (e) {
       if (e.message.match('NO_OBJECT')) {
         // continue - user already deleted
@@ -295,7 +295,7 @@ async function deleteLdapUsers (userId) {
       }
     }
     try {
-      await deleteLdapUser('Sandra ' + req.params.id)
+      await deleteUser('Sandra ' + req.params.id)
     } catch (e) {
       if (e.message.match('NO_OBJECT')) {
         // continue - user already deleted
@@ -321,6 +321,6 @@ module.exports = {
   addToGroup,
   lockUser,
   listUsers,
-  deleteLdapUser,
-  deleteLdapUsers
+  deleteUser,
+  deleteUsers
 }
