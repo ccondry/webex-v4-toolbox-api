@@ -459,8 +459,8 @@ async function main (user) {
       console.log(`setting user provision info to not provisioned for webex-v4prod...`)
       const query = {id: userId}
       const updates = {
-        $unset: {
-          'demo.webex-v4prod.provision': ''
+        $set: {
+          'demo.webex-v4prod.provision': 'deleted'
         },
         $currentDate: {
           'demo.webex-v4prod.lastAccess': {$type: 'date'}
