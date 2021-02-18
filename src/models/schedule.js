@@ -23,15 +23,17 @@ async function getProvisionStartedUsers () {
 }
 
 async function getProvisionDeletingUsers () {
+  // return array users who need to be deprovisioned 
+  const query = {'demo.webex-v4prod.provision': 'deleting'}
+  const projection = {
+    demo: false,
+    password: false
+  }
+  return db.find('toolbox', 'users', query, projection)
+}
+
+async function checkMaxUsers () {
   try {
-    // return array users who need to be deprovisioned 
-    // const query = {'demo.webex-v4prod.provision': 'deleting'}
-    // const projection = {
-    //   demo: false,
-    //   password: false
-    // }
-    // return db.find('toolbox', 'users', query, projection)
-  
     // wait for globals to exist
     await Promise.resolve(globals.initialLoad)
     // max number of users that can be provisioned. more than this will trigger
@@ -81,10 +83,15 @@ async function getProvisionDeletingUsers () {
       })
       // console.log('userMap', userMap)
       // keep top users, return the rest
-      return userMap.slice(maxUsers)
+      // return userMap.slice(maxUsers)
+      // set each of these users to deleting state
+      const userIds = userMap.slice(maxUsers).map(v => v.id)
+      const filter = {id: {$in: userIds}}
+      const updates = {$set: {'demo.webex-v4prod.provision': 'deleting'}}
+      return db.updateMany('toolbox', 'users', filter, updates)
     } else {
       // not full - return empty array
-      return []
+      // return []
     }
   } catch (e) {
     throw e
@@ -97,10 +104,15 @@ async function go () {
   if (!running) {
     running = true
     // console.log('running =', running)
+    // check if there are too many users provisioned
+    try {
+      await checkMaxUsers()
+    } catch (e) {
+      console.log('failed to check max users:', e)
+    }
     // get list of users to deprovision
     try {
       const users = await getProvisionDeletingUsers()
-      // console.log('getProvisionDeletingUsers', users)
       if (users.length > 0) {
         console.log(`starting deprovision for ${users.length} users`)
       }
