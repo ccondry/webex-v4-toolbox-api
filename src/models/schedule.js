@@ -44,6 +44,8 @@ async function getProvisionDeletingUsers () {
   // if license usage of CJP premium is > 95%
   // if (cjpPremiumLicenses.usage / cjpPremiumLicenses.volume >= 0.95) {
   // if (cjpPremiumLicenses.volume - cjpPremiumLicenses.usage <= 10) {
+  console.log('cjpPremiumLicenses.usage', cjpPremiumLicenses.usage)
+  console.log('maxUsers', maxUsers)
   if (cjpPremiumLicenses.usage > maxUsers) {
     // too full - need to deprovision some users
     // get all control hub users
