@@ -123,9 +123,9 @@ async function deleteSkillProfile (name) {
 // delete email treatment rule
 async function deleteTreatmentRule (name) {
   try {
-    const g = await globals.get()
+    await Promise.resolve(globals.initialLoad)
+    const entryPointId = globals.get('webexV4EmailEntryPointId')
     const client = await ch.get()
-    const entryPointId = g.webexV4EmailEntryPointId
     let rules
     try {
       // console.log('getting email treatment rules list for entry point ID', entryPointId)
@@ -286,6 +286,7 @@ async function main (user) {
       await deleteVirtualTeam(`Q_Chat_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete virtual team Q_Chat_dCloud_${userId}:`, e.message)
+      throw e
     }
 
     // voice queue
@@ -294,6 +295,7 @@ async function main (user) {
       await deleteVirtualTeam(`Q_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete virtual team Q_dCloud_${userId}:`, e.message)
+      throw e
     }
 
     // email queue
@@ -302,6 +304,7 @@ async function main (user) {
       await deleteVirtualTeam(`Q_Email_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete virtual team Q_Email_dCloud_${userId}:`, e.message)
+      throw e
     }
     
     // chat entry point
@@ -310,6 +313,7 @@ async function main (user) {
       await deleteVirtualTeam(`EP_Chat_${userId}`)
     } catch (e) {
       console.log(`failed to delete virtual team EP_Chat_${userId}:`, e.message)
+      throw e
     }
     
     
@@ -318,6 +322,7 @@ async function main (user) {
       await deleteTeam(`T_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete team T_dCloud_${userId}:`, e.message)
+      throw e
     }
     
 
@@ -327,6 +332,7 @@ async function main (user) {
       await deleteChatTemplate(`EP_Chat_${userId}`)
     } catch (e) {
       console.log('failed to delete chat template:', e.message)
+      throw e
     }
     
 
@@ -337,6 +343,7 @@ async function main (user) {
       await routingStrategy.delete(`RS_Chat_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy RS_Chat_${userId}:`, e.message)
+      throw e
     }
 
     try {
@@ -344,6 +351,7 @@ async function main (user) {
       await routingStrategy.delete(`Current-RS_Chat_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
+      throw e
     }
 
     // chat queue again
@@ -352,6 +360,7 @@ async function main (user) {
       await routingStrategy.delete(`RS_Chat_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy RS_Chat_dCloud_${userId}:`, e.message)
+      throw e
     }
     
     try {
@@ -359,6 +368,7 @@ async function main (user) {
       await routingStrategy.delete(`Current-RS_Chat_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy Current-RS_Chat_dCloud_${userId}:`, e.message)
+      throw e
     }
     
     // chat entry point
@@ -367,6 +377,7 @@ async function main (user) {
       await routingStrategy.delete(`RS_EP_Chat_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy RS_EP_Chat_${userId}:`, e.message)
+      throw e
     }
 
     try {
@@ -374,6 +385,7 @@ async function main (user) {
       await routingStrategy.delete(`Current-RS_EP_Chat_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
+      throw e
     }
     
     // chat entry point again
@@ -382,6 +394,7 @@ async function main (user) {
       await routingStrategy.delete(`EP_Chat_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy EP_Chat_${userId}:`, e.message)
+      throw e
     }
 
     try {
@@ -389,6 +402,7 @@ async function main (user) {
       await routingStrategy.delete(`Current-EP_Chat_1234${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy Current-EP_Chat_${userId}:`, e.message)
+      throw e
     }
 
     // email routing strategy
@@ -397,6 +411,7 @@ async function main (user) {
       await routingStrategy.delete(`RS_Email_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy RS_Email_dCloud_${userId}:`, e.message)
+      throw e
     }
     
     try {
@@ -404,6 +419,7 @@ async function main (user) {
       await routingStrategy.delete(`Current-RS_Email_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy Current-RS_Email_dCloud_${userId}:`, e.message)
+      throw e
     }
     
     // voice queue
@@ -412,6 +428,7 @@ async function main (user) {
       await routingStrategy.delete(`RS_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy RS_dCloud_${userId}:`, e.message)
+      throw e
     }
 
     try {
@@ -419,6 +436,7 @@ async function main (user) {
       await routingStrategy.delete(`Current-RS_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy Current-RS_dCloud_${userId}:`, e.message)
+      throw e
     }
 
     // Skill Profiles
@@ -427,6 +445,7 @@ async function main (user) {
       await deleteSkillProfile(`Skill_${userId}`)
     } catch (e) {
       console.log(`failed to delete skill profile Skill_${userId}:`, e.message)
+      throw e
     }
 
     // email treatment rule
@@ -435,6 +454,7 @@ async function main (user) {
       await deleteTreatmentRule(`route${userId}`)
     } catch (e) {
       console.log(`failed to delete email treatment rule Rule${userId}:`, e.message)
+      throw e
     }
 
     // email routing strategy queue
@@ -443,6 +463,7 @@ async function main (user) {
       await routingStrategy.globalEmail.delete(`Q_Email_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to delete queue Q_Email_dCloud_${userId} from the global email routing strategy:`, e.message)
+      throw e
     }
 
     // delete LDAP users
@@ -460,6 +481,7 @@ async function main (user) {
       await unlicense(userId)
     } catch (e) {
       console.log(`failed to delete control hub user licenses:`, e.message)
+      throw e
     }
 
     // remove roles from control hub users
@@ -468,6 +490,7 @@ async function main (user) {
       await removeRoles(userId)
     } catch (e) {
       console.log(`failed to delete control hub user roles:`, e.message)
+      throw e
     }
 
     // remove provision info from database
@@ -483,12 +506,12 @@ async function main (user) {
       console.log(`successfully set user provision info to not provisioned for webex-v4prod`)
     } catch (e) {
       console.log(`failed to set user provision info to not provisioned for webex-v4prod:`, e.message)
+      throw e
     }
-
     console.log(`finished deprovisioning user ${userId}`)
-    process.exit(0)
   } catch (e) {
     console.log(`failed to deprovision user ${userId}:`, e.message)
+    throw e
   }
 }
 

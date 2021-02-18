@@ -19,15 +19,15 @@ async function get (name) {
 // delete email routing strategy rule
 async function deleteQueue (name) {
   try {
-    const g = await globals.get()
-    if (!g.webexV4CjpEmailRoutingStrategyName) {
+    await Promise.resolve(globals.initialLoad)
+    if (!globals.get('webexV4CjpEmailRoutingStrategyName')) {
       // cannot continue without routing strategy name
       const message = 'global value "webexV4CjpEmailRoutingStrategyName" is missing'
       teamsLogger.log(message)
       throw Error(message)
     }
     // name of the global email routing strategy
-    const strategyName = g.webexV4CjpEmailRoutingStrategyName
+    const strategyName = globals.get('webexV4CjpEmailRoutingStrategyName')
     // get the current global email routing strategy
     const strategy = await get('Current-' + strategyName)
     if (!strategy) {

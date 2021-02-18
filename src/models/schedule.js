@@ -3,14 +3,11 @@ const provision = require('./provision')
 const deprovision = require('./deprovision')
 const db = require('./db')
 const ch = require('./control-hub/client')
+const globals = require('./globals')
 
 // number of milliseconds to wait after completing the scheduled job before
 // starting again
 const throttle = 10 * 1000
-// max number of users that can be provisioned. more than this will trigger
-// deprovision. this is number of agents, so each user person counts as 2
-// (sjeffers and rbarrows)
-const maxUsers = 4
 
 // running state
 let running = false
@@ -33,6 +30,12 @@ async function getProvisionDeletingUsers () {
   //   password: false
   // }
   // return db.find('toolbox', 'users', query, projection)
+
+  // wait for globals to exist
+  await Promise.resolve(globals.initialLoad)
+  // max number of users that can be provisioned. more than this will trigger
+  // deprovision. this is number of toolbox users.
+  const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
 
   // find license usage in control hub
   const client = await ch.getClient()
@@ -62,22 +65,19 @@ async function getProvisionDeletingUsers () {
     const projection = {id: true, 'demo.webex-v4prod.lastAccess': true}
     const provisionedUsers = await db.find('toolbox', 'users', query, projection)
     // console.log('provisionedUsers', provisionedUsers)
-    const userMap = licensedUsers.map(user => {
-      // find matching provision info
-      const provision = provisionedUsers.find(v => v.id === user.userName.slice(8, 12))
-      const ret = {
-        username: user.userName,
-        id: user.id
-      }
-      if (provision) {
-        ret.lastAccess = provision.demo['webex-v4prod'].lastAccess
-      }
-      return ret
+    // filter provisioned toolbox users to those with matching licensed control hub users
+    const userMap = provisionedUsers.filter(user => {
+      return licensedUsers.find(agent => user.id === agent.userName.slice(8, 12))
     })
-    // sort by last access time
-    userMap.sort((a, b) => new Date(b.lastAccess || 0) - new Date(a.lastAccess || 0))
+    // sort by last access time descending
+    userMap.sort((a, b) => {
+      const aDate = new Date(a.demo['webex-v4prod'].lastAccess || 0)
+      const bDate = new Date(b.demo['webex-v4prod'].lastAccess || 0)
+      // descending
+      return bDate - aDate
+    })
     
-    // keep 200 users
+    // keep top users, return the rest
     return userMap.slice(maxUsers)
   }
 }
@@ -91,12 +91,12 @@ async function go () {
     // get list of users to deprovision
     try {
       const users = await getProvisionDeletingUsers()
-      console.log('getProvisionDeletingUsers', users)
+      // console.log('getProvisionDeletingUsers', users)
       if (users.length > 0) {
         console.log(`starting deprovision for ${users.length} users`)
       }
       for (const user of users) {
-        // await deprovision(user)
+        await deprovision(user)
       }
     } catch (e) {
       console.log('deprovision error:', e.message)      
