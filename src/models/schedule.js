@@ -28,8 +28,10 @@ async function getProvisionStartedUsers () {
 
 async function getProvisionDeletingUsers () {
   // return array users who need to be deprovisioned 
-  const query = {'demo.webex-v4prod.provision': 'delete'}
-  const query = {'demo.webex-v4prod.provision': 'deleting'}
+  const query = {$or: [
+    {'demo.webex-v4prod.provision': 'delete'},
+    {'demo.webex-v4prod.provision': 'deleting'}
+  ]}
   const projection = {
     demo: false,
     password: false
