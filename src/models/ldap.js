@@ -286,7 +286,7 @@ async function deleteUser (cn) {
 async function deleteUsers (userId) {
   try {
     try {
-      await deleteUser('Rick ' + req.params.id)
+      await deleteUser('Rick ' + userId)
     } catch (e) {
       if (e.message.match('NO_OBJECT')) {
         // continue - user already deleted
@@ -295,7 +295,7 @@ async function deleteUsers (userId) {
       }
     }
     try {
-      await deleteUser('Sandra ' + req.params.id)
+      await deleteUser('Sandra ' + userId)
     } catch (e) {
       if (e.message.match('NO_OBJECT')) {
         // continue - user already deleted
