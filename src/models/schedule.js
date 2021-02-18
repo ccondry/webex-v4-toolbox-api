@@ -13,8 +13,8 @@ const throttle = 10 * 1000
 let running = false
 
 async function getProvisionStartedUsers () {
-  // users who need to be provisioned
-  const query = {'demo.webex-v4prod.provision': 'started'}
+  // return array of users who need to be provisioned
+  const query = {'demo.webex-v4prod.provision': {$or: ['started', 'starting']}}
   const projection = {
     demo: false,
     password: false
@@ -32,6 +32,8 @@ async function getProvisionDeletingUsers () {
   return db.find('toolbox', 'users', query, projection)
 }
 
+// find licensed users over the webexV4MaxUsers setting, and mark them 'deleting'
+// so they will be deprovisioned
 async function checkMaxUsers () {
   try {
     // wait for globals to exist
