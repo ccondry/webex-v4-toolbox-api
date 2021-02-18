@@ -360,7 +360,7 @@ async function main (user) {
 
     try {
       console.log(`checking another format of chat entry point current routing strategies...`)
-      await routingStrategy.delete(`Current-EP_Chat_1234${userId}`)
+      await routingStrategy.delete(`Current-EP_Chat_${userId}`)
     } catch (e) {
       console.log(`failed to delete routing strategy Current-EP_Chat_${userId}:`, e.message)
       throw e
