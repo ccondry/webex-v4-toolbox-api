@@ -265,7 +265,7 @@ module.exports = async function (user) {
     })
 
     // notify user on Teams
-    await teamsNotifier.send(user)
+    // await teamsNotifier.send(user)
   } catch (e) {
     throw e
   }
