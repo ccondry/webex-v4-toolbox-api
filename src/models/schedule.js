@@ -14,7 +14,10 @@ let running = false
 
 async function getProvisionStartedUsers () {
   // return array of users who need to be provisioned
-  const query = {'demo.webex-v4prod.provision': {$or: ['started', 'starting']}}
+  const query = {$or: [
+    {'demo.webex-v4prod.provision': 'starting'},
+    {'demo.webex-v4prod.provision': 'started'},
+  ]}
   const projection = {
     demo: false,
     password: false
