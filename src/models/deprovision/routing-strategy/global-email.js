@@ -1,4 +1,10 @@
-const cjp = require('../../cjp/client')
+const cjpClient = require('../../cjp/client')
+// wrapper for compatibility
+const cjp = {
+  get () {
+    return cjpClient
+  }
+}
 const globals = require('../../globals')
 const teamsLogger = require('../../teams-logger')
 // const convert = require('xml-js')
