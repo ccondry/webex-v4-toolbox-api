@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 
 // helper function to append query parameters to a URL for fetch
-export const addUrlQueryParams = function (endpoint, params) {
+function addUrlQueryParams (endpoint, params) {
   let url = endpoint
   if (typeof params === 'object') {
     // append URL query paramenters
