@@ -460,6 +460,9 @@ async function main (user) {
       const updates = {
         $unset: {
           'demo.webex-v4prod.provision': ''
+        },
+        $currentDate: {
+          'demo.webex-v4prod.lastAccess': {$type: 'date'}
         }
       }
       await db.updateOne('toolbox', 'users', query, updates)

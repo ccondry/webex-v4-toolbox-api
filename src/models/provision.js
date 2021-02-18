@@ -41,6 +41,9 @@ module.exports = async function (user) {
         'demo.webex-v4prod.DC': 'produs1.ciscoccservice.com',
         'demo.webex-v4prod.async': true,
         'demo.webex-v4prod.orgId': process.env.ORG_ID
+      },
+      $currentDate: {
+        'demo.webex-v4prod.lastAccess': {$type: 'date'}
       }
     }
     await db.updateOne('toolbox', 'users', {id: userId}, updates)
