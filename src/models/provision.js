@@ -266,6 +266,7 @@ module.exports = async function (user) {
 
     // notify user on Teams
     // await teamsNotifier.send(user)
+    console.log('finished provisioning user', user.id)
   } catch (e) {
     throw e
   }
