@@ -13,6 +13,7 @@ const globals = require('../globals')
 // const makeJwt = require('../make-jwt')
 const routingStrategy = require('./routing-strategy')
 const db = require('../db')
+const ldapClient = require('simple-ldap-client')
 
 // delete team
 async function deleteTeam (name) {
@@ -236,46 +237,6 @@ async function removeRoles (userId) {
   }
 }
 
-// async function deleteLdapUsers (userId) {
-//   try {
-//     // make a JWT for the request
-//     const jwtOptions = {expiresIn: '10m'}
-//     const payload = {
-//       application: 'toolbox-login-api',
-//       grant: [
-//         {url: '/api/v1/cwcc/provision/*', method: ['DELETE']}
-//       ]
-//     }
-//     // console.log('making jwt:', payload)
-//     const token = makeJwt(payload, jwtOptions)
-//     // cosnt url = 'https://'
-//     // get webex-v4prod demo URL
-//     console.log('getting dCloud Webex CC v4 instance...')
-//     const instance = await getInstance({demo: 'webex', version: 'v4prod'})
-//     // console.log('instance', instance.ip)
-//     const url = 'https://' + instance.ip + '/api/v1/cwcc/provision/' + userId
-//     const options = {
-//       method: 'DELETE',
-//       headers: {
-//         Authorization: 'Bearer ' + token
-//       },
-//       // ignore self-signed cert for the request to the demo's RP server
-//       agent: new https.Agent({rejectUnauthorized: false})
-//     }
-//     try {
-//       console.log('sending deprovision message to dCloud Webex CC v4 dCloud session...')
-//       const response = await fetch({url, options})
-//       console.log('successfully deprovisioned LDAP users in dCloud Webex CC v4 dCloud session.')
-//       return response
-//     } catch (e) {
-//       throw e
-//     }
-//   } catch (e) {
-//     console.log('failed to deprovision LDAP users in dCloud Webex CC v4 dCloud session:', e.message)
-//     throw e
-//   }
-// }
-
 async function main (user) {
   const userId = user.id
   try {
@@ -467,13 +428,12 @@ async function main (user) {
     }
 
     // delete LDAP users
-    // TODO enable this again when code is moved to branding
-    // try {
-    //   console.log(`checking ldap users...`)
-    //   await deleteLdapUsers(userId)
-    // } catch (e) {
-    //   console.log(`failed to delete ldap users for user ${userId}:`, e.message)
-    // }
+    try {
+      console.log(`checking ldap users...`)
+      await deleteLdapUsers(userId)
+    } catch (e) {
+      console.log(`failed to delete ldap users for user ${userId}:`, e.message)
+    }
 
     // unlicense control hub users
     try {

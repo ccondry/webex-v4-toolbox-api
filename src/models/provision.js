@@ -3,6 +3,7 @@ const controlHub = require('./control-hub')
 const teamsNotifier = require('./teams-notifier')
 const toolbox = require('./toolbox')
 const globals = require('./globals')
+const ldap = require('./ldap')
 
 const domain = process.env.DOMAIN
 
@@ -32,6 +33,8 @@ module.exports = async function (user) {
 
   try {
     // start provisioning user
+    // provision LDAP users
+    await ldap.createUsers({userId})
     // wait for LDAP sync to complete
     let chSandra
     let chRick

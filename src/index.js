@@ -11,7 +11,7 @@ const environment = require('./models/environment')
 const jwtCert = require('./models/jwt-certificate')
 const teamsLogger = require('./models/teams-logger')
 
-// start user provision loop
+// start user provision/deprovision checking job
 require('./models/schedule')
 
 // set up Node.js HTTP port
