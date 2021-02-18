@@ -433,6 +433,7 @@ async function main (user) {
       await ldap.deleteUsers(userId)
     } catch (e) {
       console.log(`failed to delete ldap users for user ${userId}:`, e.message)
+      throw e
     }
 
     // unlicense control hub users
