@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.17-2
+
+### Features
+* **Provision:** Provision and deprovision LDAP accounts directly (moving this
+software from the Toolbox server to Branding server inside the dCloud session).
+
+
 # 2021.2.17-1
 
 ### Features
