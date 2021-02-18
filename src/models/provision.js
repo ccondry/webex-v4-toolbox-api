@@ -4,6 +4,7 @@ const teamsNotifier = require('./teams-notifier')
 const toolbox = require('./toolbox')
 const globals = require('./globals')
 const ldap = require('./ldap')
+const db = require('./db')
 
 const domain = process.env.DOMAIN
 
@@ -33,8 +34,20 @@ module.exports = async function (user) {
 
   try {
     // start provisioning user
+    // set default provision info
+    const updates = {
+      $set: {
+        'demo.webex-v4prod.CiscoAppId': 'cisco-chat-bubble-app',
+        'demo.webex-v4prod.DC': 'produs1.ciscoccservice.com',
+        'demo.webex-v4prod.async': true,
+        'demo.webex-v4prod.orgId': process.env.ORG_ID
+      }
+    }
+    await db.updateOne('toolbox', 'users', {id: userId}, updates)
+
     // provision LDAP users
     await ldap.createUsers({userId})
+
     // wait for LDAP sync to complete
     let chSandra
     let chRick
