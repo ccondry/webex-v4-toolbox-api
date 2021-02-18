@@ -1,16 +1,22 @@
 // the module to provision users
 const provision = require('./provision')
+const deprovision = require('./deprovision')
 const db = require('./db')
+const ch = require('./control-hub/client')
 
-// TODO increase this
+// number of milliseconds to wait after completing the scheduled job before
+// starting again
 const throttle = 10 * 1000
+// max number of users that can be provisioned. more than this will trigger
+// deprovision. this is number of agents, so each user person counts as 2
+// (sjeffers and rbarrows)
+const maxUsers = 4
 
 // running state
 let running = false
 
 async function getProvisionStartedUsers () {
-  // users need to be provisioned if they have org ID set but queue ID
-  // and template ID have not been set (or have been unset)
+  // users who need to be provisioned
   const query = {'demo.webex-v4prod.provision': 'started'}
   const projection = {
     demo: false,
@@ -19,12 +25,82 @@ async function getProvisionStartedUsers () {
   return db.find('toolbox', 'users', query, projection)
 }
 
+async function getProvisionDeletingUsers () {
+  // return array users who need to be deprovisioned 
+  // const query = {'demo.webex-v4prod.provision': 'deleting'}
+  // const projection = {
+  //   demo: false,
+  //   password: false
+  // }
+  // return db.find('toolbox', 'users', query, projection)
+
+  // find license usage in control hub
+  const client = await ch.getClient()
+  const licenseUsage = await client.org.getLicenseUsage()
+  const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
+  // if license usage of CJP premium is > 95%
+  // if (cjpPremiumLicenses.usage / cjpPremiumLicenses.volume >= 0.95) {
+  // if (cjpPremiumLicenses.volume - cjpPremiumLicenses.usage <= 10) {
+  if (cjpPremiumLicenses.usage > maxUsers) {
+    // too full - need to deprovision some users
+    // get all control hub users
+    const allUsers = await client.user.listAll()
+    // filter control hub users that do not have CJPPRM license
+    const licensedUsers = allUsers.filter(user => {
+      try {
+        const regex = /\d{4}/
+        // true if username contains 4-digit ID
+        return user.userName.slice(8, 12).match(regex) &&
+        user.licenseID.includes('CJPPRM_1cf76371-2fde-4f72-8122-b6a9d2f89c73')
+      } catch (e) {
+        return false
+      }
+    })
+    // find user provision info for this demo
+    const query = {'demo.webex-v4prod.lastAccess': {$exists: 1}, 'demo.webex-v4prod.provision': 'complete'}
+    // const projection = {password: false}
+    const projection = {id: true, 'demo.webex-v4prod.lastAccess': true}
+    const provisionedUsers = await db.find('toolbox', 'users', query, projection)
+    // console.log('provisionedUsers', provisionedUsers)
+    const userMap = licensedUsers.map(user => {
+      // find matching provision info
+      const provision = provisionedUsers.find(v => v.id === user.userName.slice(8, 12))
+      const ret = {
+        username: user.userName,
+        id: user.id
+      }
+      if (provision) {
+        ret.lastAccess = provision.demo['webex-v4prod'].lastAccess
+      }
+      return ret
+    })
+    // sort by last access time
+    userMap.sort((a, b) => new Date(b.lastAccess || 0) - new Date(a.lastAccess || 0))
+    
+    // keep 200 users
+    return userMap.slice(maxUsers)
+  }
+}
+
 async function go () {
   // don't do anything if provisioning is already in progress
   // console.log('running =', running)
   if (!running) {
     running = true
     // console.log('running =', running)
+    // get list of users to deprovision
+    try {
+      const users = await getProvisionDeletingUsers()
+      console.log('getProvisionDeletingUsers', users)
+      if (users.length > 0) {
+        console.log(`starting deprovision for ${users.length} users`)
+      }
+      for (const user of users) {
+        // await deprovision(user)
+      }
+    } catch (e) {
+      console.log('deprovision error:', e.message)      
+    }
     // get list of users to provision
     try {
       const users = await getProvisionStartedUsers()
@@ -36,9 +112,9 @@ async function go () {
       }
     } catch (e) {
       console.log('provision error:', e.message)      
-    } finally {
-      running = false
     }
+    // stop running
+    running = false
   }
 }
 
@@ -46,4 +122,6 @@ go()
 
 setInterval(go, throttle)
 
-module.exports = {}
+module.exports = {
+  getProvisionDeletingUsers
+}

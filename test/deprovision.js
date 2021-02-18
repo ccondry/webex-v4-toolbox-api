@@ -1,6 +1,6 @@
 require('dotenv').config()
 const deprovision = require('../src/models/deprovision')
 
-deprovision('1234')
+deprovision('0609')
 .then(r => console.log(r))
 .catch(e => console.log(e))

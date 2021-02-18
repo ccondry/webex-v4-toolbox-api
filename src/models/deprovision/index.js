@@ -1,0 +1,495 @@
+require('dotenv').config()
+const ch = require('../control-hub/client')
+const cjpClient = require('../cjp/client')
+// wrapper to translate the `await cjp.get()` call
+const cjp = {
+  async get () {
+    return cjpClient
+  }
+}
+const fetch = require('../fetch')
+const globals = require('../globals')
+// const https = require('https')
+// const makeJwt = require('../make-jwt')
+const routingStrategy = require('./routing-strategy')
+const db = require('../db')
+
+// delete team
+async function deleteTeam (name) {
+  try {
+    const client = await cjp.get()
+    const teams = await client.team.list()
+    const teamsToDelete = teams.auxiliaryDataList.filter(v => {
+      return v.attributes.name__s === name
+    })
+    for (const team of teamsToDelete) {
+      try {
+        await client.team.delete(team.id)
+        console.log(`successfully deleted user team ${team.attributes.name__s} (${team.id})`)
+      } catch (e) {
+        console.log(`failed to delete user team ${team.attributes.name__s} (${team.id}): ${e.message}`)
+      }
+    }
+  } catch (e) {
+    throw e
+  } 
+}
+
+// get virtual teams (queues and entry points)
+async function deleteVirtualTeam (name) {
+  const client = await cjp.get()
+  let queuesToDelete
+  // find the queue first
+  try {
+    const queues = await client.virtualTeam.list()
+    queuesToDelete = queues.auxiliaryDataList.filter(v => {
+      return v.attributes.name__s === name
+    })
+  } catch (e) {
+    console.log(`no virtual team named "${name}" found to delete.`)
+    return
+  }
+  // found?
+  if (queuesToDelete.length) {
+    for (const queue of queuesToDelete) {
+      console.log(`deleting virtual team ${queue.attributes.name__s} (${queue.id})...`)
+      try {
+        await client.virtualTeam.delete(queue.id)
+        console.log(`virtual team ${queue.attributes.name__s} (${queue.id}) deleted.`)
+      } catch (e) {
+        console.log(`failed to delete virtual team ${queue.attributes.name__s} (${queue.id})`)
+        throw e
+      }
+    }
+  }
+}
+
+//Get the Chat Template ID needed for Cumulus Chat routing
+async function findTemplates (name) {
+  try {
+    const client = await ch.get()
+    const templates = await client.contactCenter.chatTemplate.list()
+    const regex = new RegExp(name)
+    return templates.filter(template => template.name.match(regex))
+  } catch (error) {
+    throw error
+  }
+}
+
+//***************   DELETES  ********************** */
+//Delete Chat Template
+async function deleteChatTemplate (name) {
+  try {
+    const templates = await findTemplates(name)
+    const client = await ch.get()
+    for (const template of templates) {
+      try {
+        await client.contactCenter.chatTemplate.delete(template.templateId)
+        console.log(`successfully deleted chat template ${template.name} (${template.templateId})`)
+      } catch (e) {
+        console.log(`failed to delete chat template ${template.name} (${template.templateId}): ${e.message}`)
+      }
+
+    }
+  } catch (e) {
+    throw e
+  }
+}
+
+async function deleteSkillProfile (name) {
+  try {
+    // get CJP client library
+    const client = await cjp.get()
+    // get list of all skill profiles
+    const profiles = await client.skillProfile.list()
+    // find all profiles matching the input name
+    const profilesToDelete = profiles.auxiliaryDataList.filter(v => {
+      return v.attributes.name__s === name
+    })
+    // delete each one
+    for (const profile of profilesToDelete) {
+      try {
+        await client.skillProfile.delete(profile.id)
+        console.log(`successfully deleted skill profile ${profile.attributes.name__s} (${profile.id})`)
+      } catch (e) {
+        console.log(`failed to delete skill profile ${profile.attributes.name__s} (${profile.id})`)
+      }
+    }
+  } catch (e) {
+    throw e
+  }
+}
+
+// delete email treatment rule
+async function deleteTreatmentRule (name) {
+  try {
+    const g = await globals.get()
+    const client = await ch.get()
+    const entryPointId = g.webexV4EmailEntryPointId
+    let rules
+    try {
+      // console.log('getting email treatment rules list for entry point ID', entryPointId)
+      rules = await client.contactCenter.treatment.list(entryPointId)
+    } catch (e) {
+      console.log('failed to get email treatment rules list:', e.message)
+      throw e
+    }
+    const rulesToDelete = rules.filter(v => {
+      return v.name === name
+    })
+
+    // console.log('rulesToDelete', rulesToDelete)
+    for (const rule of rulesToDelete) {
+      // get ID from the end of the URI
+      const id = rule.uri.split('/').pop()
+      try {
+        // delete it ({entryPointId, id})
+        await client.contactCenter.treatment.delete({entryPointId, id})
+        console.log(`successfully deleted email treatment rule ${rule.name} (${id})`)
+      } catch (e) {
+        console.log(`failed to delete email treatment rule ${rule.name} (${id}): ${e.message}`)
+      }
+    }
+  } catch (e) {
+    throw e
+  } 
+}
+
+async function getInstance (query) {
+  try {
+    const url = 'https://dcloud-collab-toolbox-rtp.cxdemo.net/api/v1/auth/instance'
+    const instances = await fetch({url, query})
+    if (instances.length) {
+      return instances[0]
+    } else {
+      throw Error(`no instance found matching ${JSON.stringify(query)}`)
+    }
+  } catch (e) {
+    throw e
+  }
+}
+
+async function unlicense (userId) {
+  try {
+    const client = await ch.get()
+    const rickEmail = `rbarrows${userId}@cc1.dc-01.com`
+    const sandraEmail = `sjeffers${userId}@cc1.dc-01.com`
+    const licenses = [{
+      id: 'MS_fe3cfc81-8469-4929-8944-23e79e5d0d53',
+      idOperation: 'REMOVE',
+      properties: {}
+    }, {
+      id: 'CJPPRM_1cf76371-2fde-4f72-8122-b6a9d2f89c73',
+      idOperation: 'REMOVE',
+      properties: {}
+    }, {
+      id: 'CJPSTD_878e22e8-30e4-4d8e-8309-78f17f6c7240',
+      idOperation: 'REMOVE',
+      properties: {}
+    }, {
+      id: 'BCSTD_2849849c-4384-4493-94e9-98ff206eaad6',
+      idOperation: 'REMOVE',
+      properties: {}
+    }, {
+      id: 'BCBAS_2cd77112-4bee-4391-a3d3-ffede396cd5e',
+      idOperation: 'REMOVE',
+      properties: {}
+    }]
+  
+    await client.user.onboard({
+      email: rickEmail,
+      licenses
+    })
+    console.log('removed licenses from', rickEmail)
+    await client.user.onboard({
+      email: sandraEmail,
+      licenses
+    })
+    console.log('removed licenses from', sandraEmail)
+  } catch (e) {
+    throw e
+  }
+}
+
+async function removeRoles (userId) {
+  try {
+    const client = await ch.get()
+    const rickEmail = `rbarrows${userId}@cc1.dc-01.com`
+    const sandraEmail = `sjeffers${userId}@cc1.dc-01.com`
+    const roles = [
+      {roleName: 'CJP_PREMIUM_AGENT', 'roleState': 'INACTIVE'},
+      {roleName: 'CJP_SUPERVISOR', 'roleState': 'INACTIVE'},
+      {roleName: 'CJP_STANDARD_AGENT', 'roleState': 'INACTIVE'}
+    ]
+    await client.contactCenter.role.modify({
+      email: rickEmail,
+      roles
+    })
+    console.log('removed roles from', rickEmail)
+    await client.contactCenter.role.modify({
+      email: sandraEmail,
+      roles
+    })
+    console.log('removed roles from', sandraEmail)
+  } catch (e) {
+    throw e
+  }
+}
+
+// async function deleteLdapUsers (userId) {
+//   try {
+//     // make a JWT for the request
+//     const jwtOptions = {expiresIn: '10m'}
+//     const payload = {
+//       application: 'toolbox-login-api',
+//       grant: [
+//         {url: '/api/v1/cwcc/provision/*', method: ['DELETE']}
+//       ]
+//     }
+//     // console.log('making jwt:', payload)
+//     const token = makeJwt(payload, jwtOptions)
+//     // cosnt url = 'https://'
+//     // get webex-v4prod demo URL
+//     console.log('getting dCloud Webex CC v4 instance...')
+//     const instance = await getInstance({demo: 'webex', version: 'v4prod'})
+//     // console.log('instance', instance.ip)
+//     const url = 'https://' + instance.ip + '/api/v1/cwcc/provision/' + userId
+//     const options = {
+//       method: 'DELETE',
+//       headers: {
+//         Authorization: 'Bearer ' + token
+//       },
+//       // ignore self-signed cert for the request to the demo's RP server
+//       agent: new https.Agent({rejectUnauthorized: false})
+//     }
+//     try {
+//       console.log('sending deprovision message to dCloud Webex CC v4 dCloud session...')
+//       const response = await fetch({url, options})
+//       console.log('successfully deprovisioned LDAP users in dCloud Webex CC v4 dCloud session.')
+//       return response
+//     } catch (e) {
+//       throw e
+//     }
+//   } catch (e) {
+//     console.log('failed to deprovision LDAP users in dCloud Webex CC v4 dCloud session:', e.message)
+//     throw e
+//   }
+// }
+
+async function main (user) {
+  const userId = user.id
+  try {
+    console.log(`deprovisioning user ${userId}...`)
+    // chat queue
+    try {
+      console.log(`checking chat queues...`)
+      await deleteVirtualTeam(`Q_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_Chat_dCloud_${userId}:`, e.message)
+    }
+
+    // voice queue
+    try {
+      console.log(`checking voice queues...`)
+      await deleteVirtualTeam(`Q_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_dCloud_${userId}:`, e.message)
+    }
+
+    // email queue
+    try {
+      console.log(`checking email queues...`)
+      await deleteVirtualTeam(`Q_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_Email_dCloud_${userId}:`, e.message)
+    }
+    
+    // chat entry point
+    try {
+      console.log(`checking chat entry points...`)
+      await deleteVirtualTeam(`EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team EP_Chat_${userId}:`, e.message)
+    }
+    
+    
+    try {
+      console.log(`checking teams...`)
+      await deleteTeam(`T_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete team T_dCloud_${userId}:`, e.message)
+    }
+    
+
+    //Chat Template *************************
+    try {
+      console.log(`checking chat templates...`)
+      await deleteChatTemplate(`EP_Chat_${userId}`)
+    } catch (e) {
+      console.log('failed to delete chat template:', e.message)
+    }
+    
+
+    //Routing Strategies *************************
+    // chat queue
+    try {
+      console.log(`checking chat queue routing strategies...`)
+      await routingStrategy.delete(`RS_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Chat_${userId}:`, e.message)
+    }
+
+    try {
+      console.log(`checking chat queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
+    }
+
+    // chat queue again
+    try {
+      console.log(`checking another format of chat queue routing strategies...`)
+      await routingStrategy.delete(`RS_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Chat_dCloud_${userId}:`, e.message)
+    }
+    
+    try {
+      console.log(`checking another format of chat queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_Chat_dCloud_${userId}:`, e.message)
+    }
+    
+    // chat entry point
+    try {
+      console.log(`checking chat entry point routing strategies...`)
+      await routingStrategy.delete(`RS_EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_EP_Chat_${userId}:`, e.message)
+    }
+
+    try {
+      console.log(`checking chat entry point current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
+    }
+    
+    // chat entry point again
+    try {
+      console.log(`checking another format of chat entry point routing strategies...`)
+      await routingStrategy.delete(`EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy EP_Chat_${userId}:`, e.message)
+    }
+
+    try {
+      console.log(`checking another format of chat entry point current routing strategies...`)
+      await routingStrategy.delete(`Current-EP_Chat_1234${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-EP_Chat_${userId}:`, e.message)
+    }
+
+    // email routing strategy
+    try {
+      console.log(`checking email queue routing strategies...`)
+      await routingStrategy.delete(`RS_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Email_dCloud_${userId}:`, e.message)
+    }
+    
+    try {
+      console.log(`checking email queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_Email_dCloud_${userId}:`, e.message)
+    }
+    
+    // voice queue
+    try {
+      console.log(`checking voice queue routing strategies...`)
+      await routingStrategy.delete(`RS_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_dCloud_${userId}:`, e.message)
+    }
+
+    try {
+      console.log(`checking voice queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_dCloud_${userId}:`, e.message)
+    }
+
+    // Skill Profiles
+    try {
+      console.log(`checking skill profiles...`)
+      await deleteSkillProfile(`Skill_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete skill profile Skill_${userId}:`, e.message)
+    }
+
+    // email treatment rule
+    try {
+      console.log(`checking email treatment rules...`)
+      await deleteTreatmentRule(`route${userId}`)
+    } catch (e) {
+      console.log(`failed to delete email treatment rule Rule${userId}:`, e.message)
+    }
+
+    // email routing strategy queue
+    try {
+      console.log(`checking global email routing strategy...`)
+      await routingStrategy.globalEmail.delete(`Q_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete queue Q_Email_dCloud_${userId} from the global email routing strategy:`, e.message)
+    }
+
+    // delete LDAP users
+    // TODO enable this again when code is moved to branding
+    // try {
+    //   console.log(`checking ldap users...`)
+    //   await deleteLdapUsers(userId)
+    // } catch (e) {
+    //   console.log(`failed to delete ldap users for user ${userId}:`, e.message)
+    // }
+
+    // unlicense control hub users
+    try {
+      console.log(`checking control hub user licenses...`)
+      await unlicense(userId)
+    } catch (e) {
+      console.log(`failed to delete control hub user licenses:`, e.message)
+    }
+
+    // remove roles from control hub users
+    try {
+      console.log(`checking control hub user roles...`)
+      await removeRoles(userId)
+    } catch (e) {
+      console.log(`failed to delete control hub user roles:`, e.message)
+    }
+
+    // remove provision info from database
+    try {
+      console.log(`setting user provision info to not provisioned for webex-v4prod...`)
+      const query = {id: userId}
+      const updates = {
+        $unset: {
+          'demo.webex-v4prod.provision': ''
+        }
+      }
+      await db.updateOne('toolbox', 'users', query, updates)
+      console.log(`successfully set user provision info to not provisioned for webex-v4prod`)
+    } catch (e) {
+      console.log(`failed to set user provision info to not provisioned for webex-v4prod:`, e.message)
+    }
+
+    console.log(`finished deprovisioning user ${userId}`)
+    process.exit(0)
+  } catch (e) {
+    console.log(`failed to deprovision user ${userId}:`, e.message)
+  }
+}
+
+module.exports = main
