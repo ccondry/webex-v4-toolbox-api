@@ -78,7 +78,7 @@ async function getProvisionDeletingUsers () {
       // descending
       return bDate - aDate
     })
-    
+    console.log('userMap', userMap)
     // keep top users, return the rest
     return userMap.slice(maxUsers)
   }
