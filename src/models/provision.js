@@ -14,6 +14,9 @@ function sleep(ms) {
 }
 
 module.exports = async function (user) {
+  // make sure globals are initialized
+  await Promise.resolve(globals.initialLoad)
+
   const userId = user.id
 
   // create Rick user details
@@ -74,7 +77,7 @@ module.exports = async function (user) {
     const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
 
     // add user team to main voice queue Q_Voice_dCloud
-    await cjp.virtualTeam.addTeam('Q_Voice_dCloud', userTeam.id)
+    await cjp.virtualTeam.addTeam(globals.get('webexV4VoiceQueueName'), userTeam.id)
 
     // get or create CJP chat queue
     const chatQueue = await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`, userTeam.id)
@@ -141,7 +144,7 @@ module.exports = async function (user) {
     // await sleep(3000)
     
     // get CJP global agent team
-    const team = await cjp.team.get(`T_dCloud_Voice`)
+    const team = await cjp.team.get(globals.get('webexV4GlobalTeamName'))
     // await sleep(3000)
     // sync CJP users to Webex Control Hub
     await controlHub.syncUsers()
