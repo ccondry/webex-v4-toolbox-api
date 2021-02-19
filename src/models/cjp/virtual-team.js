@@ -43,6 +43,9 @@ async function getOrCreate (type, name, teamId) {
 async function addTeam (queueName, teamId) {
   try {
     const existing = await get(queueName)
+    if (!existing) {
+      throw Error(`virtual-team.addTeam could not find existing virtual team named ${queueName}`)
+    }
     // fix attributes from GET data for using in PUT operation
     existing.attributes.tid__s = existing.attributes.tid
     existing.attributes.sid__s = existing.attributes.sid
