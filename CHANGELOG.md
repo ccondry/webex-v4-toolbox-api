@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.19-1
+
+### Features
+* **Provision:** Don't delete LDAP users during deprovision.
+
+
 # 2021.2.19
 
 ### Bug Fixes
