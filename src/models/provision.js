@@ -5,6 +5,8 @@ const toolbox = require('./toolbox')
 const globals = require('./globals')
 const ldap = require('./ldap')
 const db = require('./db')
+const provision = require('./new/template/provision')
+const {xml2js, js2xml} = require('./parsers')
 
 const domain = process.env.DOMAIN
 
@@ -38,17 +40,15 @@ module.exports = async function (user) {
 
     // get globals
     const voiceQueueName = globals.get('webexV4VoiceQueueName')
-    if (!voiceQueueName) {
-      throw Error('global "webexV4VoiceQueueName" not found')
-    }
     const globalTeamName = globals.get('webexV4GlobalTeamName')
-    if (!globalTeamName) {
-      throw Error('global "webexV4GlobalTeamName" not found')
-    }
     const siteId = globals.get('webexV4BroadCloudSiteId')
-    if (!siteId) {
-      throw Error('global "webexV4BroadCloudSiteId" not found')
-    }
+
+    // get the names of the templates from globals
+    const chatQueueTemplateName = globals.get('webexV4ChatQueueTemplateName')
+    const emailQueueTemplateName = globals.get('webexV4EmailQueueTemplateName')
+    const chatEntryPointTemplateName = globals.get('webexV4ChatEntryPointTemplateName')
+    const chatEntryPointRoutingStrategyTemplateName = globals.get('webexV4ChatEntryPointRoutingStrategyTemplateName')
+
     
     // start provisioning user
     // set default provision info
@@ -89,21 +89,134 @@ module.exports = async function (user) {
 
     // get or create CJP user team for chat and email routing
     const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
-
     // add user team to main voice queue Q_Voice_dCloud
     await cjp.virtualTeam.addTeam(voiceQueueName, userTeam.id)
 
-    // get or create CJP chat queue
-    const chatQueue = await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`, userTeam.id)
-    // await sleep(1000)
-    
-    // get or create CJP chat entry point
-    const chatEntryPoint = await cjp.virtualTeam.getOrCreate('chatEntryPoint', `EP_Chat_${userId}`)
-    
-    // wait for Webex Control Hub to sync the chat entry point from CJP
-    // console.log('waiting 10 seconds for Control Hub to sync the chat entry point')
-    // await sleep(10 * 1000)
-    
+
+    // new template provision script
+
+    // chat queue
+    const chatQueueId = await provision({
+      templateName: chatQueueTemplateName,
+      name: 'Q_Chat_dCloud_' + userId,
+      type: 'virtualTeam',
+      typeName: 'chat queue',
+      modify: (body) => {
+        // apply these modifications to the template data
+        const distributionGroups = [{
+          order: 1,
+          duration: 0,
+          agentGroups: [{
+            teamId: userTeam.id
+          }]
+        }]
+        body.attributes.callDistributionGroups__s = JSON.stringify(distributionGroups)
+      }
+    })
+
+    // get full chat queue details, for the dbId
+    const chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
+
+    // email queue
+    const emailQueueId = await provision({
+      templateName: emailQueueTemplateName,
+      name: 'Q_Email_dCloud_' + userId,
+      type: 'virtualTeam',
+      typeName: 'email queue',
+      modify: (body) => {
+        // apply these modifications to the template data
+        const distributionGroups = [{
+          order: 1,
+          duration: 0,
+          agentGroups: [{
+            teamId: userTeam.id
+          }]
+        }]
+        body.attributes.callDistributionGroups__s = JSON.stringify(distributionGroups)
+      }
+    })
+
+    // get full email queue details, for the dbId
+    const emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
+
+    // chat entry point
+    const chatEntryPointId = await provision({
+      templateName: chatEntryPointTemplateName,
+      name: 'EP_Chat_' + userId,
+      type: 'virtualTeam',
+      typeName: 'chat entry point'
+    })
+
+    // get chat entry point details, for the dbId
+    const chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
+
+    // chat entry point routing strategy
+    await provision({
+      templateName: chatEntryPointRoutingStrategyTemplateName,
+      name: 'EP_Chat_' + userId,
+      type: 'routingStrategy',
+      typeName: 'chat entry point routing strategy',
+      modify: (body) => {
+        // set script
+        const json = xml2js(body.attributes.script__s)
+        // get current time in milliseconds
+        const now = new Date().getTime()
+        const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
+        json['call-distribution-script']['@_name'] = 'EP_Chat_' + userId
+        json['call-distribution-script']['@_scriptid'] = now
+        // start date is start of day today in milliseconds
+        json['call-distribution-script']['@_start-date'] = startOfToday
+        // chat entry point ID
+        json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
+        // chat entry point db ID
+        json['call-distribution-script']['vdn']['@_vteam-id'] = chatEntryPoint.attributes.dbId__l
+        // chat entry point name
+        json['call-distribution-script']['vdn']['@_vteam-name'] = 'EP_Chat_' + userId
+        // chat queue db ID
+        json['call-distribution-script']['call-flow-params']['param']['@_value'] = chatQueue.attributes.dbId__l
+        // convert script back to xml
+        body.attributes.script__s = js2xml(json)
+        // chat entry point db ID
+        body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
+        // chat entry point ID
+        body.attributes.virtualTeamId__s = chatEntryPointId
+      }
+    })
+
+    // chat entry point current routing strategy
+    await provision({
+      templateName: 'Current-' + chatEntryPointRoutingStrategyTemplateName,
+      name: 'Current-EP_Chat_' + userId,
+      type: 'routingStrategy',
+      typeName: 'chat entry point current routing strategy',
+      modify: (body) => {
+        // set script
+        const json = xml2js(body.attributes.script__s)
+        // get current time in milliseconds
+        const now = new Date().getTime()
+        json['call-distribution-script']['@_name'] = 'Current-EP_Chat_' + userId
+        json['call-distribution-script']['@_scriptid'] = now
+        // start date is start of day today in milliseconds
+        const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
+        json['call-distribution-script']['@_start-date'] = startOfToday
+        json['call-distribution-script']['@_end-date'] = startOfToday
+        // chat entry point ID
+        json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
+        // chat entry point db ID
+        json['call-distribution-script']['vdn']['@_vteam-id'] = chatEntryPoint.attributes.dbId__l
+        // chat entry point name
+        json['call-distribution-script']['vdn']['@_vteam-name'] = 'Current-EP_Chat_' + userId
+        // chat queue db ID
+        json['call-distribution-script']['call-flow-params']['param']['@_value'] = chatQueue.attributes.dbId__l
+        // convert script back to xml
+        body.attributes.script__s = js2xml(json)
+        // chat entry point db ID
+        body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
+        // chat entry point ID
+        body.attributes.virtualTeamId__s = chatEntryPointId
+      }
+    })
+
     // get or create the Webex Control Hub chat template
     const chatTemplate = await controlHub.chatTemplate.getOrCreate(userId, chatEntryPoint.id)
     // await sleep(3000)
@@ -142,10 +255,6 @@ module.exports = async function (user) {
     // make Rick a supervisor in Webex Control Hub
     // await controlHub.user.makeSupervisor(rick.webex.id)
     // console.log(`set Control Hub user ${rick.name} role to Supervisor`)
-    
-    // get/create CJP email queue
-    const emailQueue = await cjp.virtualTeam.getOrCreate('emailQueue', `Q_Email_dCloud_${userId}`, userTeam.id)
-    // await sleep(3000)
     
     // reset control hub user roles
     await controlHub.user.enableStandardContactCenterAgent({email: sandra.email})
@@ -224,19 +333,6 @@ module.exports = async function (user) {
     // get/create email treatment in Webex Control Hub
     await controlHub.treatment.getOrCreate(userId)
     
-    // debug
-    // console.log('emailQueue', emailQueue)
-
-    // provision chat entry point routing strategy and current routing strategy
-    await cjp.routingStrategy.user.provision({
-      name: 'EP_Chat_' + userId,
-      entryPointDbId: chatEntryPoint.attributes.dbId__l,
-      queueDbId: chatQueue.attributes.dbId__l,
-      tenantId: process.env.CJP_TENANT_ID,
-      tenantName: process.env.CJP_ENTERPRISE_NAME,
-      entryPointId: chatEntryPoint.id
-    })
-
     // get/create global email routing strategy in CJP, referencing the
     // numerical ID of the user's email queue in CJP
     await cjp.routingStrategy.globalEmail.provision(userId, emailQueue.attributes.dbId__l)
