@@ -1,5 +1,5 @@
 require('dotenv').config()
-const provision = require('../src/models/new/template/chat-queue')
+const provision = require('../src/models/new/template/provision')
 const cjp = require('../src/models/cjp/client')
 const {xml2js, js2xml} = require('../src/models/parsers')
 
