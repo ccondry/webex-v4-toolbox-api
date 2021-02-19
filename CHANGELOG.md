@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.19-2
+
+### Features
+* **Deprovision:** Remove team from global voice queue distribution group during deprovision.
+* **Provision:** Check if team is in the global voice queue distribution group before adding it.
+
+
 # 2021.2.19-1
 
 ### Features
