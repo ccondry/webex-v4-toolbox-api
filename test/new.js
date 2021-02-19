@@ -1,6 +1,7 @@
 require('dotenv').config()
 const provision = require('../src/models/new/template/provision')
 const cjp = require('../src/models/cjp/client')
+const globals = require('../src/models/globals')
 const {xml2js, js2xml} = require('../src/models/parsers')
 
 async function main (userId) {
@@ -9,9 +10,17 @@ async function main (userId) {
   const team = teamList.auxiliaryDataList.find(v => v.attributes.name__s === 'T_dCloud_' + userId)
   const teamId = team.id
 
+  // wait for globals to init
+  await Promise.resolve(globals.initialLoad)
+  // get the names of the templates from globals
+  const chatQueueTemplateName = globals.get('webexV4ChatQueueTemplateName')
+  const emailQueueTemplateName = globals.get('webexV4EmailQueueTemplateName')
+  const chatEntryPointTemplateName = globals.get('webexV4ChatEntryPointTemplateName')
+  const chatEntryPointRoutingStrategyTemplateName = globals.get('webexV4ChatEntryPointRoutingStrategyTemplateName')
+
   // // chat queue
   const chatQueueId = await provision({
-    templateName: 'Q_Chat_dCloud_0609',
+    templateName: chatQueueTemplateName,
     name: 'Q_Chat_dCloud_' + userId,
     type: 'virtualTeam',
     typeName: 'chat queue',
@@ -33,7 +42,7 @@ async function main (userId) {
 
   // email queue
   const emailQueueId = await provision({
-    templateName: 'Q_Email_dCloud_0609',
+    templateName: emailQueueTemplateName,
     name: 'Q_Email_dCloud_' + userId,
     type: 'virtualTeam',
     typeName: 'email queue',
@@ -55,7 +64,7 @@ async function main (userId) {
 
   // chat entry point
   const chatEntryPointId = await provision({
-    templateName: 'EP_Chat_0609',
+    templateName: chatEntryPointTemplateName,
     name: 'EP_Chat_' + userId,
     type: 'virtualTeam',
     typeName: 'chat entry point'
@@ -66,7 +75,7 @@ async function main (userId) {
 
   // chat entry point routing strategy
   await provision({
-    templateName: 'EP_Chat_0609',
+    templateName: chatEntryPointRoutingStrategyTemplateName,
     name: 'EP_Chat_' + userId,
     type: 'routingStrategy',
     typeName: 'chat entry point routing strategy',
@@ -99,7 +108,7 @@ async function main (userId) {
 
   // chat entry point current routing strategy
   await provision({
-    templateName: 'Current-EP_Chat_0609',
+    templateName: 'Current-' + chatEntryPointRoutingStrategyTemplateName,
     name: 'Current-EP_Chat_' + userId,
     type: 'routingStrategy',
     typeName: 'chat entry point current routing strategy',
@@ -133,4 +142,5 @@ async function main (userId) {
 }
 
 main('0325')
+.then(r => process.exit(0))
 .catch(e => console.log('error:', e.message))
