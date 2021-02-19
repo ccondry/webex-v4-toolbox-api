@@ -245,6 +245,9 @@ async function removeVoiceQueueTeam (teamName) {
     const client = await cjp.get()
     const teams = await client.team.list()
     const team = teams.auxiliaryDataList.find(v => v.name__s === teamName)
+    if (!team) {
+      throw Error(`team "${teamName}" not found`)
+    }
     const queues = await client.virtualTeam.list()
     const queue = queues.auxiliaryDataList.find(v => v.name__s === queueName)
     if (!queue) {
@@ -263,8 +266,11 @@ async function removeVoiceQueueTeam (teamName) {
     const groups = JSON.parse(queue.attributes.callDistributionGroups__s)
     // get the first distribution group
     const group = groups.find(v => v.order === 1)
-    // filter out the agent groups
-    group.agentGroups = group.agentGroups.filter(v => v.teamId === team.id)
+    if (!group) {
+      throw Error(`call distribution group 1 not found`)
+    }
+    // filter out the agent groups matching the team ID
+    group.agentGroups = group.agentGroups.filter(v => v.teamId !== team.id)
     queue.attributes.callDistributionGroups__s = JSON.stringify(groups)
     // update queue on CJP
     return client.virtualTeam.modify(queue.id, [queue])
