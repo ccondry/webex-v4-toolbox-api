@@ -125,7 +125,7 @@ async function checkMaxUsers () {
 }
 
 // find license usage in control hub
-async function getCurrentUserCount () {
+async function getLicenseUsageCount () {
   const client = await ch.getClient()
   const licenseUsage = await client.org.getLicenseUsage()
   const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
@@ -160,17 +160,17 @@ async function go () {
     try {
       // wait for globals to exist
       let users = await getProvisionStartedUsers()
+      // get max users number
+      await Promise.resolve(globals.initialLoad)
+      const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
+      const licenseUsageCount = await getLicenseUsageCount()
+      // check if provision amount would be too many
+      if (licenseUsageCount / 2 + users.length > maxUsers) {
+        // trim?
+        const max = Math.floor(maxUsers - (licenseUsageCount / 2))
+        users = users.slice(0, max)
+      }
       if (users.length > 0) {
-        // get max users number
-        await Promise.resolve(globals.initialLoad)
-        const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
-        const currentUserCount = await getCurrentUserCount()
-        // check if provision amount would be too many
-        if (currentUserCount / 2 + users.length > maxUsers) {
-          // trim?
-          const max = Math.floor(maxUsers - (currentUserCount / 2))
-          users = users.slice(0, max)
-        }
         console.log(`starting provision for ${users.length} users`)
         // provision all LDAP users first, so sync is easier
         for (const user of users) {
