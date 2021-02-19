@@ -170,15 +170,15 @@ module.exports = async function (user) {
     let chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
 
     // wait for chat entry point dbId to exist
-    count = 0
-    while (!chatEntryPoint.attributes.dbId__l && count < 10) {
+    // count = 0
+    while (!chatEntryPoint.attributes.dbId__l) {
       await sleep(2000)
       chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
-      count++
+      // count++
     }
-    if (!chatEntryPoint.attributes.dbId__l) {
-      throw Error(`chatEntryPoint.attributes.dbId__l did not exist for virtual team with ID ${chatEntryPointId}, even after ${count} retries.`)
-    }
+    // if (!chatEntryPoint.attributes.dbId__l) {
+    //   throw Error(`chatEntryPoint.attributes.dbId__l did not exist for virtual team with ID ${chatEntryPointId}, even after ${count} retries.`)
+    // }
 
     // chat entry point routing strategy
     await provision({
