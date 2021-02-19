@@ -13,7 +13,7 @@ const globals = require('../globals')
 // const makeJwt = require('../make-jwt')
 const routingStrategy = require('./routing-strategy')
 const db = require('../db')
-const ldap = require('../ldap')
+// const ldap = require('../ldap')
 
 // delete team
 async function deleteTeam (name) {
@@ -428,13 +428,13 @@ async function main (user) {
     }
 
     // delete LDAP users
-    try {
-      console.log(`checking ldap users...`)
-      await ldap.deleteUsers(userId)
-    } catch (e) {
-      console.log(`failed to delete ldap users for user ${userId}:`, e.message)
-      throw e
-    }
+    // try {
+    //   console.log(`checking ldap users...`)
+    //   await ldap.deleteUsers(userId)
+    // } catch (e) {
+    //   console.log(`failed to delete ldap users for user ${userId}:`, e.message)
+    //   throw e
+    // }
 
     // unlicense control hub users
     try {
