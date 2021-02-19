@@ -25,7 +25,12 @@ const throttle = 1000 * 60 * 5
 setInterval(refresh, throttle)
 
 function get (name) {
-  return cache[name]
+  const g = cache[name]
+  if (g) {
+    return g
+  } else {
+    throw Error(`global ${name} not found`)
+  }
 }
 
 // export our specific cache value methods and the generic getCache method
