@@ -301,10 +301,10 @@ async function main (user) {
       throw e
     }
 
-    // global voice queue
+    // remove team from global voice queue
     try {
       console.log(`checking global voice queue distribution groups...`)
-      await removeVoiceQueueTeam(`Q_dCloud_${userId}`)
+      await removeVoiceQueueTeam(`T_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to remove virtual team Q_dCloud_${userId} from global voice queue distribution groups:`, e.message)
       throw e
