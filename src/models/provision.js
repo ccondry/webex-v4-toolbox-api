@@ -3,7 +3,7 @@ const controlHub = require('./control-hub')
 const teamsNotifier = require('./teams-notifier')
 const toolbox = require('./toolbox')
 const globals = require('./globals')
-const ldap = require('./ldap')
+// const ldap = require('./ldap')
 const db = require('./db')
 const provision = require('./new/template/provision')
 const {xml2js, js2xml} = require('./parsers')
@@ -65,8 +65,8 @@ module.exports = async function (user) {
     }
     await db.updateOne('toolbox', 'users', {id: userId}, updates)
 
-    // provision LDAP users
-    await ldap.createUsers({userId})
+    // // provision LDAP users
+    // await ldap.createUsers({userId})
 
     // wait for LDAP sync to complete
     let chSandra

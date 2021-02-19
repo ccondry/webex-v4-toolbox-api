@@ -5,6 +5,7 @@ const db = require('./db')
 const ch = require('./control-hub/client')
 const globals = require('./globals')
 const teamsLogger = require('./teams-logger')
+const ldap = require('./ldap')
 
 // number of milliseconds to wait after completing the scheduled job before
 // starting again
@@ -138,7 +139,12 @@ async function go () {
       if (users.length > 0) {
         console.log(`starting provision for ${users.length} users`)
       }
+      // provision all LDAP users first, so sync is easier
       for (const user of users) {
+        await ldap.createUsers({userId: user.id})
+      }
+      for (const user of users) {
+           // provision LDAP users
         await provision(user)
       }
     } catch (e) {
