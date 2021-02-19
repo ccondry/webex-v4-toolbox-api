@@ -138,7 +138,10 @@ module.exports = async function (user) {
 
     // get full email queue details, for the dbId
     const emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
-
+    console.log('got email queue', JSON.stringify(emailQueue, null, 2))
+    if (!emailQueue.attributes.dbId__l) {
+      throw Error('emailQueue.attributes.dbId__l did not exist.')
+    }
     // chat entry point
     const chatEntryPointId = await provision({
       templateName: chatEntryPointTemplateName,
