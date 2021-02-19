@@ -244,12 +244,12 @@ async function removeVoiceQueueTeam (teamName) {
     const queueName = globals.get('webexV4VoiceQueueName')
     const client = await cjp.get()
     const teams = await client.team.list()
-    const team = teams.auxiliaryDataList.find(v => v.name__s === teamName)
+    const team = teams.auxiliaryDataList.find(v => v.attributes.name__s === teamName)
     if (!team) {
       throw Error(`team "${teamName}" not found`)
     }
     const queues = await client.virtualTeam.list()
-    const queue = queues.auxiliaryDataList.find(v => v.name__s === queueName)
+    const queue = queues.auxiliaryDataList.find(v => v.attributes.name__s === queueName)
     if (!queue) {
       throw Error(`queue "${queueName}" not found`)
     }
@@ -306,7 +306,7 @@ async function main (user) {
       console.log(`checking global voice queue distribution groups...`)
       await removeVoiceQueueTeam(`T_dCloud_${userId}`)
     } catch (e) {
-      console.log(`failed to remove virtual team Q_dCloud_${userId} from global voice queue distribution groups:`, e.message)
+      console.log(`failed to remove virtual team T_dCloud_${userId} from global voice queue distribution groups:`, e.message)
       // don't stop here - this is probably fine?
       // throw e
     }
