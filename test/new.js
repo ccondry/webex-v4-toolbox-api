@@ -75,10 +75,11 @@ async function main (userId) {
       const json = xml2js(body.attributes.script__s)
       // get current time in milliseconds
       const now = new Date().getTime()
+      const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
       json['call-distribution-script']['@_name'] = 'EP_Chat_' + userId
       json['call-distribution-script']['@_scriptid'] = now
       // start date is start of day today in milliseconds
-      json['call-distribution-script']['@_start-date'] = Math.floor(now / 1000 / 86400) * 86400 * 1000
+      json['call-distribution-script']['@_start-date'] = startOfToday
       // chat entry point ID
       json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
       // chat entry point db ID
@@ -110,8 +111,9 @@ async function main (userId) {
       json['call-distribution-script']['@_name'] = 'Current-EP_Chat_' + userId
       json['call-distribution-script']['@_scriptid'] = now
       // start date is start of day today in milliseconds
-      json['call-distribution-script']['@_start-date'] = Math.floor(now / 1000 / 86400) * 86400 * 1000
-      json['call-distribution-script']['@-end-date'] = Math.floor(now / 1000 / 86400) * 86400 * 1000
+      const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
+      json['call-distribution-script']['@_start-date'] = startOfToday
+      json['call-distribution-script']['@_end-date'] = startOfToday
       // chat entry point ID
       json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
       // chat entry point db ID
