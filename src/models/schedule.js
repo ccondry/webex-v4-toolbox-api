@@ -109,6 +109,14 @@ async function checkMaxUsers () {
   }
 }
 
+// find license usage in control hub
+async function getCurrentUserCount () {
+  const client = await ch.getClient()
+  const licenseUsage = await client.org.getLicenseUsage()
+  const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
+  return cjpPremiumLicenses.usage
+}
+
 async function go () {
   // don't do anything if provisioning is already in progress
   // console.log('running =', running)
@@ -135,17 +143,29 @@ async function go () {
     }
     // get list of users to provision
     try {
-      const users = await getProvisionStartedUsers()
+      // wait for globals to exist
+      let users = await getProvisionStartedUsers()
       if (users.length > 0) {
+        // get max users number
+        await Promise.resolve(globals.initialLoad)
+        const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
+        const currentUserCount = await getCurrentUserCount()
+        // check if provision amount would be too many
+        if (currentUserCount / 2 + users.length > maxUsers) {
+          // trim?
+          users = users.slice(0, maxUsers - currentUserCount / 2)
+        }
         console.log(`starting provision for ${users.length} users`)
-      }
-      // provision all LDAP users first, so sync is easier
-      for (const user of users) {
-        await ldap.createUsers({userId: user.id})
-      }
-      for (const user of users) {
-           // provision LDAP users
-        await provision(user)
+        // provision all LDAP users first, so sync is easier
+        for (const user of users) {
+          await ldap.createUsers({userId: user.id})
+        }
+        // provision the rest of the user stuff in CJP and control hub
+        for (const user of users) {
+          await provision(user)
+        }
+      } else {
+        // no users to provision
       }
     } catch (e) {
       const message = `provision error: ${e.message}`
