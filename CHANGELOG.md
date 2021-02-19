@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.19
+
+### Bug Fixes
+* **Provision:** Fix chat and email provisioning with new provision code for
+routing strategies, chat entry point, chat queue, and email queue.
+
+
 # 2021.2.18
 
 ### Features
