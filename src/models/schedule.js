@@ -141,7 +141,9 @@ async function go () {
         await provision(user)
       }
     } catch (e) {
-      console.log('provision error:', e.message)      
+      const message = `provision error: ${e.message}`
+      console.log(message)
+      teamsLogger.log(message)
     }
     // stop running
     running = false
