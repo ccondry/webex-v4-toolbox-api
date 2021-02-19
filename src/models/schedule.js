@@ -78,7 +78,7 @@ async function checkMaxUsers () {
     // console.log('maxUsers', maxUsers)
     // delete 10 users below the max, so that old users can be cycled out when
     // new users are waiting to be provisioned and we are at max capacity
-    if (cjpPremiumLicenses.usage > maxUsers - maxUsersBuffer) {
+    if (cjpPremiumLicenses.usage / 2 > maxUsers - maxUsersBuffer) {
       // too full - need to deprovision some users
       // get all control hub users
       const allUsers = await client.user.listAll()
@@ -117,7 +117,7 @@ async function checkMaxUsers () {
       // keep top users, return the rest
       // return userMap.slice(maxUsers)
       // set each of these users to deleting state
-      const userIds = userMap.slice(maxUsers).map(v => v.id)
+      const userIds = userMap.slice(maxUsers - maxUsersBuffer).map(v => v.id)
       const filter = {id: {$in: userIds}}
       const updates = {$set: {'demo.webex-v4prod.provision': 'deleting'}}
       return db.updateMany('toolbox', 'users', filter, updates)
