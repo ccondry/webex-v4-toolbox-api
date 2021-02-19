@@ -168,7 +168,8 @@ async function go () {
         // check if provision amount would be too many
         if (currentUserCount / 2 + users.length > maxUsers) {
           // trim?
-          users = users.slice(0, maxUsers - currentUserCount / 2)
+          const max = Math.floor(maxUsers - (currentUserCount / 2))
+          users = users.slice(0, max)
         }
         console.log(`starting provision for ${users.length} users`)
         // provision all LDAP users first, so sync is easier
