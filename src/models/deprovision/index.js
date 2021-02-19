@@ -307,7 +307,8 @@ async function main (user) {
       await removeVoiceQueueTeam(`T_dCloud_${userId}`)
     } catch (e) {
       console.log(`failed to remove virtual team Q_dCloud_${userId} from global voice queue distribution groups:`, e.message)
-      throw e
+      // don't stop here - this is probably fine?
+      // throw e
     }
 
     // email queue
