@@ -14,28 +14,42 @@ function sleep(ms) {
 }
 
 module.exports = async function (user) {
-  // make sure globals are initialized
-  await Promise.resolve(globals.initialLoad)
-
-  const userId = user.id
-
-  // create Rick user details
-  const rick = {
-    firstName: 'Rick', 
-    lastName: `Barrows${userId}`,
-    name: `Rick Barrows${userId}`,
-    email: `rbarrows${userId}@${domain}`
-  }
-  
-  // create Sandra user details
-  const sandra = {
-    firstName: 'Sandra', 
-    lastName: `Jefferson${userId}`,
-    name: `Sandra Jefferson${userId}`,
-    email: `sjeffers${userId}@${domain}`
-  }
-
   try {
+    // make sure globals are initialized
+    await Promise.resolve(globals.initialLoad)
+
+    const userId = user.id
+
+    // create Rick user details
+    const rick = {
+      firstName: 'Rick', 
+      lastName: `Barrows${userId}`,
+      name: `Rick Barrows${userId}`,
+      email: `rbarrows${userId}@${domain}`
+    }
+    
+    // create Sandra user details
+    const sandra = {
+      firstName: 'Sandra', 
+      lastName: `Jefferson${userId}`,
+      name: `Sandra Jefferson${userId}`,
+      email: `sjeffers${userId}@${domain}`
+    }
+
+    // get globals
+    const voiceQueueName = globals.get('webexV4VoiceQueueName')
+    if (!voiceQueueName) {
+      throw Error('global "webexV4VoiceQueueName" not found')
+    }
+    const globalTeamName = globals.get('webexV4GlobalTeamName')
+    if (!globalTeamName) {
+      throw Error('global "webexV4GlobalTeamName" not found')
+    }
+    const siteId = globals.get('webexV4BroadCloudSiteId')
+    if (!siteId) {
+      throw Error('global "webexV4BroadCloudSiteId" not found')
+    }
+    
     // start provisioning user
     // set default provision info
     const updates = {
@@ -77,7 +91,7 @@ module.exports = async function (user) {
     const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
 
     // add user team to main voice queue Q_Voice_dCloud
-    await cjp.virtualTeam.addTeam(globals.get('webexV4VoiceQueueName'), userTeam.id)
+    await cjp.virtualTeam.addTeam(voiceQueueName, userTeam.id)
 
     // get or create CJP chat queue
     const chatQueue = await cjp.virtualTeam.getOrCreate('chatQueue', `Q_Chat_dCloud_${userId}`, userTeam.id)
@@ -144,7 +158,7 @@ module.exports = async function (user) {
     // await sleep(3000)
     
     // get CJP global agent team
-    const team = await cjp.team.get(globals.get('webexV4GlobalTeamName'))
+    const team = await cjp.team.get(globalTeamName)
     // await sleep(3000)
     // sync CJP users to Webex Control Hub
     await controlHub.syncUsers()
@@ -226,10 +240,8 @@ module.exports = async function (user) {
     // get/create global email routing strategy in CJP, referencing the
     // numerical ID of the user's email queue in CJP
     await cjp.routingStrategy.globalEmail.provision(userId, emailQueue.attributes.dbId__l)
-    
-    // create/set agent extensions
-    const siteId = globals.get('webexV4BroadCloudSiteId')
 
+    // create/set agent extensions
     await ch.user.onboard({
       email: sandra.email,
       licenses: [{
