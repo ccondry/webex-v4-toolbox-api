@@ -21,6 +21,8 @@ module.exports = async function (user) {
     await Promise.resolve(globals.initialLoad)
 
     const userId = user.id
+    // reusable retry counter
+    let retryCount = 0
 
     // create Rick user details
     const rick = {
@@ -71,6 +73,7 @@ module.exports = async function (user) {
     // wait for LDAP sync to complete
     let chSandra
     let chRick
+    retryCount = 0
     while (!chSandra || !chRick) {
       // try to find agent and supervisor users
       try {
@@ -85,7 +88,13 @@ module.exports = async function (user) {
         // wait 20 seconds before trying again
         await sleep(20 * 1000)
       }
+      retryCount++
+      // log every 10th retry
+      if (retryCount % 10 === 0) {
+        console.log(`retry number ${retryCount} of search for ${sandra.email} in Control Hub...`)
+      }
     }
+    console.log(`found Control Hub users for ${sandra.email} and ${rick.email} after ${retryCount} retries.`)
 
     // get or create CJP user team for chat and email routing
     const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
@@ -116,10 +125,17 @@ module.exports = async function (user) {
     let chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
         
     // wait for chat queue to exist
+    retryCount = 0
     while (!chatQueue.attributes.dbId__l) {
       await sleep(2000)
       chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
+      retryCount++
+      // log every 20th retry
+      if (retryCount % 20 === 0) {
+        console.log(`retry number ${retryCount} of search for dbId of chat queue "${'Q_Chat_dCloud_' + userId}" (${chatQueueId})`)
+      }
     }
+    console.log(`found cjp chat queue ${chatQueue.attributes.name__s} (${chatQueue.id}) dbId after ${retryCount} retries.`)
 
     // email queue
     const emailQueueId = await provision({
@@ -142,12 +158,20 @@ module.exports = async function (user) {
 
     // get full email queue details, for the dbId
     let emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
-
+    
+    console.log('waiting for email queue dbId to exist...')
     // wait for email queue dbId to exist
+    retryCount = 0
     while (!emailQueue.attributes.dbId__l) {
       await sleep(2000)
       emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
+      retryCount++
+      // log every 20th retry
+      if (retryCount % 20 === 0) {
+        console.log(`retry number ${retryCount} of search for dbId of email queue "${'Q_Email_dCloud_' + userId}" (${emailQueueId})`)
+      }
     }
+    console.log(`found emailQueue dbId after ${retryCount} retries`)
     // chat entry point
     const chatEntryPointId = await provision({
       templateName: chatEntryPointTemplateName,
@@ -160,10 +184,16 @@ module.exports = async function (user) {
     let chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
 
     // wait for chat entry point dbId to exist
+    retryCount = 0
     while (!chatEntryPoint.attributes.dbId__l) {
       await sleep(2000)
       chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
+      retryCount++
+      if (retryCount % 20 === 0) {
+        console.log(`retry number ${retryCount} of search for dbId of chat entry point "${'EP_Chat_' + userId}" (${chatEntryPointId})`)
+      }
     }
+    console.log(`found chat entry point dbId after ${retryCount} retries`)
 
     // chat entry point routing strategy
     await provision({
@@ -296,14 +326,17 @@ module.exports = async function (user) {
 
     // get Rick's CJP user details
     rick.cjp = await cjp.user.get(rick.email)
-    let retryCount = 0
+    retryCount = 0
     while (!rick.cjp) {
-      console.log(`did not find ${rick.email} in CJP after ${retryCount} retries. Waiting and trying again...`)
       // wait
       await sleep(1000 * 20)
       // try again
       rick.cjp = await cjp.user.get(rick.email)
       retryCount++
+      // log every 10th retry
+      if (retryCount % 10 === 0) {
+        console.log(`retry number ${retryCount} of search for CJP user ${rick.email}`)
+      }
     }
     console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id} after ${retryCount} retries`)
     // await sleep(1000)
@@ -320,14 +353,20 @@ module.exports = async function (user) {
   
     // get Sandra's CJP user details
     sandra.cjp = await cjp.user.get(sandra.email)
+    retryCount = 0
     while (!sandra.cjp) {
       console.log('did not find', sandra.email, 'in CJP. Waiting and trying again...')
       // wait
       await sleep(1000 * 20)
       // try again
       sandra.cjp = await cjp.user.get(sandra.email)
+      retryCount++
+      // log every 10th retry
+      if (retryCount % 10 === 0) {
+        console.log(`retry number ${retryCount} of search for CJP user ${sandra.email}`)
+      }
     }
-    console.log(`got CJP user details for ${sandra.name}: ${sandra.cjp.id}`)
+    console.log(`found CJP user details for ${sandra.name}: ${sandra.cjp.id} after ${retryCount} retries.`)
 
     // assign skill profile and team to Sandra
     await cjp.user.modify({
