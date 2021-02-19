@@ -115,7 +115,18 @@ module.exports = async function (user) {
     })
 
     // get full chat queue details, for the dbId
-    const chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
+    let chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
+        
+    // wait for chat queue to exist
+    count = 0
+    while (!chatQueue.attributes.dbId__l && count < 10) {
+      await sleep(2000)
+      chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
+      count++
+    }
+    if (!chatQueue.attributes.dbId__l) {
+      throw Error(`chatQueue.attributes.dbId__l did not exist for virtual team with ID ${chatQueueId}, even after ${count} retries.`)
+    }
 
     // email queue
     const emailQueueId = await provision({
@@ -137,10 +148,17 @@ module.exports = async function (user) {
     })
 
     // get full email queue details, for the dbId
-    const emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
-    console.log('got email queue', JSON.stringify(emailQueue, null, 2))
+    let emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
+
+    // wait for email queue dbId to exist
+    let count = 0
+    while (!emailQueue.attributes.dbId__l && count < 10) {
+      await sleep(2000)
+      emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
+      count++
+    }
     if (!emailQueue.attributes.dbId__l) {
-      throw Error('emailQueue.attributes.dbId__l did not exist.')
+      throw Error(`emailQueue.attributes.dbId__l did not exist for virtual team with ID ${emailQueueId}, even after ${count} retries.`)
     }
     // chat entry point
     const chatEntryPointId = await provision({
@@ -151,7 +169,18 @@ module.exports = async function (user) {
     })
 
     // get chat entry point details, for the dbId
-    const chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
+    let chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
+
+    // wait for chat entry point dbId to exist
+    count = 0
+    while (!chatEntryPoint.attributes.dbId__l && count < 10) {
+      await sleep(2000)
+      chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
+      count++
+    }
+    if (!chatEntryPoint.attributes.dbId__l) {
+      throw Error(`chatEntryPoint.attributes.dbId__l did not exist for virtual team with ID ${chatEntryPointId}, even after ${count} retries.`)
+    }
 
     // chat entry point routing strategy
     await provision({
