@@ -1,3 +1,4 @@
+require('dotenv').config()
 const db = require('../src/models/db')
 
 // provision all users in v4 who are provisioned in v3
