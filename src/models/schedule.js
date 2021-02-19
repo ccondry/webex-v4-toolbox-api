@@ -65,7 +65,8 @@ async function checkMaxUsers () {
     // max number of users that can be provisioned. more than this will trigger
     // deprovision. this is number of toolbox users.
     const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
-  
+    // number of users to delete below the maxUser limit
+    const maxUsersBuffer = parseInt(globals.get('webexV4MaxUsersBuffer'))
     // find license usage in control hub
     const client = await ch.getClient()
     const licenseUsage = await client.org.getLicenseUsage()
@@ -75,7 +76,9 @@ async function checkMaxUsers () {
     // if (cjpPremiumLicenses.volume - cjpPremiumLicenses.usage <= 10) {
     // console.log('cjpPremiumLicenses.usage', cjpPremiumLicenses.usage)
     // console.log('maxUsers', maxUsers)
-    if (cjpPremiumLicenses.usage > maxUsers) {
+    // delete 10 users below the max, so that old users can be cycled out when
+    // new users are waiting to be provisioned and we are at max capacity
+    if (cjpPremiumLicenses.usage > maxUsers - maxUsersBuffer) {
       // too full - need to deprovision some users
       // get all control hub users
       const allUsers = await client.user.listAll()
@@ -91,7 +94,10 @@ async function checkMaxUsers () {
         }
       })
       // find user provision info for this demo
-      const query = {'demo.webex-v4prod.lastAccess': {$exists: 1}, 'demo.webex-v4prod.provision': 'complete'}
+      const query = {
+        'demo.webex-v4prod.lastAccess': {$exists: 1},
+        'demo.webex-v4prod.provision': 'complete'
+      }
       // const projection = {password: false}
       const projection = {id: true, 'demo.webex-v4prod.lastAccess': true}
       const provisionedUsers = await db.find('toolbox', 'users', query, projection)
