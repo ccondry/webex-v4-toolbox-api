@@ -4,6 +4,7 @@ const deprovision = require('./deprovision')
 const db = require('./db')
 const ch = require('./control-hub/client')
 const globals = require('./globals')
+const teamsLogger = require('./teams-logger')
 
 // number of milliseconds to wait after completing the scheduled job before
 // starting again

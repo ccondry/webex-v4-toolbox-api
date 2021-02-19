@@ -1,5 +1,6 @@
 // create a valid template in CJP that provision can copy from
 const cjp = require('../../cjp')
+const teamsLogger = require('../../teams-logger')
 
 // return a clean copy of a template JSON that can be modified
 function cleanTemplate (template) {
