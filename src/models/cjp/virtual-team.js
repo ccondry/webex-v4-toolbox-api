@@ -78,6 +78,7 @@ async function addTeam (queueName, teamId) {
   }
 }
 
+
 module.exports = {
   create,
   get,
