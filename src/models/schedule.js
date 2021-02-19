@@ -140,10 +140,8 @@ async function getLicenseUsageCount () {
 
 async function go () {
   // don't do anything if provisioning is already in progress
-  // console.log('running =', running)
   if (!running) {
     running = true
-    // console.log('running =', running)
     // check if there are too many users provisioned
     try {
       await checkMaxUsers()
