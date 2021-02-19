@@ -273,8 +273,10 @@ async function removeVoiceQueueTeam (teamName) {
     group.agentGroups = group.agentGroups.filter(v => v.teamId !== team.id)
     queue.attributes.callDistributionGroups__s = JSON.stringify(groups)
     // update queue on CJP
-    return client.virtualTeam.modify(queue.id, [queue])
+    await client.virtualTeam.modify(queue.id, [queue])
+    console.log(`successfully removed team "${teamName}" (${team.id}) from the global voice queue "${queue.attributes.name__s}" (${queue.id})`)
   } catch (e) {
+    console.log(`failed to remove team "${teamName}" (${team.id}) from the global voice queue "${queue.attributes.name__s}" (${queue.id}):`, e.message)
     throw e
   }
 }
