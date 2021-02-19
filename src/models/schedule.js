@@ -29,6 +29,8 @@ async function getProvisionStartedUsers () {
 }
 
 async function getProvisionDeletingUsers () {
+  // wait for globals to exist
+  await Promise.resolve(globals.initialLoad)
   // return array users who need to be deprovisioned 
   const query = {$or: [
     {'demo.webex-v4prod.provision': 'delete'},
@@ -38,7 +40,16 @@ async function getProvisionDeletingUsers () {
     demo: false,
     password: false
   }
-  return db.find('toolbox', 'users', query, projection)
+  const users = db.find('toolbox', 'users', query, projection)
+  // filter out any template user IDs
+  const templateUsers = [
+    globals.get('webexV4ChatQueueTemplateName').split('_').pop(),
+    globals.get('webexV4EmailQueueTemplateName').split('_').pop(),
+    globals.get('webexV4ChatEntryPointTemplateName').split('_').pop()
+  ]
+  return users.filter(v => {
+    return !templateUsers.includes(v.id)
+  })
 }
 
 // find licensed users over the webexV4MaxUsers setting, and mark them 'deleting'
