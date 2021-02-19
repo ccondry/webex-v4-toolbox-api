@@ -92,9 +92,7 @@ module.exports = async function (user) {
     // add user team to main voice queue Q_Voice_dCloud
     await cjp.virtualTeam.addTeam(voiceQueueName, userTeam.id)
 
-
     // new template provision script
-
     // chat queue
     const chatQueueId = await provision({
       templateName: chatQueueTemplateName,
@@ -118,7 +116,7 @@ module.exports = async function (user) {
     let chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
         
     // wait for chat queue to exist
-    count = 0
+    let count = 0
     while (!chatQueue.attributes.dbId__l && count < 10) {
       await sleep(2000)
       chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
@@ -151,7 +149,7 @@ module.exports = async function (user) {
     let emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
 
     // wait for email queue dbId to exist
-    let count = 0
+    count = 0
     while (!emailQueue.attributes.dbId__l && count < 10) {
       await sleep(2000)
       emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
