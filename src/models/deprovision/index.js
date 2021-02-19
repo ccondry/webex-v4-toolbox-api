@@ -237,6 +237,42 @@ async function removeRoles (userId) {
   }
 }
 
+// remove team from global voice queue distribution group
+async function removeVoiceQueueTeam (teamName) {
+  try {
+    await Promise.resolve(globals.initialLoad)
+    const queueName = globals.get('webexV4VoiceQueueName')
+    const client = await cjp.get()
+    const teams = await client.team.list()
+    const team = teams.auxiliaryDataList.find(v => v.name__s === teamName)
+    const queues = await client.virtualTeam.list()
+    const queue = queues.auxiliaryDataList.find(v => v.name__s === queueName)
+    if (!queue) {
+      throw Error(`queue "${queueName}" not found`)
+    }
+    // fix attributes from GET data for using in PUT operation
+    queue.attributes.tid__s = queue.attributes.tid
+    queue.attributes.sid__s = queue.attributes.sid
+    queue.attributes.cstts__l = queue.attributes.cstts
+    
+    delete queue.attributes.tid
+    delete queue.attributes.sid
+    delete queue.attributes.cstts
+
+    // get existing call distribution groups
+    const groups = JSON.parse(queue.attributes.callDistributionGroups__s)
+    // get the first distribution group
+    const group = groups.find(v => v.order === 1)
+    // filter out the agent groups
+    group.agentGroups = group.agentGroups.filter(v => v.teamId === team.id)
+    queue.attributes.callDistributionGroups__s = JSON.stringify(groups)
+    // update queue on CJP
+    return client.virtualTeam.modify(queue.id, [queue])
+  } catch (e) {
+    throw e
+  }
+}
+
 async function main (user) {
   const userId = user.id
   try {
@@ -259,6 +295,15 @@ async function main (user) {
       throw e
     }
 
+    // global voice queue
+    try {
+      console.log(`checking global voice queue distribution groups...`)
+      await removeVoiceQueueTeam(`Q_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to remove virtual team Q_dCloud_${userId} from global voice queue distribution groups:`, e.message)
+      throw e
+    }
+
     // email queue
     try {
       console.log(`checking email queues...`)
@@ -277,7 +322,7 @@ async function main (user) {
       throw e
     }
     
-    
+    // user team
     try {
       console.log(`checking teams...`)
       await deleteTeam(`T_dCloud_${userId}`)
@@ -287,7 +332,7 @@ async function main (user) {
     }
     
 
-    //Chat Template *************************
+    // Chat Template
     try {
       console.log(`checking chat templates...`)
       await deleteChatTemplate(`EP_Chat_${userId}`)
@@ -297,7 +342,7 @@ async function main (user) {
     }
     
 
-    //Routing Strategies *************************
+    // Routing Strategies
     // chat queue
     try {
       console.log(`checking chat queue routing strategies...`)
