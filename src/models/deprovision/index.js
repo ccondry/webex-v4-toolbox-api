@@ -1,6 +1,7 @@
 require('dotenv').config()
 const ch = require('../control-hub/client')
 const cjpClient = require('../cjp/client')
+const toolbox = require('../toolbox')
 // wrapper to translate the `await cjp.get()` call
 const cjp = {
   async get () {
@@ -514,16 +515,7 @@ async function main (user) {
     // remove provision info from database
     try {
       console.log(`setting user provision info to not provisioned for webex-v4prod...`)
-      const query = {id: userId}
-      const updates = {
-        $set: {
-          'demo.webex-v4prod.provision': 'deleted'
-        },
-        $currentDate: {
-          'demo.webex-v4prod.lastAccess': {$type: 'date'}
-        }
-      }
-      await db.updateOne('toolbox', 'users', query, updates)
+      await toolbox.updateUser(userId, {provision: 'deleted'})
       console.log(`successfully set user provision info to not provisioned for webex-v4prod`)
     } catch (e) {
       console.log(`failed to set user provision info to not provisioned for webex-v4prod:`, e.message)

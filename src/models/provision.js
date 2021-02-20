@@ -56,19 +56,14 @@ module.exports = async function (user) {
 
     
     // start provisioning user
-    // set default provision info
+    // set default provision info for chat
     const updates = {
-      $set: {
-        'demo.webex-v4prod.CiscoAppId': 'cisco-chat-bubble-app',
-        'demo.webex-v4prod.DC': 'produs1.ciscoccservice.com',
-        'demo.webex-v4prod.async': true,
-        'demo.webex-v4prod.orgId': process.env.ORG_ID
-      },
-      $currentDate: {
-        'demo.webex-v4prod.lastAccess': {$type: 'date'}
-      }
+      CiscoAppId: 'cisco-chat-bubble-app',
+      DC: 'produs1.ciscoccservice.com',
+      async: true,
+      orgId: await globals.getAsync('webexV4ControlHubOrgId')
     }
-    await db.updateOne('toolbox', 'users', {id: userId}, updates)
+    await toolbox.updateUser(userId, updates)
 
     // // provision LDAP users
     // await ldap.createUsers({userId})
