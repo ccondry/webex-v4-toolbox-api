@@ -1,5 +1,5 @@
 require('dotenv').config()
-
+const sleep = require('../src/utils').sleep
 const controlHub = require('../src/models/control-hub')
 
 // Sleep

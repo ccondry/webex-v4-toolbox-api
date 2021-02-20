@@ -1,11 +1,6 @@
 require('dotenv').config()
-
+const sleep = require('../src/utils').sleep
 const cjp = require('../src/models/cjp')
-
-// Sleep
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 async function main (userId) {
   try {

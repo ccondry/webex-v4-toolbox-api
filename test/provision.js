@@ -6,13 +6,9 @@ const teamsNotifier = require('../src/models/teams-notifier')
 const token = require('../src/models/control-hub/token')
 const toolbox = require('../src/models/toolbox')
 const session = require('../src/models/session')
+const sleep = require('../src/utils').sleep
 
 const domain = process.env.DOMAIN
-
-// Sleep
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 // go
 main({

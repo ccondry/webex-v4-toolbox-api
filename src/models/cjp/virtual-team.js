@@ -1,10 +1,7 @@
 const client = require('./client')
 const templates = require('./templates')
 const log = require('../json-logger')
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+const utils = require('../../utils')
 
 // find existing chat queue by name
 async function get (name) {
@@ -34,7 +31,7 @@ async function getOrCreate (type, name, teamId) {
     console.log(`created new CJP ${type} virtual team named "${name}"`)
     while (!vteam) {
       // wait for it to be created
-      await sleep(4000)
+      await utils.sleep(4000)
       vteam = await get(name)
     }
     console.log(`found new CJP ${type} virtual team named "${name}": ${vteam.id}`)

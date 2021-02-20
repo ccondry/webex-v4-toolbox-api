@@ -8,9 +8,7 @@ const template = require('./template')
 // webex org ID
 const orgId = process.env.ORG_ID
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+const sleep = require('../../../utils').sleep
 
 async function getToken () {
   try {

@@ -2,6 +2,7 @@
 const cjp = require('../../cjp')
 const teamsLogger = require('../../teams-logger')
 const log = require('../../json-logger')
+const sleep = require('../../../utils').sleep
 
 // return a clean copy of a template JSON that can be modified
 function cleanTemplate (template) {

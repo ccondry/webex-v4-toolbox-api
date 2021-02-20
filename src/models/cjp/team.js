@@ -1,11 +1,7 @@
 const client = require('./client')
 const template = require('./templates').team
 const log = require('../json-logger')
-
-// Sleep
-function sleep (ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+const utils = require('../../utils')
 
 async function list () {
 	try {
@@ -49,7 +45,7 @@ async function getOrCreate (name) {
       // wait for it to exist
       let team
       while (!team) {
-        await sleep(1000 * 4)
+        await utils.sleep(1000 * 4)
         team = await get(name)
       }
       return team

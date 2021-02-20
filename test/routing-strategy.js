@@ -1,5 +1,6 @@
-const fetch = require('node-fetch')
+// const fetch = require('node-fetch')
 const moment = require('moment')
+const sleep = require('../src/utils').sleep
 
 //cwcc Library
 const client = require('../src/models/cjp/client')
@@ -8,11 +9,6 @@ const client = require('../src/models/cjp/client')
 const tenantId = process.env.CJP_TENANT_ID
 const enterpriseName = 'dCloudProd2'
 const siteId = '292'
-
-//Sleep
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 // find routing strategy matching name
 async function getRoutingStrategy (name) {
