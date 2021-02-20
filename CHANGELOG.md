@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.20
+
+### Bug Fixes
+* **Provision:** Multiple bug fixes and improvements.
+* **Deprovision:** Multiple bug fixes and improvements.
+
+
 # 2021.2.19-2
 
 ### Features
