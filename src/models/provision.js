@@ -16,6 +16,9 @@ function sleep(ms) {
 }
 
 module.exports = async function (user) {
+  if (!user.id || !user.id.length === 4) {
+    throw Error(`will not provision user with invalid user ID "${user.id}"`)
+  }
   try {
     // make sure globals are initialized
     await Promise.resolve(globals.initialLoad)

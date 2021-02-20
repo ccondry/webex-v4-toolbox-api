@@ -282,6 +282,9 @@ async function removeVoiceQueueTeam (teamName) {
 }
 
 async function main (user) {
+  if (!user.id || !user.id.length === 4) {
+    throw Error(`will not deprovision user with invalid user ID "${user.id}"`)
+  }
   const userId = user.id
   try {
     console.log(`deprovisioning user ${userId}...`)
