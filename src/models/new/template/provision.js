@@ -69,7 +69,7 @@ async function provision ({
       await client[type].modify(existing.id, [newBody])
       console.log(`updated existing ${typeName} ${existing.attributes.name__s} ${existing.id}.`)
       // return the item's ID
-      return existing.id
+      return existing
     } else {
       // create
       console.log(`creating new ${typeName} ${newBody.attributes.name__s}...`)
