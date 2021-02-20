@@ -116,10 +116,10 @@ async function checkMaxUsers () {
       // console.log('userMap', userMap)
       // keep top users, return the rest
       // return userMap.slice(maxUsers)
-      // set each of these users to deleting state
+      // set each of these users to delete state
       const userIds = userMap.slice(maxUsers - maxUsersBuffer).map(v => v.id)
       const filter = {id: {$in: userIds}}
-      const updates = {$set: {'demo.webex-v4prod.provision': 'deleting'}}
+      const updates = {$set: {'demo.webex-v4prod.provision': 'delete'}}
       return db.updateMany('toolbox', 'users', filter, updates)
     } else {
       // not full - return empty array
