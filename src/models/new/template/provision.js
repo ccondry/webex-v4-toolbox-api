@@ -47,7 +47,7 @@ async function provision ({
       throw Error(`could not provision "${name}" - ${typeName} provisioning template "${templateName}" is missing`)
     }
     
-    const newBody = cleanTemplate(template)
+    let newBody = cleanTemplate(template)
     // set name
     newBody.attributes.name__s = name
 
