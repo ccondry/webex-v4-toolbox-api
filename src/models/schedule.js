@@ -15,12 +15,18 @@ const throttle = 10 * 1000
 let running = false
 
 async function getProvisionStartedUsers () {
-  // return array of users who need to be provisioned
-  const query = {$or: [
-    {'demo.webex-v4prod.provision': 'start'},
-    {'demo.webex-v4prod.provision': 'starting'},
-    {'demo.webex-v4prod.provision': 'started'},
-  ]}
+  // return array of users with a user ID who need to be provisioned
+  const query = {
+    $and: [{
+      $or: [
+        {'demo.webex-v4prod.provision': 'start'},
+        {'demo.webex-v4prod.provision': 'starting'},
+        {'demo.webex-v4prod.provision': 'started'}
+      ]
+    }, {
+      id: {$exists: true}
+    }]
+  }
   const projection = {
     demo: false,
     password: false
@@ -32,11 +38,17 @@ async function getProvisionDeletingUsers () {
   try {
     // wait for globals to exist
     await Promise.resolve(globals.initialLoad)
-    // return array users who need to be deprovisioned 
-    const query = {$or: [
-      {'demo.webex-v4prod.provision': 'delete'},
-      {'demo.webex-v4prod.provision': 'deleting'}
-    ]}
+    // return array users with a user ID who need to be deprovisioned 
+    const query = {
+      $and: [{
+        $or: [
+          {'demo.webex-v4prod.provision': 'delete'},
+          {'demo.webex-v4prod.provision': 'deleting'}
+        ]
+      }, {
+        id: {$exists: true}
+      }]
+    }
     const projection = {
       demo: false,
       password: false
