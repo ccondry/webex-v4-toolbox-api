@@ -15,7 +15,7 @@ async function updateUser (userId, data) {
       updates.$set['demo.webex-v4prod.' + key] = data[key]
     }
 
-    db.updateOne('toolbox', 'users', query, updates)
+    return db.updateOne('toolbox', 'users', query, updates)
   } catch (e) {
     throw e
   }
