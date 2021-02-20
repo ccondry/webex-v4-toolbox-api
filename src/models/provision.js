@@ -182,7 +182,7 @@ module.exports = async function (user) {
         // chat entry point db ID
         body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
         // chat entry point ID
-        body.attributes.virtualTeamId__s = chatEntryPointId
+        body.attributes.virtualTeamId__s = chatEntryPoint.id
       }
     })
 
@@ -216,7 +216,7 @@ module.exports = async function (user) {
         // chat entry point db ID
         body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
         // chat entry point ID
-        body.attributes.virtualTeamId__s = chatEntryPointId
+        body.attributes.virtualTeamId__s = chatEntryPoint.id
       }
     })
 
