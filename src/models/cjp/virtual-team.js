@@ -1,5 +1,6 @@
 const client = require('./client')
 const templates = require('./templates')
+const log = require('../json-logger')
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -15,7 +16,8 @@ async function get (name) {
 
 // create chat queue using provided name
 async function create (data) {
-  await client.virtualTeam.create(data)
+  log(`create-virtual-team-${data.attributes.name__s}`, data)
+  return client.virtualTeam.create(data)
 }
 
 async function getOrCreate (type, name, teamId) {

@@ -1,6 +1,7 @@
 // create a valid template in CJP that provision can copy from
 const cjp = require('../../cjp')
 const teamsLogger = require('../../teams-logger')
+const log = require('../../json-logger')
 
 // return a clean copy of a template JSON that can be modified
 function cleanTemplate (template) {
@@ -61,12 +62,14 @@ async function provision ({
       console.log(`updating existing ${typeName} ${existing.attributes.name__s} ${existing.id}...`)
       // set id of existing
       newBody.id = existing.id
+      log(`modify-${type}-${newBody.attributes.name__s}`, [newBody])
       await client[type].modify(existing.id, [newBody])
       console.log(`updated existing ${typeName} ${existing.attributes.name__s} ${existing.id}.`)
       return existing.id
     } else {
       // create
       console.log(`creating new ${typeName} ${newBody.attributes.name__s}...`)
+      log(`create-${type}-${newBody.attributes.name__s}`, [newBody])
       const response = await client[type].create([newBody])
       const newId = response[0].links[0].href.split('/').pop()
       console.log(`created new ${typeName} ${newBody.attributes.name__s}: ${newId}.`)

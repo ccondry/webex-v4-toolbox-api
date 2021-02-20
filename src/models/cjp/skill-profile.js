@@ -1,10 +1,13 @@
 const template = require('./templates').skillProfile
 const client = require('./client')
 const utils = require('../../utils')
+const log = require('../json-logger')
 
 async function create (name, userId) {
   try {
-    await client.skillProfile.create(template(name, userId))
+    const body = template(name, userId)
+    log(`create-skill-profile-${name}`, body)
+    await client.skillProfile.create(body)
   } catch (e) {
     throw e 
   }

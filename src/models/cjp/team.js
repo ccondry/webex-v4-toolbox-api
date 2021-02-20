@@ -1,5 +1,6 @@
 const client = require('./client')
 const template = require('./templates').team
+const log = require('../json-logger')
 
 // Sleep
 function sleep (ms) {
@@ -28,6 +29,8 @@ async function get (name) {
 async function create (name) {
   try {
     const data = template(name)
+    // log to file
+    log(`create-team-${name}`, data)
     return client.team.create(data)
   } catch (e) {
     throw e
