@@ -33,9 +33,20 @@ function get (name) {
   }
 }
 
+// await the initial load and get the var
+async function getAsync (name) {
+  try {
+    await Promise.resolve(initialLoad)
+    return get(name)
+  } catch (e) {
+    throw e
+  }
+}
+
 // export our specific cache value methods and the generic getCache method
 module.exports = {
   refresh,
   initialLoad,
-  get
+  get,
+  getAsync
 }
