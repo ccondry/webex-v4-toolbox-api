@@ -277,7 +277,19 @@ module.exports = async function (user) {
     console.log('started CJP to Control Hub user sync')
 
     // get/create CJP voice skill profile for this user
-    const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
+    // const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
+    const skillProfile = await provision({
+      templateName: skillProfileTemplateName,
+      name: `Skill_${userId}`,
+      type: 'skillProfile',
+      typeName: 'skill profile',
+      modify: (body) => {
+        // set user ID in profile data
+        const profileData = JSON.parse(body.attributes.profileData__s)
+        profileData[0].value = userId
+        body.attributes.profileData__s = JSON.stringify(profileData)
+      }
+    })
     // await sleep(1000)
     // const allCjpUsers = await cjp.user.list()
     // console.log('allCjpUsers', allCjpUsers.details.users)
