@@ -247,7 +247,8 @@ async function removeVoiceQueueTeam (teamName) {
     const teams = await client.team.list()
     const team = teams.auxiliaryDataList.find(v => v.attributes.name__s === teamName)
     if (!team) {
-      throw Error(`team "${teamName}" not found`)
+      // throw Error(`team "${teamName}" not found`)
+      return
     }
     const queues = await client.virtualTeam.list()
     const queue = queues.auxiliaryDataList.find(v => v.attributes.name__s === queueName)
@@ -277,14 +278,14 @@ async function removeVoiceQueueTeam (teamName) {
     await client.virtualTeam.modify(queue.id, [queue])
     console.log(`successfully removed team "${teamName}" (${team.id}) from the global voice queue "${queue.attributes.name__s}" (${queue.id})`)
   } catch (e) {
-    console.log(`failed to remove team "${teamName}" from the global voice queue:`, e.message)
+    // console.log(`failed to remove team "${teamName}" from the global voice queue:`, e.message)
     throw e
   }
 }
 
 async function main (user) {
   if (!user.id || !user.id.length === 4) {
-    throw Error(`will not deprovision user with invalid user ID "${user.id}"`)
+    throw Error(`will not deprovision user ${user.email} with invalid user ID "${user.id}"`)
   }
   const userId = user.id
   try {
@@ -312,9 +313,8 @@ async function main (user) {
       console.log(`checking global voice queue distribution groups...`)
       await removeVoiceQueueTeam(`T_dCloud_${userId}`)
     } catch (e) {
-      console.log(`failed to remove virtual team T_dCloud_${userId} from global voice queue distribution groups:`, e.message)
-      // don't stop here - this is probably fine?
-      // throw e
+      console.log(`failed to remove team T_dCloud_${userId} from global voice queue distribution groups:`, e.message)
+      throw e
     }
 
     // email queue
