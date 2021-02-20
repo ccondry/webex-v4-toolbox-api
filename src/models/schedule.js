@@ -176,7 +176,7 @@ async function go () {
       }
       if (users.length > 0) {
         console.log(`starting provision for ${users.length} users`)
-        // provision all LDAP users first, so sync is easier
+        // batch provision LDAP users first, so sync is easier
         for (const user of users) {
           await ldap.createUsers({userId: user.id})
         }
