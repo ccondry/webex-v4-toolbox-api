@@ -45,7 +45,7 @@ module.exports = async function (user) {
 
     // get globals
     const voiceQueueName = globals.get('webexV4VoiceQueueName')
-    const globalTeamName = globals.get('webexV4GlobalTeamName')
+    // const globalTeamName = globals.get('webexV4GlobalTeamName')
     const siteId = globals.get('webexV4BroadCloudSiteId')
 
     // get the names of the templates from globals
@@ -270,7 +270,7 @@ module.exports = async function (user) {
     // await sleep(3000)
     
     // get CJP global agent team
-    const team = await cjp.team.get(globalTeamName)
+    // const team = await cjp.team.get(globalTeamName)
     // await sleep(3000)
     // sync CJP users to Webex Control Hub
     await controlHub.syncUsers()
@@ -304,7 +304,10 @@ module.exports = async function (user) {
       agent: 'rick',
       id: rick.cjp.id,
       userId,
-      teamIds: [team.id, userTeam.id],
+      teamIds: [
+        // team.id,
+        userTeam.id
+      ],
       skillProfileId: skillProfile.id
     })
     console.log(`assigned skill profile to CJP user ${rick.name}: ${skillProfile.id}`)
@@ -331,7 +334,10 @@ module.exports = async function (user) {
       agent: 'sandra',
       id: sandra.cjp.id,
       userId,
-      teamIds: [team.id, userTeam.id],
+      teamIds: [
+        // team.id,
+        userTeam.id
+      ],
       skillProfileId: skillProfile.id
     })
     console.log(`assigned skill profile to CJP user ${sandra.name}: ${skillProfile.id}`)
