@@ -54,6 +54,7 @@ module.exports = async function (user) {
     const chatEntryPointTemplateName = globals.get('webexV4ChatEntryPointTemplateName')
     const chatEntryPointRoutingStrategyTemplateName = globals.get('webexV4ChatEntryPointRoutingStrategyTemplateName')
     const teamTemplateName = globals.get('webexV4TeamTemplateName')
+    const skillProfileTemplateName = globals.get('webexV4SkillProfileTemplateName')
 
     
     // start provisioning user
