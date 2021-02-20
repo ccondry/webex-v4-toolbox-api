@@ -276,7 +276,7 @@ async function removeVoiceQueueTeam (teamName) {
     await client.virtualTeam.modify(queue.id, [queue])
     console.log(`successfully removed team "${teamName}" (${team.id}) from the global voice queue "${queue.attributes.name__s}" (${queue.id})`)
   } catch (e) {
-    console.log(`failed to remove team "${teamName}" (${team.id}) from the global voice queue "${queue.attributes.name__s}" (${queue.id}):`, e.message)
+    console.log(`failed to remove team "${teamName}" from the global voice queue "${queue.attributes.name__s}" (${queue.id}):`, e.message)
     throw e
   }
 }
