@@ -53,6 +53,7 @@ module.exports = async function (user) {
     const emailQueueTemplateName = globals.get('webexV4EmailQueueTemplateName')
     const chatEntryPointTemplateName = globals.get('webexV4ChatEntryPointTemplateName')
     const chatEntryPointRoutingStrategyTemplateName = globals.get('webexV4ChatEntryPointRoutingStrategyTemplateName')
+    const teamTemplateName = globals.get('webexV4TeamTemplateName')
 
     
     // start provisioning user
@@ -94,14 +95,20 @@ module.exports = async function (user) {
     }
     console.log(`found Control Hub users for ${sandra.email} and ${rick.email} after ${retryCount} retries.`)
 
-    // get or create CJP user team for chat and email routing
-    const userTeam = await cjp.team.getOrCreate(`T_dCloud_${userId}`)
+    // provision 1 CJP user team for all chat, email, voice routing
+    const userTeam = await provision({
+      templateName: teamTemplateName,
+      name: `T_dCloud_${userId}`,
+      type: 'team',
+      typeName: 'team'
+    })
+    
     // add user team to main voice queue, if they are not already in it
     await cjp.virtualTeam.addTeam(voiceQueueName, userTeam.id)
 
     // new template provision script
     // chat queue
-    const chatQueueId = await provision({
+    const chatQueue = await provision({
       templateName: chatQueueTemplateName,
       name: 'Q_Chat_dCloud_' + userId,
       type: 'virtualTeam',
@@ -119,24 +126,8 @@ module.exports = async function (user) {
       }
     })
 
-    // get full chat queue details, for the dbId
-    let chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
-        
-    // wait for chat queue to exist
-    retryCount = 0
-    while (!chatQueue.attributes.dbId__l) {
-      await sleep(2000)
-      chatQueue = await cjp.client.virtualTeam.get(chatQueueId)
-      retryCount++
-      // log every 20th retry
-      if (retryCount % 20 === 0) {
-        console.log(`retry number ${retryCount} of search for dbId of chat queue "${'Q_Chat_dCloud_' + userId}" (${chatQueueId})`)
-      }
-    }
-    console.log(`found cjp chat queue ${chatQueue.attributes.name__s} (${chatQueue.id}) dbId after ${retryCount} retries.`)
-
     // email queue
-    const emailQueueId = await provision({
+    const emailQueue = await provision({
       templateName: emailQueueTemplateName,
       name: 'Q_Email_dCloud_' + userId,
       type: 'virtualTeam',
@@ -154,44 +145,13 @@ module.exports = async function (user) {
       }
     })
 
-    // get full email queue details, for the dbId
-    let emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
-    
-    console.log('waiting for email queue dbId to exist...')
-    // wait for email queue dbId to exist
-    retryCount = 0
-    while (!emailQueue.attributes.dbId__l) {
-      await sleep(2000)
-      emailQueue = await cjp.client.virtualTeam.get(emailQueueId)
-      retryCount++
-      // log every 20th retry
-      if (retryCount % 20 === 0) {
-        console.log(`retry number ${retryCount} of search for dbId of email queue "${'Q_Email_dCloud_' + userId}" (${emailQueueId})`)
-      }
-    }
-    console.log(`found emailQueue dbId after ${retryCount} retries`)
     // chat entry point
-    const chatEntryPointId = await provision({
+    const chatEntryPoint = await provision({
       templateName: chatEntryPointTemplateName,
       name: 'EP_Chat_' + userId,
       type: 'virtualTeam',
       typeName: 'chat entry point'
     })
-
-    // get chat entry point details, for the dbId
-    let chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
-
-    // wait for chat entry point dbId to exist
-    retryCount = 0
-    while (!chatEntryPoint.attributes.dbId__l) {
-      await sleep(2000)
-      chatEntryPoint = await cjp.client.virtualTeam.get(chatEntryPointId)
-      retryCount++
-      if (retryCount % 20 === 0) {
-        console.log(`retry number ${retryCount} of search for dbId of chat entry point "${'EP_Chat_' + userId}" (${chatEntryPointId})`)
-      }
-    }
-    console.log(`found chat entry point dbId after ${retryCount} retries`)
 
     // chat entry point routing strategy
     await provision({
