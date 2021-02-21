@@ -1,5 +1,4 @@
 const client = require('./client')
-const cleanTemplate = require('../clean-template')
 const log = require('../json-logger')
 
 // find agent user by login username
@@ -24,9 +23,27 @@ async function modify ({
 }) {
   try {
     // clean current data
-    const clean = cleanTemplate(current)
-    // apply changes
-    changes(clean)
+    // const clean = cleanTemplate(current)
+    const copy = JSON.parse(JSON.stringify(current))
+    // null aux data type
+    copy.auxiliaryDataType = null
+    // update last modified timestamp
+    copy.attributes._lmts__l = new Date().getTime()
+
+    // move sid to sid__s
+    copy.attributes.sid__s = copy.attributes.sid
+    delete copy.attributes.sid
+
+    // move tid to tid__s
+    copy.attributes.tid__s = copy.attributes.tid
+    delete copy.attributes.tid
+
+    // move cstts to cstts__l
+    copy.attributes.cstts__l = copy.attributes.cstts
+    delete copy.attributes.cstts
+
+    // apply caller changes
+    changes(copy)
     // log the modify request body to JSON file
     log(`modify-user-${copy.attributes.email__s}`, copy)
     // modify with REST PUT - DO NOT PUT IN ARRAY
