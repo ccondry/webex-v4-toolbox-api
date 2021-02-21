@@ -200,7 +200,7 @@ async function go () {
         // no users to provision
       }
     } catch (e) {
-      const s = JSON.stringfy(e, null, 2)
+      const s = JSON.stringify(e, null, 2)
       const message = `provision error: ${s}`
       console.log(message, e)
       teamsLogger.log({
