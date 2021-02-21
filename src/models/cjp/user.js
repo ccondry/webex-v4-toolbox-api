@@ -25,6 +25,9 @@ async function modify ({
   try {
     // get current user
     const current = await client.user.get(id)
+    if (!current) {
+      throw Error('did not find current CJP user with ID ' + id)
+    }
     // clean current data
     const clean = cleanTemplate(current)
     // apply changes
