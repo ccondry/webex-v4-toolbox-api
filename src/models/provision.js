@@ -340,18 +340,6 @@ module.exports = async function (user) {
 
     // assign skill profile and team to Sandra
     await cjp.user.modify({
-      agent: 'sandra',
-      id: sandra.cjp.id,
-      userId,
-      teamIds: [
-        // team.id,
-        userTeam.id
-      ],
-      skillProfileId: skillProfile.id
-    })
-    console.log(`assigned skill profile to CJP user ${sandra.name}: ${skillProfile.id}`)
-    
-    await cjp.user.modify({
       id: sandra.cjp.id,
       changes: (body) => {
         body.attributes.teamIds__sa = [userTeam.id]
