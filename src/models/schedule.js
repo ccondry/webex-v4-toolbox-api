@@ -201,12 +201,11 @@ async function go () {
       }
     } catch (e) {
       // const s = JSON.stringify(e, null, 2)
-      const s = e.toString()
+      // const s = e.toString()
+      const s = e.message
       const message = `provision error: ${s}`
-      console.log(message, e)
-      teamsLogger.log({
-        markdown: 'provision error:\r\n```json\r\n' + s + '\r\n```' 
-      })
+      console.log(message)
+      teamsLogger.log(message)
     }
     // stop running
     running = false

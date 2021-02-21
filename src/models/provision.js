@@ -313,7 +313,7 @@ module.exports = async function (user) {
   
     // assign skill profile and team to Rick
     await cjp.user.modify({
-      id: rick.cjp.id,
+      current: rick.cjp,
       changes: (body) => {
         body.attributes.teamIds__sa = [userTeam.id]
         body.attributes.skillProfileId__s = skillProfile.id
@@ -340,7 +340,7 @@ module.exports = async function (user) {
 
     // assign skill profile and team to Sandra
     await cjp.user.modify({
-      id: sandra.cjp.id,
+      current: sandra.cjp,
       changes: (body) => {
         body.attributes.teamIds__sa = [userTeam.id]
         body.attributes.skillProfileId__s = skillProfile.id

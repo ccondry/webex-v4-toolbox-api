@@ -19,15 +19,10 @@ async function get (login) {
 
 // set skill profile ID and team IDs on agent
 async function modify ({
-  id,
+  current,
   changes
 }) {
   try {
-    // get current user
-    const current = await client.user.get(id)
-    if (!current) {
-      throw Error('did not find current CJP user with ID ' + id)
-    }
     // clean current data
     const clean = cleanTemplate(current)
     // apply changes
@@ -35,8 +30,9 @@ async function modify ({
     // log the modify request body to JSON file
     log(`modify-user-${clean.attributes.email__s}`, [clean])
     // modify with REST PUT
-    return client.user.modify(id, [clean])
+    return client.user.modify(clean.id, [clean])
   } catch (e) {
+    console.log('failed to modify CJP user:', e.message)
     throw e
   }
 }
