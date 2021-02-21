@@ -1,5 +1,6 @@
 const client = require('./client')
-const templates = require('./templates')
+const cleanTemplate = require('../clean-template')
+const log = require('../json-logger')
 
 // find agent user by login username
 async function get (login) {
@@ -18,21 +19,20 @@ async function get (login) {
 
 // set skill profile ID and team IDs on agent
 async function modify ({
-  agent,
   id,
-  userId,
-  teamIds,
-  skillProfileId
+  changes
 }) {
   try {
-    const body = templates[agent]({
-      id,
-      userId,
-      teamIds,
-      skillProfileId
-    })
-    // id is actually ignored in this modify method
-    return client.user.modify(id, body)
+    // get current user
+    const current = await client.user.get(id)
+    // clean current data
+    const clean = cleanTemplate(current)
+    // apply changes
+    changes(clean)
+    // log the modify request body to JSON file
+    log(`modify-user-${clean.attributes.email__s}`, [clean])
+    // modify with REST PUT
+    return client.user.modify(id, [clean])
   } catch (e) {
     throw e
   }
