@@ -28,9 +28,9 @@ async function modify ({
     // apply changes
     changes(clean)
     // log the modify request body to JSON file
-    log(`modify-user-${clean.attributes.email__s}`, [clean])
-    // modify with REST PUT
-    return client.user.modify(clean.id, [clean])
+    log(`modify-user-${copy.attributes.email__s}`, copy)
+    // modify with REST PUT - DO NOT PUT IN ARRAY
+    return client.user.modify(copy.id, copy)
   } catch (e) {
     console.log('failed to modify CJP user:', e.message)
     throw e
