@@ -1,0 +1,53 @@
+[
+  {
+    "auxiliaryDataType": "USER_DATA",
+    "type": "user",
+    "attributes": {
+      "lastName__s": "0325",
+      "_lmts__l": 1613880886182,
+      "historicalReportsEnabled__i": 0,
+      "ciUserId__s": "9d7c9892-7934-49e3-9efa-a08f549ab14e",
+      "multimediaProfileId__s": "AXNt1GpBBvHuTr-DwpOM",
+      "mobile__s": "",
+      "externalId__s": "",
+      "work__s": "",
+      "roleId__s": null,
+      "status__i": 1,
+      "secretQuestion__s": null,
+      "xspVersion__s": "24.0",
+      "subscriptionId__s": "630f1f86-bc91-4c36-b3c8-24118954686e",
+      "city__s": "",
+      "login__s": "rbarrows0325@cc1.dc-01.com",
+      "profileId__s": "AXNehq6b2lFHBsnxC9Qw",
+      "invalidAttempts__i": 0,
+      "street__s": "",
+      "postalCode__s": "",
+      "agentProfileId__s": "AXNehq5V2lFHBsnxC9Qr",
+      "locked__i": 0,
+      "timezone__s": null,
+      "passwordPolicyId__s": null,
+      "country__s": "",
+      "bcUserId__s": "wcc_user_9d7c9892-7934-49e3-9efa-a08f549ab14e",
+      "siteId__s": "AXNehqhY2lFHBsnxC9O0",
+      "email__s": "rbarrows0325@cc1.dc-01.com",
+      "_type__s": "user",
+      "passwordLastModifiedTime__l": 0,
+      "passwordHistoryData__s": "",
+      "state__s": "",
+      "legacyPassword__s": "HlOwotGpKq54x5GXNkqpO6DPa1IGIgjk/d73Mcey0LE=$+kC4VHpPyKLdQV9+EEayr1p/siucdduyl6DiLBBKqtE=",
+      "firstName__s": "Rick Barrows",
+      "extMultimediaProfileId__s": null,
+      "password__s": "null",
+      "defaultDn__s": "",
+      "changePassword__i": 0,
+      "secretAnswer__s": null,
+      "callCenterEnabled__i": 1,
+      "teamIds__sa": [
+        "AXfCs2gTe-vnBSvWZ585"
+      ],
+      "skillProfileId__s": "AXfCs9rE125NU5rJtuXN",
+      "cstts__l": 1613880886182,
+      "tid__s": "166"
+    }
+  }
+]
