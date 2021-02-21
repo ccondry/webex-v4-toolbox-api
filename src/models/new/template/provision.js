@@ -46,12 +46,12 @@ async function provision ({
       teamsLogger.log(`${typeName} provisioning template "${templateName}" is missing! please create it.`)
       throw Error(`could not provision "${name}" - ${typeName} provisioning template "${templateName}" is missing`)
     }
-    
+
+    // start creating new body from a clean template copy
     let newBody = cleanTemplate(template)
     // set name
     newBody.attributes.name__s = name
 
-    // update or create on CJP
     // check for existing 
     const existing = existingList.find(v => v.attributes.name__s === name)
     // run any specific modifications to the data

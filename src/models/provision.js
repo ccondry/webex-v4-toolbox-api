@@ -4,7 +4,6 @@ const teamsNotifier = require('./teams-notifier')
 const toolbox = require('./toolbox')
 const globals = require('./globals')
 // const ldap = require('./ldap')
-const db = require('./db')
 const provision = require('./new/template/provision')
 const {xml2js, js2xml} = require('./parsers')
 
@@ -190,7 +189,7 @@ module.exports = async function (user) {
     // chat entry point current routing strategy
     await provision({
       templateName: 'Current-' + chatEntryPointRoutingStrategyTemplateName,
-      name: 'Current-EP_Chat_' + userId,
+      name: `Current-EP_Chat_${userId}`,
       type: 'routingStrategy',
       typeName: 'chat entry point current routing strategy',
       modify: (body) => {
