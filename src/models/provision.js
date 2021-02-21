@@ -315,8 +315,12 @@ module.exports = async function (user) {
     await cjp.user.modify({
       current: rick.cjp,
       changes: (body) => {
+        // set team IDs to user team
         body.attributes.teamIds__sa = [userTeam.id]
+        // set skill profile ID to user skill profile
         body.attributes.skillProfileId__s = skillProfile.id
+        // enable contact center
+        body.attributes.callCenterEnabled__i = 1
       }
     })
     console.log(`assigned skill profile ${skillProfile.id} and team ID ${userTeam.id} to CJP user ${rick.name} (${rick.cjp.id}).`)
