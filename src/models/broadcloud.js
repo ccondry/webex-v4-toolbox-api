@@ -7,7 +7,7 @@ const baseUrl = 'https://rialto.broadcloudpbx.com/enterpriseportalapi/v1.0/custo
 async function getPhoneNumbers ({siteId, query}) {
   const defaultQuery = {
     // filter: 'status=unassigned',
-    limit: 200,
+    limit: 500,
     offset: 0,
     sort: 'phoneNumber'
   }
@@ -16,21 +16,36 @@ async function getPhoneNumbers ({siteId, query}) {
   const customerId = globals.get('webexV4BroadCloudCustomerId')
   const token = globals.get('webexV4ControlHubToken').access_token
   const url = `${baseUrl}/${customerId}/sites/${siteId}/phoneassignments`
+  const combinedQuery = {...defaultQuery, ...query}
   const options = {
-    query: {...defaultQuery, ...query},
+    query: combinedQuery,
     headers: {
       Authorization: 'Bearer ' + token
     }
   }
-  return fetch(url, options)
+  let response = await fetch(url, options)
+
+  let ret = []
+  ret.push.apply(ret, response.results)
+
+  while (response.total > response.offset + response.limit) {
+    // more to get
+    // update the offset to get next set of results
+    combinedQuery.offset = response.offset + response.limit
+    console.log('getting more broadcom phone numbers:', combinedQuery)
+    // get next set of results
+    response = await fetch(url, options)
+    // put results in return array
+    ret.push.apply(ret, response.results)
+  }
+  return ret
 }
 
 // get array of internal extensions assigned to users
 async function getExtensions ({siteId, query}) {
-  // TODO get all, not just first 200
   const defaultQuery = {
     // filter: 'status=unassigned',
-    limit: 200,
+    limit: 500,
     offset: 0,
     sort: 'firstName'
   }
@@ -39,13 +54,29 @@ async function getExtensions ({siteId, query}) {
   const customerId = globals.get('webexV4BroadCloudCustomerId')
   const token = globals.get('webexV4ControlHubToken').access_token
   const url = `${baseUrl}/${customerId}/sites/${siteId}/userassignments`
+  const combinedQuery = {...defaultQuery, ...query}
   const options = {
-    query: {...defaultQuery, ...query},
+    query: combinedQuery,
     headers: {
       Authorization: 'Bearer ' + token
     }
   }
-  return fetch(url, options)
+  let response = await fetch(url, options)
+
+  let ret = []
+  ret.push.apply(ret, response.results)
+
+  while (response.total > response.offset + response.limit) {
+    // more to get
+    // update the offset to get next set of results
+    combinedQuery.offset = response.offset + response.limit
+    console.log('getting more broadcom extensions:', combinedQuery)
+    // get next set of results
+    response = await fetch(url, options)
+    // put results in return array
+    ret.push.apply(ret, response.results)
+  }
+  return ret
 }
 
 // get array of sites
