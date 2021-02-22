@@ -20,8 +20,8 @@ async function refresh () {
 // prime the cache now:
 const initialLoad = refresh()
 
-// update cache values every 5 minutes
-const throttle = 1000 * 60 * 5
+// update cache values every 1 minute
+const throttle = 1000 * 60 * 1
 setInterval(refresh, throttle)
 
 function get (name) {
