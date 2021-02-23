@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.23-1
+
+### Features
+* **Provision:** Don't set cstts__l on CJP objects during provision.
+
+
 # 2021.2.23
 
 ### Features
