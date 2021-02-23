@@ -54,7 +54,8 @@ module.exports = async function (user) {
     const chatEntryPointRoutingStrategyTemplateName = globals.get('webexV4ChatEntryPointRoutingStrategyTemplateName')
     const teamTemplateName = globals.get('webexV4TeamTemplateName')
     const skillProfileTemplateName = globals.get('webexV4SkillProfileTemplateName')
-
+    const agentTemplateLoginName = globals.get('webexV4AgentTemplateLoginName')
+    const supervisorTemplateLoginName = globals.get('webexV4SupervisorTemplateLoginName')
     
     // start provisioning user
     // set default provision info for chat
@@ -317,10 +318,16 @@ module.exports = async function (user) {
     }
     console.log(`got CJP user details for ${rick.name}: ${rick.cjp.id} after ${retryCount} retries`)
     // await sleep(1000)
-  
+
+    // get template supervisor 
+    const templateSupervisor = await cjp.user.get(supervisorTemplateLoginName)
+    if (!templateSupervisor) {
+      throw Error(`template agent ${supervisorTemplateLoginName} not found`)
+    }
+
     // assign skill profile and team to Rick
     await cjp.user.modify({
-      current: rick.cjp,
+      current: templateSupervisor,
       changes: (body) => {
         // set team IDs to user team
         body.attributes.teamIds__sa = [userTeam.id]
@@ -328,10 +335,24 @@ module.exports = async function (user) {
         body.attributes.skillProfileId__s = skillProfile.id
         // enable contact center
         body.attributes.callCenterEnabled__i = 1
+        body.id = rick.cjp.id
+        body.login = rick.cjp.login
+        body.emailAddress = rick.cjp.emailAddress
+        body.attributes.lastName__s = rick.cjp.attributes.lastName__s
+        body.attributes.ciUserId__s = rick.cjp.attributes.ciUserId__s
+        body.attributes.multimediaProfileId__s = rick.cjp.attributes.multimediaProfileId__s
+        body.attributes.subscriptionId__s = rick.cjp.attributes.subscriptionId__s
+        body.attributes.login__s = rick.cjp.attributes.login__s
+        body.attributes.profileId__s = rick.cjp.attributes.profileId__s
+        body.attributes.agentProfileId__s = rick.cjp.attributes.agentProfileId__s
+        body.attributes.bcUserId__s = rick.cjp.attributes.bcUserId__s
+        body.attributes.email__s = rick.cjp.attributes.email__s
+        // TODO delete dbId__l setting?
+        body.attributes.dbId__l = rick.cjp.attributes.dbId__l
       }
     })
     console.log(`assigned skill profile ${skillProfile.id} and team ID ${userTeam.id} to CJP user ${rick.name} (${rick.cjp.id}).`)
-  
+
     // get Sandra's CJP user details
     sandra.cjp = await cjp.user.get(sandra.email)
     retryCount = 0
@@ -348,10 +369,16 @@ module.exports = async function (user) {
       }
     }
     console.log(`found CJP user details for ${sandra.name}: ${sandra.cjp.id} after ${retryCount} retries.`)
+  
+    // get template user 
+    const templateAgent = await cjp.user.get(agentTemplateLoginName)
+    if (!templateAgent) {
+      throw Error(`template agent ${agentTemplateLoginName} not found`)
+    }
 
     // assign skill profile and team to Sandra
     await cjp.user.modify({
-      current: sandra.cjp,
+      current: templateAgent,
       changes: (body) => {
         // set team IDs to user team
         body.attributes.teamIds__sa = [userTeam.id]
@@ -359,6 +386,20 @@ module.exports = async function (user) {
         body.attributes.skillProfileId__s = skillProfile.id
         // enable contact center
         body.attributes.callCenterEnabled__i = 1
+        body.id = sandra.cjp.id
+        body.login = sandra.cjp.login
+        body.emailAddress = sandra.cjp.emailAddress
+        body.attributes.lastName__s = sandra.cjp.attributes.lastName__s
+        body.attributes.ciUserId__s = sandra.cjp.attributes.ciUserId__s
+        body.attributes.multimediaProfileId__s = sandra.cjp.attributes.multimediaProfileId__s
+        body.attributes.subscriptionId__s = sandra.cjp.attributes.subscriptionId__s
+        body.attributes.login__s = sandra.cjp.attributes.login__s
+        body.attributes.profileId__s = sandra.cjp.attributes.profileId__s
+        body.attributes.agentProfileId__s = sandra.cjp.attributes.agentProfileId__s
+        body.attributes.bcUserId__s = sandra.cjp.attributes.bcUserId__s
+        body.attributes.email__s = sandra.cjp.attributes.email__s
+        // TODO delete dbId__l setting?
+        body.attributes.dbId__l = sandra.cjp.attributes.dbId__l
       }
     })
     console.log(`assigned skill profile ${skillProfile.id} and team ID ${userTeam.id} to CJP user ${sandra.name} (${sandra.cjp.id}).`)
@@ -392,6 +433,7 @@ module.exports = async function (user) {
         }
       }]
     })
+    console.log(`added agent extension 80${userId} to ${sandra.email}`)
 
     await ch.user.onboard({
       email: rick.email,
@@ -408,6 +450,7 @@ module.exports = async function (user) {
         }
       }]
     })
+    console.log(`added agent extension 82${userId} to ${rick.email}`)
 
     // set provision done in toolbox db
     await toolbox.updateUser(userId, {
