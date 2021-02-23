@@ -4,6 +4,18 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.23
+
+### Features
+* **Globals:** Refresh globals every 1 minute instead of every 5 minutes.
+* **Provision:** Use CJP template user data instead of static template data to
+modify users.
+
+### Bug Fixes
+* **Provision:** Get all broadcom phone numbers and extensions, not just the
+first 200. Set CJP users to Contact Center Enabled.
+
+
 # 2021.2.20
 
 ### Bug Fixes
