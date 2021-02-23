@@ -6,7 +6,8 @@ function cleanTemplate (template) {
   // move timestamps to properly-named attributes, and update to current time
   const now = new Date().getTime()
   copy.attributes._lmts__l = now
-  copy.attributes.cstts__l = now
+  // TODO maybe not set this when modifying existing
+  // copy.attributes.cstts__l = now
   delete copy.attributes.cstts
   
   // move tenant ID to properly-named attribute
