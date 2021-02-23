@@ -200,12 +200,16 @@ async function go () {
         // no users to provision
       }
     } catch (e) {
-      // const s = JSON.stringify(e, null, 2)
-      // const s = e.toString()
       const s = e.message
       const message = `provision error: ${s}`
       console.log(message)
-      teamsLogger.log(message)
+      const regex = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN/
+      if (message.match(regex)) {
+        // just log to console - atlas-a.wbx2.com gives these often
+      } else {
+        // also send to teams logger
+        teamsLogger.log(message)
+      }
     }
     // stop running
     running = false
