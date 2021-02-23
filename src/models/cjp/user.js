@@ -31,15 +31,15 @@ async function modify ({
     copy.attributes._lmts__l = new Date().getTime()
 
     // move sid to sid__s
-    copy.attributes.sid__s = copy.attributes.sid
+    // copy.attributes.sid__s = copy.attributes.sid
     delete copy.attributes.sid
 
     // move tid to tid__s
-    copy.attributes.tid__s = copy.attributes.tid
+    // copy.attributes.tid__s = copy.attributes.tid
     delete copy.attributes.tid
 
     // move cstts to cstts__l
-    copy.attributes.cstts__l = copy.attributes.cstts
+    // copy.attributes.cstts__l = copy.attributes.cstts
     delete copy.attributes.cstts
 
     // apply caller changes
