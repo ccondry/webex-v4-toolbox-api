@@ -124,7 +124,7 @@ module.exports = async function (user) {
     
     // add user team to main voice queue, if they are not already in it
     await cjp.virtualTeam.addTeam(voiceQueueName, userTeam.id)
-
+    
     // new template provision script
     // chat queue
     const chatQueue = await provision({
