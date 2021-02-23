@@ -95,12 +95,30 @@ module.exports = async function (user) {
     }
     console.log(`found Control Hub users for ${sandra.email} and ${rick.email} after ${retryCount} retries.`)
 
+    // provision skill profile ID for user
+    const skillProfile = await provision({
+      templateName: skillProfileTemplateName,
+      name: `Skill_${userId}`,
+      type: 'skillProfile',
+      typeName: 'skill profile',
+      modify: (body) => {
+        // set user ID in profile data
+        const profileData = JSON.parse(body.attributes.profileData__s)
+        profileData[0].value = userId
+        body.attributes.profileData__s = JSON.stringify(profileData)
+      }
+    })
+
     // provision 1 CJP user team for all chat, email, voice routing
+    // referencing the user's skill profile ID
     const userTeam = await provision({
       templateName: teamTemplateName,
       name: `T_dCloud_${userId}`,
       type: 'team',
-      typeName: 'team'
+      typeName: 'team',
+      modify: body => {
+        body.attributes.skillProfileId__s = skillProfile.id
+      }
     })
     
     // add user team to main voice queue, if they are not already in it
@@ -278,18 +296,7 @@ module.exports = async function (user) {
 
     // get/create CJP voice skill profile for this user
     // const skillProfile = await cjp.skillProfile.getOrCreate(`Skill_${userId}`, userId)
-    const skillProfile = await provision({
-      templateName: skillProfileTemplateName,
-      name: `Skill_${userId}`,
-      type: 'skillProfile',
-      typeName: 'skill profile',
-      modify: (body) => {
-        // set user ID in profile data
-        const profileData = JSON.parse(body.attributes.profileData__s)
-        profileData[0].value = userId
-        body.attributes.profileData__s = JSON.stringify(profileData)
-      }
-    })
+    
     // await sleep(1000)
     // const allCjpUsers = await cjp.user.list()
     // console.log('allCjpUsers', allCjpUsers.details.users)
