@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.23-2
+
+### Bug Fixes
+* **Provision:** Fix logic of adding user team to global voice queue call
+distribution group 1.
+
+
 # 2021.2.23-1
 
 ### Features
