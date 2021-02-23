@@ -59,20 +59,24 @@ async function addTeam (queueName, teamId) {
     // console.log('groups', groups)
     // get the first distribution group
     const group = groups.find(v => v.order === 1)
-    // add user team ID to distribution group if they are not aleady in it
+    // add user team ID to distribution group if they are not already in it
     if (group.agentGroups.find(v => v.teamId === teamId)) {
-      // not in the group. add.
+      // already in the group
+      console.log(`team "${teamId}" was already in call distribution group 1 of queue "${queueName}"`)
+      return
+    } else {
+      // not in the group. add now.
       group.agentGroups.push({teamId})
       existing.attributes.callDistributionGroups__s = JSON.stringify(groups)
-      // console.log('new', JSON.stringify(existing, null, 2))
+      // log json file
+      log(`modify-virtual-team-${queueName}`, [existing])
       // update queue on CJP
       const response = await client.virtualTeam.modify(existing.id, [existing])
+      console.log(`team "${teamId}" added to queue "${queueName}" call distribution group 1`)
       return response
-    } else {
-      // already in
-      return
     }
   } catch (e) {
+    console.log(`failed to add team "${teamId}" to queue "${queueName}" call distribution group 1: ${e.message}`)
     throw e
   }
 }
