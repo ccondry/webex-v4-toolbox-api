@@ -53,8 +53,25 @@ async function updateDemoUsers (filter, updates) {
   }
 }
 
+async function listGlobals (query) {
+  try {
+    const url = 'http://localhost:3032/api/v1/auth/app/global'
+    // const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/global'
+    const options = {
+      headers: {
+        Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
+      },
+      query
+    }
+    return fetch(url, options)
+  } catch (e) {
+    throw e
+  }
+}
+
 module.exports = {
   updateUser,
   findUsers,
-  updateDemoUsers
+  updateDemoUsers,
+  listGlobals
 }
