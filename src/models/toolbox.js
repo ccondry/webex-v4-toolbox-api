@@ -36,7 +36,7 @@ async function findUsers (query, projection) {
 
 async function updateDemoUsers (filter, updates) {
   try {
-    const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/demo/webex-v4prod/users'
+    const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/demo/webex-v4prod/user'
     const options = {
       headers: {
         Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
