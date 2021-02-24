@@ -75,12 +75,11 @@ async function log () {
 
   // send message to room
   try {
-    await Promise.resolve(globals.initialLoad)
     const url = 'https://webexapis.com/v1/messages'
     const roomIdVar = process.env.NODE_ENV === 'production' ? 'productionLogRoomId' : 'developmentLogRoomId'
     // get roomId, hopefully from cache
-    const roomId = globals.get(roomIdVar)
-    const token = globals.get('toolbotToken')
+    const roomId = await globals.getAsync(roomIdVar)
+    const token = await globals.get('toolbotToken')
     const options = {
       method: 'POST',
       headers: {
