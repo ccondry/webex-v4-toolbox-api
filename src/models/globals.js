@@ -1,4 +1,4 @@
-const db = require('./db')
+const toolbox = require('./toolbox')
 
 // globals cache - these values all come from toolbox.globals in mongo db
 const cache = {}
@@ -7,7 +7,7 @@ const cache = {}
 async function refresh () {
   // update cache
   try {
-    const globals = await db.find('toolbox', 'globals', {})
+    const globals = await toolbox.listGlobals()
     // reduce to key: value pairs
     for (const global of globals) {
       cache[global.name] = global.value

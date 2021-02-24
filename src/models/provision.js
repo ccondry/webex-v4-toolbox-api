@@ -59,13 +59,12 @@ module.exports = async function (user) {
     
     // start provisioning user
     // set default provision info for chat
-    const updates = {
+    await toolbox.updateUser(userId, {
       CiscoAppId: 'cisco-chat-bubble-app',
       DC: 'produs1.ciscoccservice.com',
       async: true,
       orgId: await globals.getAsync('webexV4ControlHubOrgId')
-    }
-    await toolbox.updateUser(userId, updates)
+    })
 
     // // provision LDAP users
     // await ldap.createUsers({userId})
@@ -452,13 +451,14 @@ module.exports = async function (user) {
     })
     console.log(`added agent extension 82${userId} to ${rick.email}`)
 
-    // set provision done in toolbox db
+    // set provision done in toolbox db, and remove encrypted ldap password
     await toolbox.updateUser(userId, {
-      provision: 'complete'
+      provision: 'complete',
+      password: null
     })
 
     // notify user on Teams
-    // await teamsNotifier.send(user)
+    await teamsNotifier.send(user)
     console.log('finished provisioning user', user.id)
   } catch (e) {
     throw e

@@ -20,7 +20,6 @@
   "author": "Coty Condry <ccondry@cisco.com>",
   "license": "MIT",
   "dependencies": {
-    "@ccondry/mongo-wrapper": "^2020.10.21",
     "cwcc-provision-client": "^0.4.0",
     "dotenv": "^8.2.0",
     "fast-xml-parser": "^3.18.0",

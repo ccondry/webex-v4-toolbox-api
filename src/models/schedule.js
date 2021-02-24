@@ -1,7 +1,7 @@
 // the module to provision users
 const provision = require('./provision')
 const deprovision = require('./deprovision')
-const db = require('./db')
+const toolbox = require('./toolbox')
 const ch = require('./control-hub/client')
 const globals = require('./globals')
 const teamsLogger = require('./teams-logger')
@@ -27,11 +27,7 @@ async function getProvisionStartedUsers () {
       id: {$exists: true}
     }]
   }
-  const projection = {
-    demo: false,
-    password: false
-  }
-  return db.find('toolbox', 'users', query, projection)
+  return toolbox.findUsers(query)
 }
 
 async function getProvisionDeletingUsers () {
@@ -49,11 +45,7 @@ async function getProvisionDeletingUsers () {
         id: {$exists: true}
       }]
     }
-    const projection = {
-      demo: false,
-      password: false
-    }
-    const users = await db.find('toolbox', 'users', query, projection)
+    const users = await toolbox.findUsers(query)
     // filter out any template user IDs
     const templateUsers = [
       globals.get('webexV4ChatQueueTemplateName').split('_').pop(),
@@ -112,7 +104,7 @@ async function checkMaxUsers () {
       }
       // const projection = {password: false}
       const projection = {id: true, 'demo.webex-v4prod.lastAccess': true}
-      const provisionedUsers = await db.find('toolbox', 'users', query, projection)
+      const provisionedUsers = await toolbox.findUsers(query, projection)
       // console.log('provisionedUsers', provisionedUsers)
       // filter provisioned toolbox users to those with matching licensed control hub users
       const userMap = provisionedUsers.filter(user => {
@@ -132,7 +124,7 @@ async function checkMaxUsers () {
       const userIds = userMap.slice(maxUsers - maxUsersBuffer).map(v => v.id)
       const filter = {id: {$in: userIds}}
       const updates = {$set: {'demo.webex-v4prod.provision': 'delete'}}
-      return db.updateMany('toolbox', 'users', filter, updates)
+      return toolbox.updateUsers(filter, updates)
     } else {
       // not full - return empty array
       // return []
@@ -188,13 +180,16 @@ async function go () {
       }
       if (users.length > 0) {
         console.log(`starting provision for ${users.length} users`)
-        // batch provision LDAP users first, so sync is easier
+        // provision LDAP users
         for (const user of users) {
-          await ldap.createUsers({userId: user.id})
+          // create rbarrowsXXXX, sjeffersXXXX, and VPN LDAP accounts
+          await ldap.createUsers({user})
         }
-        // provision the rest of the user stuff in CJP and control hub
-        for (const user of users) {
-          await provision(user)
+        // provision the rest of the user stuff in CJP and control hub?
+        if (process.env.PROVISION_ALL === 'true') {
+          for (const user of users) {
+            await provision(user)
+          }
         }
       } else {
         // no users to provision

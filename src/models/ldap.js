@@ -1,4 +1,6 @@
 const ldapClient = require('simple-ldap-client')
+const getHash = require('./get-hash')
+const toolbox = require('./toolbox')
 // set up ldap client
 const ldap = new ldapClient(process.env.LDAP_URL, process.env.LDAP_BASE_DN)
 const userSearchDn = process.env.LDAP_USER_SEARCH_DN || 'OU=Sync2Webex,DC=dcloud,DC=cisco,DC=com'
@@ -230,10 +232,11 @@ async function lockUser ({username, lock}) {
 }
 
 async function createUsers ({
-  userId,
+  user,
   password = 'C1sco12345'
 }) {
   try {
+    const userId = user.id
     await createUser({
       firstName: 'Rick Barrows',
       lastName: userId,
@@ -243,7 +246,6 @@ async function createUsers ({
       physicalDeliveryOfficeName: userId,
       telephoneNumber: '82' + userId,
       userId,
-      mail: 'rbarrows' + userId + '@' + process.env.DOMAIN,
       email: 'rbarrows' + userId + '@' + process.env.DOMAIN,
       description: 'Rick ' + userId,
       usersDn: process.env.LDAP_USER_SEARCH_DN,
@@ -261,7 +263,6 @@ async function createUsers ({
       physicalDeliveryOfficeName: userId,
       telephoneNumber: '80' + userId,
       userId,
-      mail: 'sjeffers' + userId + '@' + process.env.DOMAIN,
       email: 'sjeffers' + userId + '@' + process.env.DOMAIN,
       description: 'Sandra ' + userId,
       usersDn: process.env.LDAP_USER_SEARCH_DN,
@@ -269,24 +270,40 @@ async function createUsers ({
     })
     
     console.log(`LDAP provision successful for user Sandra ${userId}`)
-
+    if (user.demo && user.demo['webex-v4prod'] && user.demo['webex-v4prod'].password) {
+      // create username from hash of user email
+      const username = getHash(user.email)
+      await createUser({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username,
+        commonName: `${user.firstName} ${user.lastName}`,
+        domain: process.env.DOMAIN,
+        physicalDeliveryOfficeName: user.id,
+        email: user.email,
+        description: 'user ' + user.id,
+        usersDn: process.env.LDAP_VPN_USER_SEARCH_DN,
+        password: await decrypt(user.demo['webex-v4prod'].password)
+      })
+      console.log(`LDAP provision successful for VPN user ${user.firstName} ${user.lastName} (${user.id})`)
+    }
   } catch (e) {
     console.log('Failed LDAP provision for user', userId, ':', e.message)
   }
 }
 
-async function deleteUser (cn) {
+async function deleteUser (cn, searchDn) {
   return ldap.deleteUser({
     adminDn: process.env.LDAP_ADMIN_DN,
     adminPassword: process.env.LDAP_ADMIN_PASSWORD,
-    userDn: `CN=${cn},${userSearchDn}`
+    userDn: `CN=${cn},${searchDn || userSearchDn}`
   })
 }
 
-async function deleteUsers (userId) {
+async function deleteUsers (user) {
   try {
     try {
-      await deleteUser('Rick ' + userId)
+      await deleteUser('Rick ' + user.id)
     } catch (e) {
       if (e.message.match('NO_OBJECT')) {
         // continue - user already deleted
@@ -295,7 +312,16 @@ async function deleteUsers (userId) {
       }
     }
     try {
-      await deleteUser('Sandra ' + userId)
+      await deleteUser('Sandra ' + user.id)
+    } catch (e) {
+      if (e.message.match('NO_OBJECT')) {
+        // continue - user already deleted
+      } else {
+        throw e
+      }
+    }
+    try {
+      await deleteUser(getHash(user.email), process.env.LDAP_VPN_USER_SEARCH_DN)
     } catch (e) {
       if (e.message.match('NO_OBJECT')) {
         // continue - user already deleted

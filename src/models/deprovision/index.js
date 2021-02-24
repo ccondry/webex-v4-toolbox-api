@@ -13,7 +13,6 @@ const globals = require('../globals')
 // const https = require('https')
 // const makeJwt = require('../make-jwt')
 const routingStrategy = require('./routing-strategy')
-const db = require('../db')
 // const ldap = require('../ldap')
 
 // delete team
