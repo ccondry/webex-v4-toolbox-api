@@ -286,6 +286,10 @@ async function createUsers ({
         password: await decrypt(user.demo['webex-v4prod'].password)
       })
       console.log(`LDAP provision successful for VPN user ${user.firstName} ${user.lastName} (${user.id})`)
+      // store username hash in user object
+      await toolbox.updateUser(userId, {
+        vpnUsername: username
+      })
     }
   } catch (e) {
     console.log('Failed LDAP provision for user', userId, ':', e.message)
