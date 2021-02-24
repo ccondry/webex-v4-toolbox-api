@@ -4,6 +4,15 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.24
+
+### Features
+* **Provision:** Move database commands to REST commands with JWT to
+toolbox-login-api. decrypt user password during provision and use it provision
+VPN LDAP account, removing the password from the database at the end of
+successful provision.
+
+
 # 2021.2.23-2
 
 ### Bug Fixes
