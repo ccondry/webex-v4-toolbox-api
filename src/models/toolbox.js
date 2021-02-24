@@ -4,7 +4,9 @@ async function updateUser (userId, body) {
   try {
     const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/user/' + userId
     const options = {
-      Authorization: 'Bearer ' + process.env.TOOLBOX_JWT,
+      headers: {
+        Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
+      },
       method: 'POST',
       body
     }
@@ -18,7 +20,9 @@ async function findUsers (query, projection) {
   try {
     const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/user/'
     const options = {
-      Authorization: 'Bearer ' + process.env.TOOLBOX_JWT,
+      headers: {
+        Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
+      },
       query: {
         query: JSON.stringify(query),
         projection: JSON.stringify(projection)
@@ -34,7 +38,9 @@ async function updateDemoUsers (filter, updates) {
   try {
     const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/demo/webex-v4prod/users'
     const options = {
-      Authorization: 'Bearer ' + process.env.TOOLBOX_JWT,
+      headers: {
+        Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
+      },
       method: 'POST',
       body: {
         filter,
