@@ -229,7 +229,7 @@ async function lockUser ({username, lock}) {
     }
   } catch (e) {
     console.log(e)
-    throw new Error(e)
+    throw e
   }
 }
 
@@ -274,6 +274,7 @@ async function createUsers ({
     
     console.log(`LDAP provision successful for user Sandra ${userId}`)
     if (user.demo && user.demo['webex-v4prod'] && user.demo['webex-v4prod'].password) {
+      console.log('creating VPN LDAP user account...')
       // create username from hash of user email
       const username = getHash(user.email)
       const encryptedPassword = user.demo['webex-v4prod'].password
@@ -304,6 +305,7 @@ async function createUsers ({
     }
   } catch (e) {
     console.log('Failed LDAP provision for user', userId, ':', e)
+    throw e
   }
 }
 
