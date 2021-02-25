@@ -1,5 +1,6 @@
 const ldapClient = require('simple-ldap-client')
 const getHash = require('./get-hash')
+const decrypt = require('./decrypt')
 const toolbox = require('./toolbox')
 // set up ldap client
 const ldap = new ldapClient(process.env.LDAP_URL, process.env.LDAP_BASE_DN)
