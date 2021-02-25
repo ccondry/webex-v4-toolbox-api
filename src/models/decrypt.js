@@ -6,9 +6,9 @@ const fs = require('fs')
 const key = fs.readFileSync('./certs/rsa-private.pem')
 
 module.exports = function (encryptedData) {
-  console.log('encryptedData', encryptedData)
+  // console.log('encryptedData', encryptedData)
   const buf = Buffer.from(encryptedData, 'base64')
-  console.log('buf', buf)
+  // console.log('buf', buf)
   const decrypted = crypto.privateDecrypt(
     {
       key,
@@ -20,8 +20,8 @@ module.exports = function (encryptedData) {
     },
     buf
   )
-  console.log('decrypted', decrypted)
+  // console.log('decrypted', decrypted)
   const utf8 = decrypted.toString('utf8')
-  console.log('utf8', utf8)
+  // console.log('utf8', utf8)
   return utf8
 }
