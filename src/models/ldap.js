@@ -255,8 +255,7 @@ async function createUsers ({
     })
 
     console.log(`LDAP provision successful for user Rick ${userId}`)
-    
-    await createUser({
+    const sandraUser = {
       firstName: 'Sandra Jefferson' ,
       lastName: userId,
       username: 'sjeffers' + userId,
@@ -269,24 +268,34 @@ async function createUsers ({
       description: 'Sandra ' + userId,
       usersDn: process.env.LDAP_USER_SEARCH_DN,
       password
-    })
+    }
+    // console.log('sandraUser', sandraUser)
+    await createUser(sandraUser)
     
     console.log(`LDAP provision successful for user Sandra ${userId}`)
     if (user.demo && user.demo['webex-v4prod'] && user.demo['webex-v4prod'].password) {
       // create username from hash of user email
       const username = getHash(user.email)
-      await createUser({
+      const encryptedPassword = user.demo['webex-v4prod'].password
+      // console.log('encryptedPassword', encryptedPassword)
+      const vpnPassword = await decrypt(encryptedPassword)
+      // console.log('vpnPassword', vpnPassword)
+      const vpnUser = {
         firstName: user.firstName,
         lastName: user.lastName,
         username,
         commonName: `${user.firstName} ${user.lastName}`,
         domain: process.env.DOMAIN,
         physicalDeliveryOfficeName: user.id,
-        email: user.email,
+        // email: user.email,
+        telephoneNumber: '80' + userId,
+        email: username + '@' + process.env.DOMAIN,
         description: 'user ' + user.id,
         usersDn: process.env.LDAP_VPN_USER_SEARCH_DN,
-        password: await decrypt(user.demo['webex-v4prod'].password)
-      })
+        password: vpnPassword
+      }
+      // console.log('vpnUser', vpnUser)
+      await createUser(vpnUser)
       console.log(`LDAP provision successful for VPN user ${user.firstName} ${user.lastName} (${user.id})`)
       // store username hash in user object
       await toolbox.updateUser(userId, {
@@ -294,7 +303,7 @@ async function createUsers ({
       })
     }
   } catch (e) {
-    console.log('Failed LDAP provision for user', userId, ':', e.message)
+    console.log('Failed LDAP provision for user', userId, ':', e)
   }
 }
 

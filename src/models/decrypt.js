@@ -1,11 +1,12 @@
 const crypto = require('crypto')
 const fs = require('fs')
+const path = require('path')
 
 // my private cert
 const key = fs.readFileSync('./certs/rsa-private.pem')
 
 module.exports = function (encryptedData) {
-  return crypto.privateDecrypt(
+  const decrypted = crypto.privateDecrypt(
     {
       key,
       // In order to decrypt the data, we need to specify the
@@ -16,4 +17,5 @@ module.exports = function (encryptedData) {
     },
     Buffer.from(encryptedData, 'base64')
   )
+  return decrypted.toString('utf8')
 }
