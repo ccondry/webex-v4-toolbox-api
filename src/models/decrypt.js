@@ -14,6 +14,6 @@ module.exports = function (encryptedData) {
       padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
       oaepHash: 'sha256'
     },
-    Buffer.from(encryptedData)
+    Buffer.from(encryptedData, 'base64')
   )
 }
