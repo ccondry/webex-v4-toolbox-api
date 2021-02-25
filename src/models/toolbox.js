@@ -4,19 +4,7 @@ const urlBase = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth'
 // const urlBase = 'http://localhost:3032/api/v1/auth'
 
 async function updateUser (userId, body) {
-  try {
-    const url = urlBase + '/app/user/' + userId
-    const options = {
-      headers: {
-        Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
-      },
-      method: 'POST',
-      body
-    }
-    return fetch(url, options)
-  } catch (e) {
-    throw e
-  }
+  return updateDemoUsers({id: userId}, body)
 }
 
 async function findUsers (query = {}, projection = {}) {
@@ -40,7 +28,7 @@ async function findUsers (query = {}, projection = {}) {
 
 async function updateDemoUsers (filter, updates) {
   try {
-    const url = urlBase + '/app/demo/webex-v4prod/user'
+    const url = urlBase + '/app/demo/webex-v4prod/users'
     const options = {
       headers: {
         Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
