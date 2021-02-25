@@ -1,5 +1,6 @@
 node_modules
 .env
+certs/*
 rsa-private.pem
 rsa-public.pem
 ad1.pem
