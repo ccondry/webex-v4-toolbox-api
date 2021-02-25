@@ -192,7 +192,8 @@ async function createUser (body) {
     console.log('successfully enabled LDAP user account. done creating user.')
     return
   } catch (error) {
-    console.log('failed to create LDAP user:', error.message)
+    // console.log('failed to create LDAP user:', error.message)
+    console.log('failed to create LDAP user:', error)
     throw error
   }
 }
