@@ -162,7 +162,7 @@ async function go () {
         await deprovision(user)
       }
     } catch (e) {
-      console.log('deprovision error:', e)      
+      console.log('deprovision error:', e.message)      
     }
     // get list of users to provision
     try {
