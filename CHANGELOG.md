@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.25-1
+
+### Bug Fixes
+* **Provision:** Fix bugs in password decryption during VPN LDAP user creation.
+
+
 # 2021.2.25
 
 ### Bug Fixes
