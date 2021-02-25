@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.25
+
+### Bug Fixes
+* **Provision:** Fix new bugs in database REST commands and VPN LDAP user creation.
+
+
 # 2021.2.24
 
 ### Features
