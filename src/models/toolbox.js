@@ -1,8 +1,11 @@
 const fetch = require('./fetch')
 
+const urlBase = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth'
+// const urlBase = 'http://localhost:3032/api/v1/auth'
+
 async function updateUser (userId, body) {
   try {
-    const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/user/' + userId
+    const url = urlBase + '/app/user/' + userId
     const options = {
       headers: {
         Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
@@ -16,9 +19,10 @@ async function updateUser (userId, body) {
   }
 }
 
-async function findUsers (query, projection) {
+async function findUsers (query = {}, projection = {}) {
+  // console.log('findUsers', query, projection)
   try {
-    const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/user/'
+    const url = urlBase + '/app/user'
     const options = {
       headers: {
         Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
@@ -36,7 +40,7 @@ async function findUsers (query, projection) {
 
 async function updateDemoUsers (filter, updates) {
   try {
-    const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/demo/webex-v4prod/user'
+    const url = urlBase + '/app/demo/webex-v4prod/user'
     const options = {
       headers: {
         Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
@@ -55,8 +59,7 @@ async function updateDemoUsers (filter, updates) {
 
 async function listGlobals (query) {
   try {
-    const url = 'http://localhost:3032/api/v1/auth/app/global'
-    // const url = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth/app/global'
+    const url = urlBase + '/app/global'
     const options = {
       headers: {
         Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
