@@ -235,8 +235,8 @@ async function createUsers ({
   user,
   password = 'C1sco12345'
 }) {
+  const userId = user.id
   try {
-    const userId = user.id
     await createUser({
       firstName: 'Rick Barrows',
       lastName: userId,
