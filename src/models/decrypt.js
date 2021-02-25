@@ -12,8 +12,8 @@ module.exports = function (encryptedData) {
       // same hashing function and padding scheme that we used to
       // encrypt the data in the previous step
       padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-      oaepHash: 'sha256',
+      oaepHash: 'sha256'
     },
-    encryptedData
+    Buffer.from(encryptedData)
   )
 }
