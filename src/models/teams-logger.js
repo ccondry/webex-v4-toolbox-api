@@ -2,7 +2,7 @@ const fetch = require('./fetch')
 const package = require('../../package.json')
 const os = require('os')
 const globals = require('./globals')
-
+const location = process.env.LOCATION || 'unknown'
 // find env hostname
 const hostname = os.hostname()
 
@@ -66,8 +66,8 @@ async function log () {
   const packageName = package.name
   // const packageVersion = process.env.npm_package_version
   const packageVersion = package.version
-  const textPrefix = `${packageName} ${packageVersion} on ${hostname}: `
-  const markdownPrefix = `**${packageName} ${packageVersion}** on **${hostname}**: `
+  const textPrefix = `${packageName} ${packageVersion} on ${hostname} in ${location}: `
+  const markdownPrefix = `**${packageName} ${packageVersion}** on **${hostname}** in **${location}**: `
   // add prefix to plaintext
   text = textPrefix + text
   // add prefix to markdown
