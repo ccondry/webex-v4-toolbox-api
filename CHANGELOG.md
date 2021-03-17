@@ -4,6 +4,15 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.3.17-5
+
+### Bug Fixes 
+* **Deprovision:** Remove any previous provision password and error from user
+demo config data when provision completes succesfully.
+* **Provision:** Remove any previous provision password and error from user
+demo config data when provision completes succesfully.
+
+
 # 2021.3.17-4
 
 ### Bug Fixes 
