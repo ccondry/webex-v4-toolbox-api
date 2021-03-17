@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.3.17
+
+### Features
+* **Provision:** If a new user chooses a password that does not meet the LDAP
+requirements, stop trying to provision them and provide the error to the UI.
+
+
 # 2021.2.25-1
 
 ### Bug Fixes
