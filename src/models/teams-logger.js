@@ -1,6 +1,7 @@
 const fetch = require('./fetch')
 const package = require('../../package.json')
 const globals = require('./globals')
+const environment = require('./environment')
 const location = environment.location
 // find env hostname
 const hostname = environment.hostname
