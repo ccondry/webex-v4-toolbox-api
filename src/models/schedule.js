@@ -191,6 +191,7 @@ async function go () {
             // error from LDAP that the new user's VPN password is not valid
             // (too short, etc.)
             const ldapPasswordError = /DSID-031A12D2/
+            console.log('ldapPasswordError.test(e.message)', ldapPasswordError.test(e.message))
             if (ldapPasswordError.test(e.message)) {
               // user's password is not valid for LDAP to set their VPN user
               // password update user provision data so toolbox can notify user
