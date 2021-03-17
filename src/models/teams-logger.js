@@ -1,10 +1,9 @@
 const fetch = require('./fetch')
 const package = require('../../package.json')
-const os = require('os')
 const globals = require('./globals')
-const location = process.env.LOCATION || 'unknown'
+const location = environment.location
 // find env hostname
-const hostname = os.hostname()
+const hostname = environment.hostname
 
 // trim message to 7439 bytes for Webex to accept it
 function trimMessage (message) {
