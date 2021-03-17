@@ -514,7 +514,11 @@ async function main (user) {
     // remove provision info from database
     try {
       console.log(`setting user provision info to not provisioned for webex-v4prod...`)
-      await toolbox.updateUser(userId, {provision: 'deleted'})
+      await toolbox.updateUser(userId, {
+        provision: 'deleted',
+        password: null,
+        error: null
+      })
       console.log(`successfully set user provision info to not provisioned for webex-v4prod`)
     } catch (e) {
       console.log(`failed to set user provision info to not provisioned for webex-v4prod:`, e.message)

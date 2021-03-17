@@ -452,9 +452,11 @@ module.exports = async function (user) {
     console.log(`added agent extension 82${userId} to ${rick.email}`)
 
     // set provision done in toolbox db, and remove encrypted ldap password
+    // and remove any previous errors
     await toolbox.updateUser(userId, {
       provision: 'complete',
-      password: null
+      password: null,
+      error: null
     })
 
     // notify user on Teams
