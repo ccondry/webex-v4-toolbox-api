@@ -123,7 +123,7 @@ async function checkMaxUsers () {
       // set each of these users to delete state
       const userIds = userMap.slice(maxUsers - maxUsersBuffer).map(v => v.id)
       const filter = {id: {$in: userIds}}
-      const updates = {$set: {'demo.webex-v4prod.provision': 'delete'}}
+      const updates = {provision: 'delete'}
       return toolbox.updateUsers(filter, updates)
     } else {
       // not full - return empty array
@@ -193,15 +193,20 @@ async function go () {
             const ldapPasswordError = /DSID-031A12D2/
             console.log('ldapPasswordError.test(e.message)', ldapPasswordError.test(e.message))
             if (ldapPasswordError.test(e.message)) {
+              console.log('user password is invalid. updating user provision with error...')
               // user's password is not valid for LDAP to set their VPN user
               // password update user provision data so toolbox can notify user
-              const updates = {$set: {
-                'demo.webex-v4prod.provision': 'error',
-                'demo.webex-v4prod.error': 'Invalid password. Please provision using a VPN password that is 10 or more characters.',
-              }}
+              const updates = {
+                provision: 'error',
+                error: 'Invalid password. Please provision using a VPN password that is 10 or more characters.',
+              }
               // update the user with the error
-              await toolbox.updateUser(user.id, updates)
-              console.log('updated user', user.id, 'with invalid password provision error.')
+              toolbox.updateUser(user.id, updates)
+              .then(r => {
+                console.log('updated user', user.id, 'with invalid password provision error.')
+              }).catch(e2 => {
+                console.log('failed to update user', user.id, 'with invalid password provision error:', e2.message)
+              })
               // mark user should not be provisioned in CJP and control hub
               errorUsers.push(user.id)
               // continue with next user
