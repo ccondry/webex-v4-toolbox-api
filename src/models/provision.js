@@ -262,7 +262,12 @@ module.exports = async function (user) {
     console.log(`enabled Control Hub user ${rick.name} as Contact Center Supervisor`)
     // await sleep(3000)
     // enable user contact center licenses
-    await controlHub.user.onboard(rick.email)
+    try {
+      await controlHub.user.onboard(rick.email)
+    } catch (e) {
+      console.log(`failed to onboard ${rick.name}: ${e.message}`, e)
+      throw e
+    }
 
     // get Rick user object from Webex Control Hub
     rick.webex = await controlHub.user.get(rick.email)
@@ -284,7 +289,12 @@ module.exports = async function (user) {
     console.log(`enabled Control Hub user ${sandra.name} for Contact Center Agent`)
 
     // enable user contact center licenses
-    await controlHub.user.onboard(sandra.email)
+    try {
+      await controlHub.user.onboard(sandra.email)
+    } catch (e) {
+      console.log(`failed to onboard ${sandra.name}: ${e.message}`, e)
+      throw e
+    }
     // await sleep(3000)
     
     // get CJP global agent team
