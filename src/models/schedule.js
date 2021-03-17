@@ -191,7 +191,7 @@ async function go () {
             // error from LDAP that the new user's VPN password is not valid
             // (too short, etc.)
             const ldapPasswordError = /DSID-031A12D2/
-            if (e.message.match(ldapPasswordError)) {
+            if (ldapPasswordError.test(e.message)) {
               // user's password is not valid for LDAP to set their VPN user
               // password update user provision data so toolbox can notify user
               const updates = {$set: {
@@ -225,9 +225,8 @@ async function go () {
       console.log(message)
       // outgoing network error message (probably from Atlas)
       const atlasError = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN/
-      if (message.match(atlasError)) {
+      if (atlasError.test(message)) {
         // just log to console - atlas-a.wbx2.com gives these often
-        return toolbox.updateUser(filter, updates)
       } else {
         // send any unexpected errors to teams logger
         teamsLogger.log(message)
