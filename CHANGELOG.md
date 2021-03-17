@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.3.17-4
+
+### Bug Fixes 
+* **Service:** Fix issue causing service to not start.
+
+
 # 2021.3.17-3
 
 ### Features 
