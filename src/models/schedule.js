@@ -187,6 +187,7 @@ async function go () {
           try {
             await ldap.createUsers({user})
           } catch (e) {
+            console.log('ldap.createUsers error:', e.message)
             // error from LDAP that the new user's VPN password is not valid
             // (too short, etc.)
             const ldapPasswordError = /DSID-031A12D2/
@@ -199,6 +200,7 @@ async function go () {
               }}
               // update the user with the error
               await toolbox.updateUser(user.id, updates)
+              console.log('updated user', user.id, 'with invalid password provision error.')
               // mark user should not be provisioned in CJP and control hub
               errorUsers.push(user.id)
               // continue with next user
