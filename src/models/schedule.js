@@ -180,14 +180,37 @@ async function go () {
       }
       if (users.length > 0) {
         console.log(`starting provision for ${users.length} users`)
+        const errorUsers = []
         // provision LDAP users
         for (const user of users) {
           // create rbarrowsXXXX, sjeffersXXXX, and VPN LDAP accounts
-          await ldap.createUsers({user})
+          try {
+            await ldap.createUsers({user})
+          } catch (e) {
+            // error from LDAP that the new user's VPN password is not valid
+            // (too short, etc.)
+            const ldapPasswordError = /DSID-031A12D2/
+            if (e.message.match(ldapPasswordError)) {
+              // user's password is not valid for LDAP to set their VPN user
+              // password update user provision data so toolbox can notify user
+              const updates = {$set: {
+                'demo.webex-v4prod.provision': 'error',
+                'demo.webex-v4prod.error': 'Invalid password. Please provision using a VPN password that is 10 or more characters.',
+              }}
+              // update the user with the error
+              await toolbox.updateUser(user.id, updates)
+              // mark user should not be provisioned in CJP and control hub
+              errorUsers.push(user.id)
+              // continue with next user
+              continue
+            }
+          }
         }
         // provision the rest of the user stuff in CJP and control hub?
         if (process.env.PROVISION_ALL === 'true') {
-          for (const user of users) {
+          // filter out any users who had an error during LDAP provisioning
+          const successfulUsers = users.filter(v => !errorUsers.includes(v.id))
+          for (const user of successfulUsers) {
             await provision(user)
           }
         }
@@ -198,11 +221,13 @@ async function go () {
       const s = e.message
       const message = `provision error: ${s}`
       console.log(message)
-      const regex = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN/
-      if (message.match(regex)) {
+      // outgoing network error message (probably from Atlas)
+      const atlasError = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN/
+      if (message.match(atlasError)) {
         // just log to console - atlas-a.wbx2.com gives these often
+        return toolbox.updateUser(filter, updates)
       } else {
-        // also send to teams logger
+        // send any unexpected errors to teams logger
         teamsLogger.log(message)
       }
     }
