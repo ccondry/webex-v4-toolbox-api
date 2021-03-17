@@ -4,6 +4,14 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.3.17-2
+
+### Bug Fixes
+* **Deprovision:** Fix marking users for deprovision when there are too many
+users currently provisioned.
+* **Provision:** Fix user provision error message.
+
+
 # 2021.3.17-1
 
 ### Features
