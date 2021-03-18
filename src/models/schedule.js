@@ -230,9 +230,11 @@ async function go () {
       const message = `provision error: ${s}`
       console.log(message)
       // outgoing network error message (probably from Atlas)
-      const atlasError = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN/
-      if (atlasError.test(message)) {
-        // just log to console - atlas-a.wbx2.com gives these often
+      const generalNetworkError = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN|connect ETIMEDOUT|504 Gateway Time-out/
+      if (generalNetworkError.test(message)) {
+        // just log to console - atlas-a.wbx2.com and
+        // dcloud-collab-toolbox.cxdemo.net give these errors often and just
+        // need to retry in a moment
       } else {
         // send any unexpected errors to teams logger
         teamsLogger.log(message)
