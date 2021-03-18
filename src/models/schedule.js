@@ -235,6 +235,7 @@ async function go () {
         // just log to console
         // atlas-a.wbx2.com and dcloud-collab-toolbox.cxdemo.net give these
         // errors often and just need to retry in a moment
+        console.log(message)
       } else {
         // send any other, unexpected errors to teams logger
         teamsLogger.log(message)
