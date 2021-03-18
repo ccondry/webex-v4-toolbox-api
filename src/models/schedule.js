@@ -232,11 +232,11 @@ async function go () {
       // outgoing network error message (probably from Atlas)
       const generalNetworkError = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN|connect ETIMEDOUT|504 Gateway Time-out/
       if (generalNetworkError.test(message)) {
-        // just log to console - atlas-a.wbx2.com and
-        // dcloud-collab-toolbox.cxdemo.net give these errors often and just
-        // need to retry in a moment
+        // just log to console
+        // atlas-a.wbx2.com and dcloud-collab-toolbox.cxdemo.net give these
+        // errors often and just need to retry in a moment
       } else {
-        // send any unexpected errors to teams logger
+        // send any other, unexpected errors to teams logger
         teamsLogger.log(message)
       }
     }
