@@ -12,7 +12,8 @@ function getHash (sub) {
   .createHash('shake128', {outputLength: 6})
   .update(sub, 'utf-8')
   .digest('base64')
-  .replace('+', '')
+  // remove any characters that are not letters, numbers, or underscores
+  .replace(/\W/g, '')
   return sub.split('@').shift().slice(0, 8) + hash
 }
 
