@@ -35,7 +35,8 @@ async function provision ({
 
     // check for existing user object
     const existing = existingList.find(v => v.name === name)
-    console.log(`searched existing list of ${existingList.length} Control Hub ${typeName}. existing = ${existing}`)
+    console.log(`searched existing list of ${existingList.length} Control Hub ${typeName} for one named ${name}. existing = ${existing}`)
+    console.log(existingList)
     // run any specific modifications to the data using caller-provided function
     if (typeof modify === 'function') {
       modify(template, existing)
