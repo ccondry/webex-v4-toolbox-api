@@ -4,7 +4,10 @@ const teamsNotifier = require('./teams-notifier')
 const toolbox = require('./toolbox')
 const globals = require('./globals')
 // const ldap = require('./ldap')
+// the next two are newer provision functions using existing template objects on
+// the server-side as the base for creating/updating user objects
 const provision = require('./new/template/provision')
+const chProvision = require('./new/template/control-hub')
 const {xml2js, js2xml} = require('./parsers')
 
 const domain = process.env.DOMAIN
@@ -56,6 +59,7 @@ module.exports = async function (user) {
     const skillProfileTemplateName = globals.get('webexV4SkillProfileTemplateName')
     const agentTemplateLoginName = globals.get('webexV4AgentTemplateLoginName')
     const supervisorTemplateLoginName = globals.get('webexV4SupervisorTemplateLoginName')
+    const chatTemplateTemplateName = globals.get('webexV4ChatTemplateTemplateName')
     
     // start provisioning user
     // set default provision info for chat
@@ -239,13 +243,23 @@ module.exports = async function (user) {
     })
 
     // get or create the Webex Control Hub chat template
-    const chatTemplate = await controlHub.chatTemplate.getOrCreate(userId, chatEntryPoint.id)
-    // await sleep(3000)
-  
-    // Debug
-    // console.log(chatTemplate)
-    // const chatTemplates = await controlHub.chatTemplate.list()
-    // console.log(chatTemplates)
+    const chatTemplate = await chProvision({
+      name: `EP_Chat_${userId}`,
+      templateName: chatTemplateTemplateName,
+      type: 'chatTemplate',
+      typeName: 'chat template',
+      idName: 'templateId',
+      modify: (body) => {
+        // delete data that server will generate
+        delete body.createdTime
+        delete body.lastUpdatedTime
+        delete body.updatedBy
+        delete body.uri
+
+        // set entry point ID
+        body.entryPoint = chatEntryPoint.id
+      }
+    })
 
     // add read-only admin role to Rick user in Webex Control Hub
     const ch = await controlHub.client.getClient()
