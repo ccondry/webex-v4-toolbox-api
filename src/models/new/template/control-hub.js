@@ -16,7 +16,7 @@ async function provision ({
     // provision client
     const client = await ch.client.get()
     // get all existing chat templates
-    const existingList = await client.contactCenter[typeName].list()
+    const existingList = await client.contactCenter[type].list()
     // find the template object in list
     const templateExists = existingList.find(v => v.name === templateName)
     // throw error if template not found
@@ -64,7 +64,7 @@ async function provision ({
       const maxCount = 10
       while (newExists === null && count < maxCount) {
         await sleep(2000)
-        const newList = await client.contactCenter[typeName].list()
+        const newList = await client.contactCenter[type].list()
         newExists = newList.find(v => v.name === name)
         count++
       }
