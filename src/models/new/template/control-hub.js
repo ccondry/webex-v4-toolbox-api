@@ -61,10 +61,10 @@ async function provision ({
       // create on Control Hub
       await client.contactCenter[type].create(template)
       // wait for it to exist
-      let newExists = null
+      let newExists
       let count = 0
       const maxCount = 10
-      while (newExists === null && count < maxCount) {
+      while (!newExists && count < maxCount) {
         await sleep(2000)
         const newList = await client.contactCenter[type].list()
         newExists = newList.find(v => v.name === name)
