@@ -27,6 +27,7 @@ async function provision ({
 
     // get full template data body
     const template = await client.contactCenter[type].get(templateExists[idName])
+    console.log('for example, the template data is', template)
     // delete original ID
     delete template[idName]
     // set name
@@ -34,7 +35,7 @@ async function provision ({
 
     // check for existing user object
     const existing = existingList.find(v => v.name === name)
-    
+    console.log(`searched existing list of ${existingList.length} Control Hub ${typeName}. existing = ${existing}`)
     // run any specific modifications to the data using caller-provided function
     if (typeof modify === 'function') {
       modify(template, existing)
