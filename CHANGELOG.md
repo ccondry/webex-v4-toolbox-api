@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.3.31
+
+### Features
+* **Logging:** Provision Control Hub chat templates using template data on
+Control Hub instead of static template data.
+
+
 # 2021.3.19
 
 ### Features
