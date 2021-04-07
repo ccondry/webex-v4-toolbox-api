@@ -9,6 +9,7 @@ const globals = require('./globals')
 const provision = require('./new/template/provision')
 const chProvision = require('./new/template/control-hub')
 const {xml2js, js2xml} = require('./parsers')
+const teamsLogger = require('./teams-logger')
 
 const domain = process.env.DOMAIN
 
@@ -94,7 +95,12 @@ module.exports = async function (user) {
       retryCount++
       // log every 10th retry
       if (retryCount % 10 === 0) {
-        console.log(`retry number ${retryCount} of search for ${sandra.email} in Control Hub...`)
+        console.log(`retry number ${retryCount} of search for ${sandra.email} and ${rick.email} in Control Hub...`)
+        if (retryCount % 50 === 0) {
+          // send webex teams message for every 50 retries, because we probably
+          // need help
+          teamsLogger.log(`Still not finding ${sandra.email} and ${rick.email} in Control Hub after ${retryCount} retries. Check LDAP -> Webex sync?`)
+        }
       }
     }
     console.log(`found Control Hub users for ${sandra.email} and ${rick.email} after ${retryCount} retries.`)
