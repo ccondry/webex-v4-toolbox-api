@@ -96,8 +96,8 @@ module.exports = async function (user) {
       // log every 10th retry
       if (retryCount % 10 === 0) {
         console.log(`retry number ${retryCount} of search for ${sandra.email} and ${rick.email} in Control Hub...`)
-        if (retryCount % 50 === 0) {
-          // send webex teams message for every 50 retries, because we probably
+        if (retryCount % 20 === 0) {
+          // send webex teams message for every 20 retries, because we probably
           // need help
           teamsLogger.log(`Still not finding ${sandra.email} and ${rick.email} in Control Hub after ${retryCount} retries. Check LDAP -> Webex sync?`)
         }
