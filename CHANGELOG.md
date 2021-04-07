@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.4.7
+
+### Bug Fixes
+* **Provision:** Log to Webex for every 50 retries when waiting for Sandra and
+Rick users to sync from LDAP to Webex Control Hub.
+
+
 # 2021.3.31-1
 
 ### Bug Fixes
