@@ -484,7 +484,7 @@ module.exports = async function (user) {
     console.log(`added agent extension 82${userId} to ${rick.email}`)
 
     // map WXM user accounts but don't stop on errors
-    wxm.mapUsers(orgId, [chSandra, chRick])
+    wxm.mapUsers([chSandra, chRick])
     .then(r => {
       console.log(`mapped WXM users for ${chSandra.userName} and ${chRick.userName}`)
     })
