@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.5.6-1
+
+### Fixes
+* **Provision:** Fix WXM provision request method.
+
+
 # 2021.5.6
 
 ### Features
