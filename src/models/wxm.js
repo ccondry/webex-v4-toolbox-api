@@ -8,7 +8,7 @@ async function mapUsers (orgId, users) {
   const options = {
     method: 'POST',
     headers: {
-      Authorization: 'Bearer ' + globals.get('wxmCreds')
+      Authorization: 'Basic ' + globals.get('webexV4WxmCredentials')
     },
     body: {
       ExternalIdentityProviderName: 'webexci',
