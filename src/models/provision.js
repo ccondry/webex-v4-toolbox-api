@@ -483,9 +483,16 @@ module.exports = async function (user) {
     })
     console.log(`added agent extension 82${userId} to ${rick.email}`)
 
-    // map WXM user accounts
-    await wxm.mapUsers(orgId, [chSandra, chRick])
-    console.log(`mapped WXM users for ${chSandra.userName} and ${chRick.userName}`)
+    // map WXM user accounts but don't stop on errors
+    wxm.mapUsers(orgId, [chSandra, chRick])
+    .then(r => {
+      console.log(`mapped WXM users for ${chSandra.userName} and ${chRick.userName}`)
+    })
+    .catch(e => {
+      const message = `failed to map WXM users for ${chSandra.userName} and ${chRick.userName}: ${e.message}`
+      console.log(message)
+      teamsLogger.warn(message)
+    })
 
     // set provision done in toolbox db, and remove encrypted ldap password
     // and remove any previous errors

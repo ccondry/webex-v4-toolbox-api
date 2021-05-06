@@ -103,5 +103,6 @@ module.exports = {
   error: log,
   info: log,
   debug: log,
+  warn: log,
   warning: log
 }
