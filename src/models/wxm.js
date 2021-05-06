@@ -6,6 +6,7 @@ async function mapUsers (orgId, users) {
   const url = 'https://api.getcloudcherry.com/api/account/UpdateExternalIdp/Bulk'
 
   const options = {
+    method: 'POST',
     body: {
       ExternalIdentityProviderName: 'webexci',
       IDPMapppings: users.map(user => {
