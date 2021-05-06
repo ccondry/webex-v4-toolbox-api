@@ -10,6 +10,7 @@ const provision = require('./new/template/provision')
 const chProvision = require('./new/template/control-hub')
 const {xml2js, js2xml} = require('./parsers')
 const teamsLogger = require('./teams-logger')
+const wxm = require('./wxm')
 
 const domain = process.env.DOMAIN
 
@@ -61,6 +62,7 @@ module.exports = async function (user) {
     const agentTemplateLoginName = globals.get('webexV4AgentTemplateLoginName')
     const supervisorTemplateLoginName = globals.get('webexV4SupervisorTemplateLoginName')
     const chatTemplateTemplateName = globals.get('webexV4ChatTemplateTemplateName')
+    const orgId = globals.get('webexV4ControlHubOrgId')
     
     // start provisioning user
     // set default provision info for chat
@@ -68,7 +70,7 @@ module.exports = async function (user) {
       CiscoAppId: 'cisco-chat-bubble-app',
       DC: 'produs1.ciscoccservice.com',
       async: true,
-      orgId: await globals.getAsync('webexV4ControlHubOrgId')
+      orgId
     })
 
     // // provision LDAP users
@@ -480,6 +482,10 @@ module.exports = async function (user) {
       }]
     })
     console.log(`added agent extension 82${userId} to ${rick.email}`)
+
+    // map WXM user accounts
+    await wxm.mapUsers(orgId, [chSandra, chRick])
+    console.log(`mapped WXM users for ${chSandra.userName} and ${chRick.userName}`)
 
     // set provision done in toolbox db, and remove encrypted ldap password
     // and remove any previous errors
