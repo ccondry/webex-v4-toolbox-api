@@ -55,7 +55,7 @@ async function modify ({
 }
 
 // list agent users
-async function list (login) {
+async function list () {
   try {
     const users = await client.user.list()
     // console.log('user list', list)
