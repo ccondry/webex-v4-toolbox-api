@@ -156,7 +156,7 @@ async function makeSupervisor (id) {
 
 async function list () {
   const token = await getToken()
-  console.log('token', token)
+  // console.log('token', token)
   const url = `https://identity.webex.com/identity/scim/${orgId}/v1/Users`
   const attributes = [
     'name',
