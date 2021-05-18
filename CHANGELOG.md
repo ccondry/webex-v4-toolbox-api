@@ -4,6 +4,14 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.5.18
+
+### Fixes
+* **Provision:** Send sync user request to Control Hub for each agent that is
+provisioned.
+* **Provision:** Retry provision team if the team did not get fully provisioned.
+
+
 # 2021.5.13
 
 ### Fixes
