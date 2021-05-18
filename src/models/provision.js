@@ -107,6 +107,24 @@ module.exports = async function (user) {
     }
     console.log(`found Control Hub users for ${sandra.email} and ${rick.email} after ${retryCount} retries.`)
 
+    // send sync request to make control hub sync to managment portal and aqm
+    try {
+      await ch.contactCenter.ocis.fix(chSandra.id)
+    } catch (e) {
+      const message = `Failed to send user account sync request (OCIS) to Control Hub ${chSandra.email}: ${e.message}`
+      console.log(message)
+      teamsLogger.warn(message)
+    }
+    
+    // send sync request to make control hub sync to managment portal and aqm
+    try {
+      await ch.contactCenter.ocis.fix(chRick.id)
+    } catch (e) {
+      const message = `Failed to send user account sync request (OCIS) to Control Hub for ${chRick.email}: ${e.message}`
+      console.log(message)
+      teamsLogger.warn(message)
+    }
+    
     // provision skill profile ID for user
     const skillProfile = await provision({
       templateName: skillProfileTemplateName,
