@@ -63,7 +63,10 @@ module.exports = async function (user) {
     const supervisorTemplateLoginName = globals.get('webexV4SupervisorTemplateLoginName')
     const chatTemplateTemplateName = globals.get('webexV4ChatTemplateTemplateName')
     const orgId = globals.get('webexV4ControlHubOrgId')
-    
+
+    // get control hub client object
+    const ch = await controlHub.client.getClient()
+
     // start provisioning user
     // set default provision info for chat
     await toolbox.updateUser(userId, {
@@ -312,7 +315,7 @@ module.exports = async function (user) {
     })
 
     // add read-only admin role to Rick user in Webex Control Hub
-    const ch = await controlHub.client.getClient()
+    
     ch.user.modify({
       userId: chRick.id,
       roles: ['id_readonly_admin']
