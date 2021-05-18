@@ -153,30 +153,6 @@ module.exports = async function (user) {
         body.attributes.skillProfileId__s = skillProfile.id
       }
     })
-
-    // check that team has dbId__l and sid attributes before continuing
-    if (!userTeam.attributes.dbId__l || !userTeam.attributes.sid) {
-      teamsLogger.log(`user ${userId} team did not have both dbId__l and sid attributes. Attempting to provision them again...`)
-      userTeam = await provision({
-        templateName: teamTemplateName,
-        name: `T_dCloud_${userId}`,
-        type: 'team',
-        typeName: 'team',
-        modify: body => {
-          body.attributes.skillProfileId__s = skillProfile.id
-        }
-      })
-    }
-    
-    // check again if team has dbId__l and sid attributes, log and continue if
-    // not
-    if (!userTeam.attributes.dbId__l || !userTeam.attributes.sid) {
-      // still failed
-      teamsLogger.error(`user ${userId} team did not have both dbId__l and sid attributes after retrying provision. They may need their user or team saved from the Management Portal admin UI.`)
-    } else {
-      // success
-      teamsLogger.info(`user ${userId} team now has both dbId__l and sid attributes after retrying provision. No further action necessary.`)
-    }
     
     // add user team to main voice queue, if they are not already in it
     await cjp.virtualTeam.addTeam(voiceQueueName, userTeam.id)

@@ -57,8 +57,8 @@ async function provision ({
       // get new ID from response
       newBody.id = response[0].links[0].href.split('/').pop()
       console.log(`created new ${typeName} ${newBody.attributes.name__s}: ${newBody.id}.`)
-      // wait for virtual team dbId to exist before returning
-      if (type === 'virtualTeam') {
+      // wait for team or virtual team dbId to exist before returning
+      if (type === 'virtualTeam' || type === 'team') {
         // get full virtualTeam details, for the dbId
         let details = await cjp.client[type].get(newBody.id)
             
