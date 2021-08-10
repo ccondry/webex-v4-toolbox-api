@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.8.10
+
+### Features
+* **Provision:** Also notify staff on Webex when a user has been provisioned.
+
+
 # 2021.5.18-1
 
 ### Fixes
