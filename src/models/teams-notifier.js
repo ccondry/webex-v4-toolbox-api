@@ -1,8 +1,17 @@
 const fetch = require('./fetch')
 const globals = require('./globals')
 
-// main log method
 async function send (user) {
+  try {
+    await sendToUser(user)
+    await sendToStaff(user)
+  } catch (e) {
+    throw e
+  }
+}
+
+// notify user
+async function sendToUser (user) {
   try {
     let markdown = `***Hello ${user.firstName}***,<br> `
     markdown += `Your ***Cisco Webex Contact Center v4*** provisioning is now complete!<br><br> `
@@ -10,7 +19,7 @@ async function send (user) {
     markdown += `Please be sure to read the demo guide that details to run and use the demo. `
     markdown += `<br>Thank You!`
     
-    const url = 'https://api.ciscospark.com/v1/messages'
+    const url = 'https://webexapis.com/v1/messages'
     const token = globals.get('toolbotToken')
     const options = {
       method: 'POST',
@@ -22,9 +31,34 @@ async function send (user) {
         markdown
       }
     }
+    // send to user
     await fetch(url, options)
   } catch (e) {
-    console.log(`failed to notify user ${user.email} on Webex Teams:`, e.message)
+    console.log(`failed to notify user ${user.email} on Webex:`, e.message)
+  }
+}
+
+// notify staff
+async function sendToStaff (user) {
+  try {
+    // prepare message
+    let markdown = `${user.email} (${user.id}) has finished provisioning in the Webex CC v4 instant demo.`
+    const url = 'https://webexapis.com/v1/messages'
+    const token = globals.get('toolbotToken')
+    const options = {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token
+      },
+      body: {
+        roomId: globals.get('webexV4ProvisionRoomId'),
+        markdown
+      }
+    }
+    // send message
+    await fetch(url, options)
+  } catch (e) {
+    console.log(`failed to notify staff of provision on Webex:`, e.message)
   }
 }
 

@@ -523,7 +523,7 @@ module.exports = async function (user) {
       error: null
     })
 
-    // notify user on Teams
+    // notify user and staff on Webex
     await teamsNotifier.send(user)
     console.log('finished provisioning user', user.id)
   } catch (e) {
