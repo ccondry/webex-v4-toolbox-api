@@ -91,11 +91,11 @@ async function markDeprovision (userIds) {
   if (!Array.isArray(userIds)) {
     console.error('teamsNotifier.markDeprovision was called without userIds array')
   }
-  console.log('markDeprovsion - userIds.length =', userIds.length)
   if (userIds.length === 0) {
     // no user IDs to act on. do nothing.
     return
   }
+  console.log('markDeprovsion - userIds.length =', userIds.length)
   try {
     // prepare message
     let markdown = `Marking the following users for deprovision from the Webex CC v4 instant demo: \r\n* ${userIds.join('\r\n* ')}`
