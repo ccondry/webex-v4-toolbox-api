@@ -6,6 +6,7 @@ const ch = require('./control-hub/client')
 const globals = require('./globals')
 const teamsLogger = require('./teams-logger')
 const ldap = require('./ldap')
+const teamsNotifier = require('./teams-notifier')
 
 // number of milliseconds to wait after completing the scheduled job before
 // starting again
@@ -124,6 +125,9 @@ async function checkMaxUsers () {
       const userIds = userMap.slice(maxUsers - maxUsersBuffer).map(v => v.id)
       const filter = {id: {$in: userIds}}
       const updates = {provision: 'delete'}
+      // log to webex staff room
+      teamsNotifier.markDeprovision(userIds)
+      // update toolbox database
       return toolbox.updateUsers(filter, updates)
     } else {
       // not full - return empty array

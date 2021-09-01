@@ -38,7 +38,7 @@ async function sendToUser (user) {
   }
 }
 
-// notify staff
+// notify staff of provision
 async function sendToStaff (user) {
   try {
     // prepare message
@@ -62,6 +62,59 @@ async function sendToStaff (user) {
   }
 }
 
+// notify staff of deprovision
+async function deprovision (user) {
+  try {
+    // prepare message
+    let markdown = `${user.email} (${user.id}) licenses have been removed (deprovisioned) from the Webex CC v4 instant demo.`
+    const url = 'https://webexapis.com/v1/messages'
+    const token = globals.get('toolbotToken')
+    const options = {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token
+      },
+      body: {
+        roomId: globals.get('webexV4ProvisionRoomId'),
+        markdown
+      }
+    }
+    // send message
+    await fetch(url, options)
+  } catch (e) {
+    console.log(`failed to notify staff of user ${user.email} deprovision on Webex: ${e.message}`)
+  }
+}
+
+// notify staff of users marked for deprovision
+async function markDeprovision (userIds) {
+  if (!Array.isArray(userIds)) {
+    console.error('teamsNotifier.markDeprovision was called without userIds array')
+  }
+  try {
+    // prepare message
+    let markdown = `Marking the following users for deprovision from the Webex CC v4 instant demo: \r\n* ${userIds.join('\r\n* ')}`
+    const url = 'https://webexapis.com/v1/messages'
+    const token = globals.get('toolbotToken')
+    const options = {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token
+      },
+      body: {
+        roomId: globals.get('webexV4ProvisionRoomId'),
+        markdown
+      }
+    }
+    // send message
+    await fetch(url, options)
+  } catch (e) {
+    console.log(`failed to notify staff of marking users ${userIds.join(', ')} Webex CC v4 users for deprovision: ${e.message}`)
+  }
+}
+
 module.exports = {
-  send
+  send,
+  deprovision,
+  markDeprovision
 }

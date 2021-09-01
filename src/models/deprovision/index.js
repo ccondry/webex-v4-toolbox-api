@@ -2,6 +2,7 @@ require('dotenv').config()
 const ch = require('../control-hub/client')
 const cjpClient = require('../cjp/client')
 const toolbox = require('../toolbox')
+const teamsNotifier = require('../teams-notifier')
 // wrapper to translate the `await cjp.get()` call
 const cjp = {
   async get () {
@@ -520,6 +521,7 @@ async function main (user) {
         error: null
       })
       console.log(`successfully set user provision info to not provisioned for webex-v4prod`)
+      teamsNotifier.deprovision(user)
     } catch (e) {
       console.log(`failed to set user provision info to not provisioned for webex-v4prod:`, e.message)
       throw e
