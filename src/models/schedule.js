@@ -154,7 +154,7 @@ async function go () {
     try {
       await checkMaxUsers()
     } catch (e) {
-      console.log('failed to check max users:', e.message)
+      console.log('failed to check max users:', e)
     }
     // get list of users to deprovision
     try {
