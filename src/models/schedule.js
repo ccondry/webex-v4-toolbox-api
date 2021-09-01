@@ -128,7 +128,7 @@ async function checkMaxUsers () {
       // log to webex staff room
       teamsNotifier.markDeprovision(userIds)
       // update toolbox database
-      return toolbox.updateUsers(filter, updates)
+      return toolbox.updateDemoUsers(filter, updates)
     } else {
       // not full - return empty array
       // return []
