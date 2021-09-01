@@ -104,7 +104,7 @@ async function checkMaxUsers () {
         'demo.webex-v4prod.provision': 'complete'
       }
       // const projection = {password: false}
-      const projection = {id: true, 'demo.webex-v4prod.lastAccess': true}
+      const projection = {id: 1, 'demo.webex-v4prod.lastAccess': 1}
       const provisionedUsers = await toolbox.findUsers(query, projection)
       // console.log('provisionedUsers', provisionedUsers)
       // filter provisioned toolbox users to those with matching licensed control hub users
