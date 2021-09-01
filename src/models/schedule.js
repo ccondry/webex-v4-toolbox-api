@@ -123,6 +123,7 @@ async function checkMaxUsers () {
       // return userMap.slice(maxUsers)
       // set each of these users to delete state
       const userIds = userMap.slice(maxUsers - maxUsersBuffer).map(v => v.id)
+      console.log('user IDs to deprovision:', userIds)
       const filter = {id: {$in: userIds}}
       const updates = {provision: 'delete'}
       // log to webex staff room
