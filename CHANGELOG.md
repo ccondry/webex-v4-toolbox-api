@@ -4,6 +4,13 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.9.1
+
+### Features
+* **Deprovision:** Notify staff on Webex when users are marked for deprovision
+and when a user has been deprovisioned.
+
+
 # 2021.8.10
 
 ### Features
