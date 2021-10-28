@@ -204,6 +204,12 @@ module.exports = async function (user) {
       typeName: 'chat entry point'
     })
 
+    // generate a random hour of the day for script start. this fixes
+    // CCBU db query/logging issue when many current routing strategies are
+    // generated at the same time
+    const randomHour = Math.floor(Math.random() * 23)
+    const randomTime = randomHour * 60 * 60 * 1000
+    
     // chat entry point routing strategy
     await provision({
       templateName: chatEntryPointRoutingStrategyTemplateName,
@@ -220,6 +226,12 @@ module.exports = async function (user) {
         json['call-distribution-script']['@_scriptid'] = now
         // start date is start of day today in milliseconds
         json['call-distribution-script']['@_start-date'] = startOfToday
+        // set the start time and end time to the same random time
+        body.attributes.startTime__l = randomTime
+        body.attributes.endTime__l = randomTime
+        // and set start and end time in the script data
+        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime).padEnd(8, '0')
+        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime).padEnd(8, '0')
         // chat entry point ID
         json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
         // chat entry point db ID
@@ -254,6 +266,12 @@ module.exports = async function (user) {
         const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
         json['call-distribution-script']['@_start-date'] = startOfToday
         json['call-distribution-script']['@_end-date'] = startOfToday
+        // set the start time and end time to the same random time
+        body.attributes.startTime__l = randomTime
+        body.attributes.endTime__l = randomTime
+        // and set start and end time in the script data
+        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime).padEnd(8, '0')
+        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime).padEnd(8, '0')
         // chat entry point ID
         json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
         // chat entry point db ID
