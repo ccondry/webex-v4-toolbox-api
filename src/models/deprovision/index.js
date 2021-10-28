@@ -13,7 +13,7 @@ const teamsNotifier = require('../teams-notifier')
 // const globals = require('../globals')
 // const https = require('https')
 // const makeJwt = require('../make-jwt')
-// const routingStrategy = require('./routing-strategy')
+const routingStrategy = require('./routing-strategy')
 // const ldap = require('../ldap')
 
 // delete team
@@ -353,110 +353,109 @@ async function main (user) {
     //   console.log('failed to delete chat template:', e.message)
     //   throw e
     // }
-    
 
     // Routing Strategies
     // chat queue
-    // try {
-    //   console.log(`checking chat queue routing strategies...`)
-    //   await routingStrategy.delete(`RS_Chat_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy RS_Chat_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking chat queue routing strategies...`)
+      await routingStrategy.delete(`RS_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Chat_${userId}:`, e.message)
+      throw e
+    }
 
-    // try {
-    //   console.log(`checking chat queue current routing strategies...`)
-    //   await routingStrategy.delete(`Current-RS_Chat_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking chat queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
+      throw e
+    }
 
     // chat queue again
-    // try {
-    //   console.log(`checking another format of chat queue routing strategies...`)
-    //   await routingStrategy.delete(`RS_Chat_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy RS_Chat_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking another format of chat queue routing strategies...`)
+      await routingStrategy.delete(`RS_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Chat_dCloud_${userId}:`, e.message)
+      throw e
+    }
     
-    // try {
-    //   console.log(`checking another format of chat queue current routing strategies...`)
-    //   await routingStrategy.delete(`Current-RS_Chat_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy Current-RS_Chat_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking another format of chat queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_Chat_dCloud_${userId}:`, e.message)
+      throw e
+    }
     
     // chat entry point
-    // try {
-    //   console.log(`checking chat entry point routing strategies...`)
-    //   await routingStrategy.delete(`RS_EP_Chat_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy RS_EP_Chat_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking chat entry point routing strategies...`)
+      await routingStrategy.delete(`RS_EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_EP_Chat_${userId}:`, e.message)
+      throw e
+    }
 
-    // try {
-    //   console.log(`checking chat entry point current routing strategies...`)
-    //   await routingStrategy.delete(`Current-RS_EP_Chat_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking chat entry point current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_EP_Chat_${userId}:`, e.message)
+      throw e
+    }
     
     // chat entry point again
-    // try {
-    //   console.log(`checking another format of chat entry point routing strategies...`)
-    //   await routingStrategy.delete(`EP_Chat_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy EP_Chat_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking another format of chat entry point routing strategies...`)
+      await routingStrategy.delete(`EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy EP_Chat_${userId}:`, e.message)
+      throw e
+    }
 
-    // try {
-    //   console.log(`checking another format of chat entry point current routing strategies...`)
-    //   await routingStrategy.delete(`Current-EP_Chat_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy Current-EP_Chat_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking another format of chat entry point current routing strategies...`)
+      await routingStrategy.delete(`Current-EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-EP_Chat_${userId}:`, e.message)
+      throw e
+    }
 
     // email routing strategy
-    // try {
-    //   console.log(`checking email queue routing strategies...`)
-    //   await routingStrategy.delete(`RS_Email_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy RS_Email_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking email queue routing strategies...`)
+      await routingStrategy.delete(`RS_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_Email_dCloud_${userId}:`, e.message)
+      throw e
+    }
     
-    // try {
-    //   console.log(`checking email queue current routing strategies...`)
-    //   await routingStrategy.delete(`Current-RS_Email_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy Current-RS_Email_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking email queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_Email_dCloud_${userId}:`, e.message)
+      throw e
+    }
     
     // voice queue
-    // try {
-    //   console.log(`checking voice queue routing strategies...`)
-    //   await routingStrategy.delete(`RS_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy RS_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking voice queue routing strategies...`)
+      await routingStrategy.delete(`RS_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy RS_dCloud_${userId}:`, e.message)
+      throw e
+    }
 
-    // try {
-    //   console.log(`checking voice queue current routing strategies...`)
-    //   await routingStrategy.delete(`Current-RS_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete routing strategy Current-RS_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking voice queue current routing strategies...`)
+      await routingStrategy.delete(`Current-RS_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete routing strategy Current-RS_dCloud_${userId}:`, e.message)
+      throw e
+    }
 
     // Skill Profiles
     // try {
@@ -477,13 +476,13 @@ async function main (user) {
     // }
 
     // email routing strategy queue
-    // try {
-    //   console.log(`checking global email routing strategy...`)
-    //   await routingStrategy.globalEmail.delete(`Q_Email_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete queue Q_Email_dCloud_${userId} from the global email routing strategy:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking global email routing strategy...`)
+      await routingStrategy.globalEmail.delete(`Q_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete queue Q_Email_dCloud_${userId} from the global email routing strategy:`, e.message)
+      throw e
+    }
 
     // delete LDAP users
     // try {
