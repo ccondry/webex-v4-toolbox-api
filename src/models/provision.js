@@ -230,8 +230,8 @@ module.exports = async function (user) {
         body.attributes.startTime__l = randomTime
         body.attributes.endTime__l = randomTime
         // and set start and end time in the script data
-        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime).padEnd(8, '0')
-        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime).padEnd(8, '0')
+        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime)
+        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime)
         // chat entry point ID
         json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
         // chat entry point db ID
@@ -270,8 +270,8 @@ module.exports = async function (user) {
         body.attributes.startTime__l = randomTime
         body.attributes.endTime__l = randomTime
         // and set start and end time in the script data
-        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime).padEnd(8, '0')
-        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime).padEnd(8, '0')
+        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime)
+        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime)
         // chat entry point ID
         json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
         // chat entry point db ID
