@@ -1,70 +1,70 @@
 require('dotenv').config()
 const ch = require('../control-hub/client')
-// const cjpClient = require('../cjp/client')
+const cjpClient = require('../cjp/client')
 const toolbox = require('../toolbox')
 const teamsNotifier = require('../teams-notifier')
 // wrapper to translate the `await cjp.get()` call
-// const cjp = {
-//   async get () {
-//     return cjpClient
-//   }
-// }
+const cjp = {
+  async get () {
+    return cjpClient
+  }
+}
 // const fetch = require('../fetch')
-// const globals = require('../globals')
+const globals = require('../globals')
 // const https = require('https')
 // const makeJwt = require('../make-jwt')
 const routingStrategy = require('./routing-strategy')
 // const ldap = require('../ldap')
 
 // delete team
-// async function deleteTeam (name) {
-//   try {
-//     const client = await cjp.get()
-//     const teams = await client.team.list()
-//     const teamsToDelete = teams.auxiliaryDataList.filter(v => {
-//       return v.attributes.name__s === name
-//     })
-//     for (const team of teamsToDelete) {
-//       try {
-//         await client.team.delete(team.id)
-//         console.log(`successfully deleted user team ${team.attributes.name__s} (${team.id})`)
-//       } catch (e) {
-//         console.log(`failed to delete user team ${team.attributes.name__s} (${team.id}): ${e.message}`)
-//       }
-//     }
-//   } catch (e) {
-//     throw e
-//   } 
-// }
+async function deleteTeam (name) {
+  try {
+    const client = await cjp.get()
+    const teams = await client.team.list()
+    const teamsToDelete = teams.auxiliaryDataList.filter(v => {
+      return v.attributes.name__s === name
+    })
+    for (const team of teamsToDelete) {
+      try {
+        await client.team.delete(team.id)
+        console.log(`successfully deleted user team ${team.attributes.name__s} (${team.id})`)
+      } catch (e) {
+        console.log(`failed to delete user team ${team.attributes.name__s} (${team.id}): ${e.message}`)
+      }
+    }
+  } catch (e) {
+    throw e
+  } 
+}
 
 // get virtual teams (queues and entry points)
-// async function deleteVirtualTeam (name) {
-//   const client = await cjp.get()
-//   let queuesToDelete
-//   // find the queue first
-//   try {
-//     const queues = await client.virtualTeam.list()
-//     queuesToDelete = queues.auxiliaryDataList.filter(v => {
-//       return v.attributes.name__s === name
-//     })
-//   } catch (e) {
-//     console.log(`no virtual team named "${name}" found to delete.`)
-//     return
-//   }
-//   // found?
-//   if (queuesToDelete.length) {
-//     for (const queue of queuesToDelete) {
-//       console.log(`deleting virtual team ${queue.attributes.name__s} (${queue.id})...`)
-//       try {
-//         await client.virtualTeam.delete(queue.id)
-//         console.log(`virtual team ${queue.attributes.name__s} (${queue.id}) deleted.`)
-//       } catch (e) {
-//         console.log(`failed to delete virtual team ${queue.attributes.name__s} (${queue.id})`)
-//         throw e
-//       }
-//     }
-//   }
-// }
+async function deleteVirtualTeam (name) {
+  const client = await cjp.get()
+  let queuesToDelete
+  // find the queue first
+  try {
+    const queues = await client.virtualTeam.list()
+    queuesToDelete = queues.auxiliaryDataList.filter(v => {
+      return v.attributes.name__s === name
+    })
+  } catch (e) {
+    console.log(`no virtual team named "${name}" found to delete.`)
+    return
+  }
+  // found?
+  if (queuesToDelete.length) {
+    for (const queue of queuesToDelete) {
+      console.log(`deleting virtual team ${queue.attributes.name__s} (${queue.id})...`)
+      try {
+        await client.virtualTeam.delete(queue.id)
+        console.log(`virtual team ${queue.attributes.name__s} (${queue.id}) deleted.`)
+      } catch (e) {
+        console.log(`failed to delete virtual team ${queue.attributes.name__s} (${queue.id})`)
+        throw e
+      }
+    }
+  }
+}
 
 // //Get the Chat Template ID needed for Cumulus Chat routing
 // async function findTemplates (name) {
@@ -239,49 +239,49 @@ async function removeRoles (userId) {
 }
 
 // remove team from global voice queue distribution group
-// async function removeVoiceQueueTeam (teamName) {
-//   try {
-//     await Promise.resolve(globals.initialLoad)
-//     const queueName = globals.get('webexV4VoiceQueueName')
-//     const client = await cjp.get()
-//     const teams = await client.team.list()
-//     const team = teams.auxiliaryDataList.find(v => v.attributes.name__s === teamName)
-//     if (!team) {
-//       // throw Error(`team "${teamName}" not found`)
-//       return
-//     }
-//     const queues = await client.virtualTeam.list()
-//     const queue = queues.auxiliaryDataList.find(v => v.attributes.name__s === queueName)
-//     if (!queue) {
-//       throw Error(`queue "${queueName}" not found`)
-//     }
-//     // fix attributes from GET data for using in PUT operation
-//     queue.attributes.tid__s = queue.attributes.tid
-//     queue.attributes.sid__s = queue.attributes.sid
-//     queue.attributes.cstts__l = queue.attributes.cstts
+async function removeVoiceQueueTeam (teamName) {
+  try {
+    await Promise.resolve(globals.initialLoad)
+    const queueName = globals.get('webexV4VoiceQueueName')
+    const client = await cjp.get()
+    const teams = await client.team.list()
+    const team = teams.auxiliaryDataList.find(v => v.attributes.name__s === teamName)
+    if (!team) {
+      // throw Error(`team "${teamName}" not found`)
+      return
+    }
+    const queues = await client.virtualTeam.list()
+    const queue = queues.auxiliaryDataList.find(v => v.attributes.name__s === queueName)
+    if (!queue) {
+      throw Error(`queue "${queueName}" not found`)
+    }
+    // fix attributes from GET data for using in PUT operation
+    queue.attributes.tid__s = queue.attributes.tid
+    queue.attributes.sid__s = queue.attributes.sid
+    queue.attributes.cstts__l = queue.attributes.cstts
     
-//     delete queue.attributes.tid
-//     delete queue.attributes.sid
-//     delete queue.attributes.cstts
+    delete queue.attributes.tid
+    delete queue.attributes.sid
+    delete queue.attributes.cstts
 
-//     // get existing call distribution groups
-//     const groups = JSON.parse(queue.attributes.callDistributionGroups__s)
-//     // get the first distribution group
-//     const group = groups.find(v => v.order === 1)
-//     if (!group) {
-//       throw Error(`call distribution group 1 not found`)
-//     }
-//     // filter out the agent groups matching the team ID
-//     group.agentGroups = group.agentGroups.filter(v => v.teamId !== team.id)
-//     queue.attributes.callDistributionGroups__s = JSON.stringify(groups)
-//     // update queue on CJP
-//     await client.virtualTeam.modify(queue.id, [queue])
-//     console.log(`successfully removed team "${teamName}" (${team.id}) from the global voice queue "${queue.attributes.name__s}" (${queue.id})`)
-//   } catch (e) {
-//     // console.log(`failed to remove team "${teamName}" from the global voice queue:`, e.message)
-//     throw e
-//   }
-// }
+    // get existing call distribution groups
+    const groups = JSON.parse(queue.attributes.callDistributionGroups__s)
+    // get the first distribution group
+    const group = groups.find(v => v.order === 1)
+    if (!group) {
+      throw Error(`call distribution group 1 not found`)
+    }
+    // filter out the agent groups matching the team ID
+    group.agentGroups = group.agentGroups.filter(v => v.teamId !== team.id)
+    queue.attributes.callDistributionGroups__s = JSON.stringify(groups)
+    // update queue on CJP
+    await client.virtualTeam.modify(queue.id, [queue])
+    console.log(`successfully removed team "${teamName}" (${team.id}) from the global voice queue "${queue.attributes.name__s}" (${queue.id})`)
+  } catch (e) {
+    // console.log(`failed to remove team "${teamName}" from the global voice queue:`, e.message)
+    throw e
+  }
+}
 
 async function main (user) {
   if (!user.id || !user.id.length === 4) {
@@ -291,58 +291,58 @@ async function main (user) {
   try {
     console.log(`deprovisioning user ${userId}...`)
     // chat queue
-    // try {
-    //   console.log(`checking chat queues...`)
-    //   await deleteVirtualTeam(`Q_Chat_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete virtual team Q_Chat_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking chat queues...`)
+      await deleteVirtualTeam(`Q_Chat_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_Chat_dCloud_${userId}:`, e.message)
+      throw e
+    }
 
     // voice queue
-    // try {
-    //   console.log(`checking voice queues...`)
-    //   await deleteVirtualTeam(`Q_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete virtual team Q_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking voice queues...`)
+      await deleteVirtualTeam(`Q_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_dCloud_${userId}:`, e.message)
+      throw e
+    }
 
     // remove team from global voice queue
-    // try {
-    //   console.log(`checking global voice queue distribution groups...`)
-    //   await removeVoiceQueueTeam(`T_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to remove team T_dCloud_${userId} from global voice queue distribution groups:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking global voice queue distribution groups...`)
+      await removeVoiceQueueTeam(`T_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to remove team T_dCloud_${userId} from global voice queue distribution groups:`, e.message)
+      throw e
+    }
 
     // email queue
-    // try {
-    //   console.log(`checking email queues...`)
-    //   await deleteVirtualTeam(`Q_Email_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete virtual team Q_Email_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking email queues...`)
+      await deleteVirtualTeam(`Q_Email_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team Q_Email_dCloud_${userId}:`, e.message)
+      throw e
+    }
     
     // chat entry point
-    // try {
-    //   console.log(`checking chat entry points...`)
-    //   await deleteVirtualTeam(`EP_Chat_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete virtual team EP_Chat_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking chat entry points...`)
+      await deleteVirtualTeam(`EP_Chat_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete virtual team EP_Chat_${userId}:`, e.message)
+      throw e
+    }
     
     // user team
-    // try {
-    //   console.log(`checking teams...`)
-    //   await deleteTeam(`T_dCloud_${userId}`)
-    // } catch (e) {
-    //   console.log(`failed to delete team T_dCloud_${userId}:`, e.message)
-    //   throw e
-    // }
+    try {
+      console.log(`checking teams...`)
+      await deleteTeam(`T_dCloud_${userId}`)
+    } catch (e) {
+      console.log(`failed to delete team T_dCloud_${userId}:`, e.message)
+      throw e
+    }
     
 
     // Chat Template
