@@ -3,8 +3,8 @@ const fetch = require('./fetch')
 const urlBase = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth'
 // const urlBase = 'http://localhost:3032/api/v1/auth'
 
-async function updateUser (userId, body) {
-  return updateDemoUsers({id: userId}, body)
+async function updateUser (userId, body, ignoreAccessTime) {
+  return updateDemoUsers({id: userId}, body, ignoreAccessTime)
 }
 
 async function findUsers (query = {}, projection = {}) {
@@ -26,7 +26,7 @@ async function findUsers (query = {}, projection = {}) {
   }
 }
 
-async function updateDemoUsers (filter, updates) {
+async function updateDemoUsers (filter, updates, ignoreAccessTime = false) {
   try {
     const url = urlBase + '/app/demo/webex-v4prod/users'
     const options = {
@@ -37,6 +37,9 @@ async function updateDemoUsers (filter, updates) {
       body: {
         filter,
         updates
+      },
+      query: {
+        ignoreAccessTime
       }
     }
     return fetch(url, options)

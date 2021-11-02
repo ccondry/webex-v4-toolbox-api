@@ -514,13 +514,15 @@ async function main (user) {
     // remove provision info from database
     try {
       console.log(`setting user provision info to not provisioned for webex-v4prod...`)
+      // don't change the user's last access time when updating their provision info
+      const ignoreAccessTime = true
       await toolbox.updateUser(userId, {
         provision: 'deleted',
         password: null,
         error: null
-      })
+      }, ignoreAccessTime)
       console.log(`successfully set user provision info to not provisioned for webex-v4prod`)
-      teamsNotifier.deprovision(user)
+      // teamsNotifier.deprovision(user)
     } catch (e) {
       console.log(`failed to set user provision info to not provisioned for webex-v4prod:`, e.message)
       throw e
