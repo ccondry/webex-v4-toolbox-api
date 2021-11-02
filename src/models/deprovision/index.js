@@ -518,6 +518,7 @@ async function main (user) {
       const ignoreAccessTime = true
       await toolbox.updateUser(userId, {
         provision: 'deleted',
+        deprovisionDate: new Date().toJSON(),
         password: null,
         error: null
       }, ignoreAccessTime)

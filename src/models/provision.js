@@ -537,6 +537,7 @@ module.exports = async function (user) {
     // and remove any previous errors
     await toolbox.updateUser(userId, {
       provision: 'complete',
+      provisionDate: new Date().toJSON(),
       password: null,
       error: null
     })
