@@ -134,6 +134,10 @@ async function checkMaxUsers () {
       // keep top users, return the rest
       // return userMap.slice(maxUsers)
       const qtyUsersToDeprovision = licensedUsers.length / 2 - maxUsers + maxUsersBuffer
+      // only continue if quantity to deprovision is 1 or more
+      if (qtyUsersToDeprovision < 1) {
+        return
+      }
       console.log('selecting', qtyUsersToDeprovision, 'users to deprovision...')
       // select the quantity of users to delete from the end of the list (users with last access)
       const userIds = userMap.slice(-1 * qtyUsersToDeprovision).map(v => v.id)
