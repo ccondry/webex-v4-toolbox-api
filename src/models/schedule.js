@@ -65,17 +65,23 @@ async function getProvisionDeletingUsers () {
 // so they will be deprovisioned
 async function checkMaxUsers () {
   try {
+    console.log('checking max users using Control Hub...')
     // wait for globals to exist
+    console.log('waiting for global variables to exist...')
     await Promise.resolve(globals.initialLoad)
+    console.log('global variables are set.')
     // max number of users that can be provisioned. more than this will trigger
     // deprovision. this is number of toolbox users.
     const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
+    console.log('global variables webexV4MaxUsers is', maxUsers)
     // number of users to delete below the maxUser limit
     const maxUsersBuffer = parseInt(globals.get('webexV4MaxUsersBuffer'))
+    console.log('global variables webexV4MaxUsersBuffer is', maxUsersBuffer)
     // find license usage in control hub
     const client = await ch.getClient()
     const licenseUsage = await client.org.getLicenseUsage()
     const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
+    console.log('cjpPremiumLicenses.usage:', cjpPremiumLicenses.usage)
     // if license usage of CJP premium is > 95%
     // if (cjpPremiumLicenses.usage / cjpPremiumLicenses.volume >= 0.95) {
     // if (cjpPremiumLicenses.volume - cjpPremiumLicenses.usage <= 10) {
@@ -85,8 +91,12 @@ async function checkMaxUsers () {
     // new users are waiting to be provisioned and we are at max capacity
     if (cjpPremiumLicenses.usage / 2 > maxUsers - maxUsersBuffer) {
       // too full - need to deprovision some users
+      // const qtyUsersToDeprovision = cjpPremiumLicenses.usage / 2 - maxUsers + maxUsersBuffer
+      // console.log('max users has been reached. we need to mark', qtyUsersToDeprovision, 'for deprovision.')
       // get all control hub users
+      console.log('getting all users list from cjp...')
       const allUsers = await client.user.listAll()
+      console.log('got all users list from cjp:', allUsers.length, 'users.')
       // filter control hub users that do not have CJPPRM license
       const licensedUsers = allUsers.filter(user => {
         try {
@@ -98,6 +108,7 @@ async function checkMaxUsers () {
           return false
         }
       })
+      console.log('licensedUsers count =', licensedUsers.length)
       // find user provision info for this demo
       const query = {
         'demo.webex-v4prod.lastAccess': {$exists: 1},
@@ -106,11 +117,12 @@ async function checkMaxUsers () {
       // const projection = {password: false}
       const projection = {id: 1, 'demo.webex-v4prod.lastAccess': 1}
       const provisionedUsers = await toolbox.findUsers(query, projection)
-      // console.log('provisionedUsers', provisionedUsers)
+      console.log('found', provisionedUsers.length, 'users with complete webex provision and a last access time in the toolbox')
       // filter provisioned toolbox users to those with matching licensed control hub users
       const userMap = provisionedUsers.filter(user => {
         return licensedUsers.find(agent => user.id === agent.userName.slice(8, 12))
       })
+      console.log(userMap.length, 'users in userMap')
       // sort by last access time descending
       userMap.sort((a, b) => {
         const aDate = new Date(a.demo['webex-v4prod'].lastAccess || 0)
@@ -121,10 +133,13 @@ async function checkMaxUsers () {
       // console.log('userMap', userMap)
       // keep top users, return the rest
       // return userMap.slice(maxUsers)
-      // set each of these users to delete state
-      const userIds = userMap.slice(maxUsers - maxUsersBuffer).map(v => v.id)
-      // console.log('user IDs to deprovision:', userIds)
+      const qtyUsersToDeprovision = licensedUsers.length / 2 - maxUsers + maxUsersBuffer
+      console.log('selecting', qtyUsersToDeprovision, 'users to deprovision...')
+      // select the quantity of users to delete from the end of the list (users with last access)
+      const userIds = userMap.slice(-1 * qtyUsersToDeprovision).map(v => v.id)
+      console.log('user IDs to deprovision:', userIds)
       if (userIds.length === 0) {
+        console.log('no users to deprovision at this time.')
         // no users to deprovision. done.
         return
       }
@@ -133,7 +148,7 @@ async function checkMaxUsers () {
       // log to webex staff room
       teamsNotifier.markDeprovision(userIds)
       // update toolbox database
-      return toolbox.updateDemoUsers(filter, updates)
+      toolbox.updateDemoUsers(filter, updates)
     } else {
       // not full - return empty array
       // return []
@@ -152,116 +167,118 @@ async function getLicenseUsageCount () {
 }
 
 async function go () {
-  // don't do anything if provisioning is already in progress
-  if (!running) {
-    running = true
-    // check if there are too many users provisioned
-    try {
-      await checkMaxUsers()
-    } catch (e) {
-      console.log('failed to check max users:', e)
-    }
-    // get list of users to deprovision
-    try {
-      const users = await getProvisionDeletingUsers()
-      if (users.length > 0) {
-        console.log(`starting deprovision for ${users.length} users`)
-      }
-      for (const user of users) {
-        await deprovision(user)
-      }
-    } catch (e) {
-      console.log('deprovision error:', e.message)      
-    }
-    // get list of users to provision
-    try {
-      // wait for globals to exist
-      let users = await getProvisionStartedUsers()
-      // get max users number
-      await Promise.resolve(globals.initialLoad)
-      const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
-      const licenseUsageCount = await getLicenseUsageCount()
-      // check if provision amount would be too many
-      if (licenseUsageCount / 2 + users.length > maxUsers) {
-        // trim?
-        const max = Math.floor(maxUsers - (licenseUsageCount / 2))
-        users = users.slice(0, max)
-      }
-      if (users.length > 0) {
-        console.log(`starting provision for ${users.length} users`)
-        const errorUsers = []
-        // provision LDAP users
-        for (const user of users) {
-          // create rbarrowsXXXX, sjeffersXXXX, and VPN LDAP accounts
-          try {
-            await ldap.createUsers({user})
-          } catch (e) {
-            console.log('ldap.createUsers error:', e.message)
-            // error from LDAP that the new user's VPN password is not valid
-            // (too short, etc.)
-            const ldapPasswordError = /DSID-031A12D2/
-            console.log('ldapPasswordError.test(e.message)', ldapPasswordError.test(e.message))
-            if (ldapPasswordError.test(e.message)) {
-              console.log('user password is invalid. updating user provision with error...')
-              // user's password is not valid for LDAP to set their VPN user
-              // password update user provision data so toolbox can notify user
-              const updates = {
-                provision: 'error',
-                error: 'Invalid password. Please provision using a VPN password that is 10 or more characters.',
-              }
-              // update the user with the error
-              toolbox.updateUser(user.id, updates)
-              .then(r => {
-                console.log('updated user', user.id, 'with invalid password provision error.')
-              }).catch(e2 => {
-                console.log('failed to update user', user.id, 'with invalid password provision error:', e2.message)
-              })
-              // mark user should not be provisioned in CJP and control hub
-              errorUsers.push(user.id)
-              // continue with next user
-              continue
-            }
-          }
-        }
-        // provision the rest of the user stuff in CJP and control hub?
-        if (process.env.PROVISION_ALL === 'true') {
-          // filter out any users who had an error during LDAP provisioning
-          const successfulUsers = users.filter(v => !errorUsers.includes(v.id))
-          for (const user of successfulUsers) {
-            await provision(user)
-          }
-        }
-      } else {
-        // no users to provision
-      }
-    } catch (e) {
-      const s = e.message
-      const message = `provision error: ${s}`
-      console.log(message)
-      // outgoing network error message (probably from Atlas)
-      const generalNetworkError = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN|connect ETIMEDOUT|read ECONNRESET|504 Gateway Time-out|502 Bad Gateway/
-      if (generalNetworkError.test(message)) {
-        // just log to console
-        // atlas-a.wbx2.com and dcloud-collab-toolbox.cxdemo.net give these
-        // errors often and just need to retry in a moment
-        console.log(message)
-        // retry now
-        running = false
-        go()
-        return
-      } else {
-        // send any other, unexpected errors to teams logger
-        teamsLogger.log(message)
-      }
-    }
-    // stop running
-    running = false
+  // check if there are too many users provisioned
+  try {
+    await checkMaxUsers()
+  } catch (e) {
+    console.log('failed to check max users:', e)
   }
+  console.log('done checking max users.')
+  // get list of users to deprovision
+  try {
+    console.log('getProvisionDeletingUsers...')
+    const users = await getProvisionDeletingUsers()
+    console.log(users.length, 'users to deprovision.')
+    if (users.length > 0) {
+      console.log(`starting deprovision for ${users.length} users`)
+    }
+    for (const user of users) {
+      await deprovision(user)
+    }
+  } catch (e) {
+    console.log('deprovision error:', e.message)      
+  }
+  console.log('getProvisionDeletingUsers done.')
+  // get list of users to provision
+  try {
+    // wait for globals to exist
+    console.log('getProvisionStartedUsers...')
+    let users = await getProvisionStartedUsers()
+    console.log(users.length, 'users need to be provisioned.')
+    // get max users number
+    await Promise.resolve(globals.initialLoad)
+    console.log('global variables are loaded.')
+    const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
+    const licenseUsageCount = await getLicenseUsageCount()
+    console.log('licenseUsageCount =', licenseUsageCount)
+    // check if provision amount would be too many
+    if (licenseUsageCount / 2 + users.length > maxUsers) {
+      console.log('current license users count', licenseUsageCount / 2 + users.length, 'is greater than max users value of', maxUsers)
+      // trim?
+      const max = Math.floor(maxUsers - (licenseUsageCount / 2))
+      users = users.slice(0, max)
+    }
+    if (users.length > 0) {
+      console.log(`starting provision for ${users.length} users`)
+      const errorUsers = []
+      // provision LDAP users
+      for (const user of users) {
+        // create rbarrowsXXXX, sjeffersXXXX, and VPN LDAP accounts
+        try {
+          await ldap.createUsers({user})
+        } catch (e) {
+          console.log('ldap.createUsers error:', e.message)
+          // error from LDAP that the new user's VPN password is not valid
+          // (too short, etc.)
+          const ldapPasswordError = /DSID-031A12D2/
+          console.log('ldapPasswordError.test(e.message)', ldapPasswordError.test(e.message))
+          if (ldapPasswordError.test(e.message)) {
+            console.log('user password is invalid. updating user provision with error...')
+            // user's password is not valid for LDAP to set their VPN user
+            // password update user provision data so toolbox can notify user
+            const updates = {
+              provision: 'error',
+              error: 'Invalid password. Please provision using a VPN password that is 10 or more characters.',
+            }
+            // update the user with the error
+            toolbox.updateUser(user.id, updates)
+            .then(r => {
+              console.log('updated user', user.id, 'with invalid password provision error.')
+            }).catch(e2 => {
+              console.log('failed to update user', user.id, 'with invalid password provision error:', e2.message)
+            })
+            // mark user should not be provisioned in CJP and control hub
+            errorUsers.push(user.id)
+            // continue with next user
+            continue
+          }
+        }
+      }
+      // provision the rest of the user stuff in CJP and control hub?
+      if (process.env.PROVISION_ALL === 'true') {
+        // filter out any users who had an error during LDAP provisioning
+        const successfulUsers = users.filter(v => !errorUsers.includes(v.id))
+        for (const user of successfulUsers) {
+          await provision(user)
+        }
+      }
+    } else {
+      // no users to provision
+    }
+  } catch (e) {
+    const s = e.message
+    const message = `provision error: ${s}`
+    console.log(message)
+    // outgoing network error message (probably from Atlas)
+    const generalNetworkError = /getaddrinfo ENOTFOUND|getaddrinfo EAI_AGAIN|connect ETIMEDOUT|read ECONNRESET|504 Gateway Time-out|502 Bad Gateway/
+    if (generalNetworkError.test(message)) {
+      // just log to console
+      // atlas-a.wbx2.com and dcloud-collab-toolbox.cxdemo.net give these
+      // errors often and just need to retry in a moment
+      console.log(message)
+    } else {
+      // send any other, unexpected errors to teams logger
+      teamsLogger.log(message)
+    }
+  }
+  console.log('provision check complete. next check in', Math.round(throttle / 1000), 'seconds.')
+  // set timer to call this function again
+  setTimeout(go, throttle)
 }
 
 go()
 
-setInterval(go, throttle)
+// setInterval(go, throttle)
 
 module.exports = {
   getProvisionDeletingUsers
