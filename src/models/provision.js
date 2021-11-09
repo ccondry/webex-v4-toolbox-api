@@ -211,7 +211,7 @@ module.exports = async function (user) {
     const randomTime = randomHour * 60 * 60 * 1000
     
     // chat entry point routing strategy
-    await provision({
+    const parentStrategy = await provision({
       templateName: chatEntryPointRoutingStrategyTemplateName,
       name: 'EP_Chat_' + userId,
       type: 'routingStrategy',
@@ -286,6 +286,8 @@ module.exports = async function (user) {
         body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
         // chat entry point ID
         body.attributes.virtualTeamId__s = chatEntryPoint.id
+        // set parent RS
+        body.attributes.parentStrategyId__s = parentStrategy.id
       }
     })
 
