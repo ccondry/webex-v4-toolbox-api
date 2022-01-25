@@ -3,10 +3,11 @@ const orgId = process.env.ORG_ID
 // cache for the bearer token
 const globals = require('../globals')
 const fetch = require('../fetch')
+const demoVersion = 'webexV' + require('../demo-version')
 
 async function getToken () {
   try {
-    const token = globals.get('webexV4ControlHubToken')
+    const token = globals.get(demoVersion + 'ControlHubToken')
     return token.access_token
   } catch (e) {
     throw e

@@ -4,11 +4,12 @@ require('dotenv').config()
 const globals = require('../src/models/globals')
 // get the CJP client library
 const client = require('../src/models/cjp/client')
+const demoVersion = 'webexV' + require('../src/models/demo-version')
 
 async function main () {
   try {
     // get the global voice queue name from globals
-    const queueName = await globals.getAsync('webexV4VoiceQueueName')
+    const queueName = await globals.getAsync(demoVersion + 'VoiceQueueName')
     // get list of all currently-existing teams
     const teams = await client.team.list()
     // find the global voice queue object

@@ -1,11 +1,12 @@
 const fetch = require('./fetch')
+const demoVersionTag = require('./demo-version-tag')
 
 async function getDemo () {
   const url = `https://mm.cxdemo.net/api/v1/demo`
   const options = {
     query: {
       demo: 'webex',
-      version: 'v4prod',
+      version: demoVersionTag,
       instant: true
     }
   }

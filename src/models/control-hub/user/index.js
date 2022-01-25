@@ -5,11 +5,11 @@ const readOnlyTemplate = require('./templates/read-only')
 const fetch = require('../../fetch')
 const client = require('../client')
 const globals = require('../../globals')
-
+const demoVersion = 'webexV' + require('../../demo-version')
 const orgId = process.env.ORG_ID
 
 function getToken () {
-  return globals.get('webexV4ControlHubToken')
+  return globals.get(demoVersion + 'ControlHubToken')
 }
 
 // set user to read-only

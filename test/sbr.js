@@ -1,6 +1,7 @@
 require('dotenv').config()
 const cjp = require('../src/models/cjp')
 const globals = require('../src/models/globals')
+const demoVersion = 'webexV' + require('../src/models/demo-version')
 
 async function cleanQueue () {
   try {
@@ -8,7 +9,7 @@ async function cleanQueue () {
     const client = cjp.client
     
     const queues = await client.virtualTeam.list()
-    const queueName = globals.get('webexV4VoiceQueueName')
+    const queueName = globals.get(demoVersion + 'VoiceQueueName')
     const queue = queues.auxiliaryDataList.find(v => v.attributes.name__s === queueName)
     if (!queue) {
       throw Error(`queue "${queueName}" not found`)

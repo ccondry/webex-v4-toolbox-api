@@ -1,6 +1,6 @@
 require('dotenv').config()
 require('../src/models/schedule')
-
+// const demoVersionTag = require('../src/models/demo-version-tag')
 // const db = require('../src/models/db')
 // const ch = require('../src/models/control-hub/client')
 
@@ -35,7 +35,7 @@ require('../src/models/schedule')
 //         }
 //       })
 //       // find user provision info for this demo, sorted by most recent lastAccess first
-//       const query = {demo: 'webex', version: 'v4prod', lastAccess: {$exists: 1}}
+//       const query = {demo: 'webex', version: demoVersionTag, lastAccess: {$exists: 1}}
 //       const projection = {}
 //       const provisionedUsers = await db.find('toolbox', 'provision', query, projection)
 //       console.log('provisionedUsers', provisionedUsers)

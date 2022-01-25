@@ -1,10 +1,11 @@
 const globals = require('../globals')
 const fetch = require('../fetch')
+const demoVersion = 'webexV' + require('../demo-version')
 
 async function get (name) {
   try {
     const url = `https://cms.produs1.ciscoccservice.com/cms/api/v2/auxiliary-data/resources/virtual-team`
-    const token = globals.get('webexV4ControlHubToken')
+    const token = globals.get(demoVersion + 'ControlHubToken')
     // console.log('token', token)
     const options = {
       headers: {

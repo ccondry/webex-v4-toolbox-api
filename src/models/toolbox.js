@@ -1,4 +1,5 @@
 const fetch = require('./fetch')
+const demoVersionTag = require('./demo-version-tag')
 
 const urlBase = 'https://dcloud-collab-toolbox.cxdemo.net/api/v1/auth'
 // const urlBase = 'http://localhost:3032/api/v1/auth'
@@ -28,7 +29,7 @@ async function findUsers (query = {}, projection = {}) {
 
 async function updateDemoUsers (filter, updates, ignoreAccessTime = false) {
   try {
-    const url = urlBase + '/app/demo/webex-v4prod/users'
+    const url = urlBase + '/app/demo/webex-' + demoVersionTag + '/users'
     const options = {
       headers: {
         Authorization: 'Bearer ' + process.env.TOOLBOX_JWT
@@ -50,6 +51,7 @@ async function updateDemoUsers (filter, updates, ignoreAccessTime = false) {
 
 async function listGlobals (query) {
   try {
+    console.log('listglobals')
     const url = urlBase + '/app/global'
     const options = {
       headers: {

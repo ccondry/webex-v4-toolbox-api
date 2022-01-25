@@ -6,7 +6,9 @@ const teamsNotifier = require('../src/models/teams-notifier')
 const token = require('../src/models/control-hub/token')
 const toolbox = require('../src/models/toolbox')
 const session = require('../src/models/session')
+const demoVersionTag = require('../src/models/demo-version-tag')
 const sleep = require('../src/utils').sleep
+
 
 const domain = process.env.DOMAIN
 
@@ -170,7 +172,7 @@ async function main (user, userJwt) {
     await toolbox.updateUser(userId, {
       templateId: chatTemplate.templateId
     })
-    console.log(`updated toolbox user ${userId} demo.webex-v4prod configuration with templateId ${chatTemplate.templateId}`)
+    console.log(`updated toolbox user ${userId} demo.webex-${demoVersionTag} configuration with templateId ${chatTemplate.templateId}`)
     
     // get/create email treatment in Webex Control Hub
     await controlHub.treatment.getOrCreate(userId)

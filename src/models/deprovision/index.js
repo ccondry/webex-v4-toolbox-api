@@ -2,7 +2,10 @@ require('dotenv').config()
 const ch = require('../control-hub/client')
 const cjpClient = require('../cjp/client')
 const toolbox = require('../toolbox')
-const teamsNotifier = require('../teams-notifier')
+// const teamsNotifier = require('../teams-notifier')
+const demoVersion = 'webexV' + require('../demo-version')
+const demoVersionTag = require('./demo-version-tag')
+
 // wrapper to translate the `await cjp.get()` call
 const cjp = {
   async get () {
@@ -126,7 +129,7 @@ async function deleteVirtualTeam (name) {
 // async function deleteTreatmentRule (name) {
 //   try {
 //     await Promise.resolve(globals.initialLoad)
-//     const entryPointId = globals.get('webexV4EmailEntryPointId')
+//     const entryPointId = globals.get(demoVersion + 'EmailEntryPointId')
 //     const client = await ch.get()
 //     let rules
 //     try {
@@ -242,7 +245,7 @@ async function removeRoles (userId) {
 async function removeVoiceQueueTeam (teamName) {
   try {
     await Promise.resolve(globals.initialLoad)
-    const queueName = globals.get('webexV4VoiceQueueName')
+    const queueName = globals.get(demoVersion + 'VoiceQueueName')
     const client = await cjp.get()
     const teams = await client.team.list()
     const team = teams.auxiliaryDataList.find(v => v.attributes.name__s === teamName)
@@ -513,7 +516,7 @@ async function main (user) {
 
     // remove provision info from database
     try {
-      console.log(`setting user provision info to not provisioned for webex-v4prod...`)
+      console.log(`setting user provision info to not provisioned for webex-${demoVersionTag}...`)
       // don't change the user's last access time when updating their provision info
       const ignoreAccessTime = true
       await toolbox.updateUser(userId, {
@@ -522,10 +525,10 @@ async function main (user) {
         password: null,
         error: null
       }, ignoreAccessTime)
-      console.log(`successfully set user provision info to not provisioned for webex-v4prod`)
+      console.log(`successfully set user provision info to not provisioned for webex-${demoVersionTag}`)
       // teamsNotifier.deprovision(user)
     } catch (e) {
-      console.log(`failed to set user provision info to not provisioned for webex-v4prod:`, e.message)
+      console.log(`failed to set user provision info to not provisioned for webex-${demoVersionTag}:`, e.message)
       throw e
     }
     console.log(`finished deprovisioning user ${userId}`)

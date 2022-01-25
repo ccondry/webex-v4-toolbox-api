@@ -1,5 +1,6 @@
 const fetch = require('./fetch')
 const globals = require('./globals')
+const demoVersion = 'webexV' + require('./demo-version')
 
 async function send (user) {
   try {
@@ -51,7 +52,7 @@ async function sendToStaff (user) {
         Authorization: 'Bearer ' + token
       },
       body: {
-        roomId: globals.get('webexV4ProvisionRoomId'),
+        roomId: globals.get(demoVersion + 'ProvisionRoomId'),
         markdown
       }
     }
@@ -75,7 +76,7 @@ async function deprovision (user) {
         Authorization: 'Bearer ' + token
       },
       body: {
-        roomId: globals.get('webexV4ProvisionRoomId'),
+        roomId: globals.get(demoVersion + 'ProvisionRoomId'),
         markdown
       }
     }
@@ -107,7 +108,7 @@ async function markDeprovision (userIds) {
         Authorization: 'Bearer ' + token
       },
       body: {
-        roomId: globals.get('webexV4ProvisionRoomId'),
+        roomId: globals.get(demoVersion + 'ProvisionRoomId'),
         markdown
       }
     }

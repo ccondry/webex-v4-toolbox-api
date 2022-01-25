@@ -11,6 +11,7 @@ const chProvision = require('./new/template/control-hub')
 const {xml2js, js2xml} = require('./parsers')
 const teamsLogger = require('./teams-logger')
 const wxm = require('./wxm')
+const demoVersion = 'webexV' + require('./demo-version')
 
 const domain = process.env.DOMAIN
 
@@ -48,21 +49,21 @@ module.exports = async function (user) {
     }
 
     // get globals
-    const voiceQueueName = globals.get('webexV4VoiceQueueName')
-    // const globalTeamName = globals.get('webexV4GlobalTeamName')
-    const siteId = globals.get('webexV4BroadCloudSiteId')
+    const voiceQueueName = globals.get(demoVersion + 'VoiceQueueName')
+    // const globalTeamName = globals.get(demoVersion + 'GlobalTeamName')
+    const siteId = globals.get(demoVersion + 'BroadCloudSiteId')
 
     // get the names of the templates from globals
-    const chatQueueTemplateName = globals.get('webexV4ChatQueueTemplateName')
-    const emailQueueTemplateName = globals.get('webexV4EmailQueueTemplateName')
-    const chatEntryPointTemplateName = globals.get('webexV4ChatEntryPointTemplateName')
-    const chatEntryPointRoutingStrategyTemplateName = globals.get('webexV4ChatEntryPointRoutingStrategyTemplateName')
-    const teamTemplateName = globals.get('webexV4TeamTemplateName')
-    const skillProfileTemplateName = globals.get('webexV4SkillProfileTemplateName')
-    const agentTemplateLoginName = globals.get('webexV4AgentTemplateLoginName')
-    const supervisorTemplateLoginName = globals.get('webexV4SupervisorTemplateLoginName')
-    const chatTemplateTemplateName = globals.get('webexV4ChatTemplateTemplateName')
-    const orgId = globals.get('webexV4ControlHubOrgId')
+    const chatQueueTemplateName = globals.get(demoVersion + 'ChatQueueTemplateName')
+    const emailQueueTemplateName = globals.get(demoVersion + 'EmailQueueTemplateName')
+    const chatEntryPointTemplateName = globals.get(demoVersion + 'ChatEntryPointTemplateName')
+    const chatEntryPointRoutingStrategyTemplateName = globals.get(demoVersion + 'ChatEntryPointRoutingStrategyTemplateName')
+    const teamTemplateName = globals.get(demoVersion + 'TeamTemplateName')
+    const skillProfileTemplateName = globals.get(demoVersion + 'SkillProfileTemplateName')
+    const agentTemplateLoginName = globals.get(demoVersion + 'AgentTemplateLoginName')
+    const supervisorTemplateLoginName = globals.get(demoVersion + 'SupervisorTemplateLoginName')
+    const chatTemplateTemplateName = globals.get(demoVersion + 'ChatTemplateTemplateName')
+    const orgId = globals.get(demoVersion + 'ControlHubOrgId')
 
     // get control hub client object
     const ch = await controlHub.client.getClient()
@@ -480,7 +481,7 @@ module.exports = async function (user) {
     await toolbox.updateUser(userId, {
       templateId: chatTemplate.templateId
     })
-    console.log(`updated toolbox user ${userId} demo.webex-v4prod configuration with templateId ${chatTemplate.templateId}`)
+    console.log(`updated toolbox user ${userId} demo.webex-${demoVersion} configuration with templateId ${chatTemplate.templateId}`)
     
     // get/create email treatment in Webex Control Hub
     await controlHub.treatment.getOrCreate(userId)

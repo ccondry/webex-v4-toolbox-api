@@ -2,6 +2,7 @@ const ldapClient = require('simple-ldap-client')
 const getHash = require('./get-hash')
 const decrypt = require('./decrypt')
 const toolbox = require('./toolbox')
+const demoVersion = require('./demo-version-tag')
 // set up ldap client
 const ldap = new ldapClient(process.env.LDAP_URL, process.env.LDAP_BASE_DN)
 const userSearchDn = process.env.LDAP_USER_SEARCH_DN || 'OU=Sync2Webex,DC=dcloud,DC=cisco,DC=com'
@@ -273,11 +274,11 @@ async function createUsers ({
     await createUser(sandraUser)
     
     console.log(`LDAP provision successful for user Sandra ${userId}`)
-    if (user.demo && user.demo['webex-v4prod'] && user.demo['webex-v4prod'].password) {
+    if (user.demo && user.demo['webex-' + demoVersion] && user.demo['webex-' + demoVersion].password) {
       console.log('creating VPN LDAP user account...')
       // create username from hash of user email
       const username = getHash(user.email)
-      const encryptedPassword = user.demo['webex-v4prod'].password
+      const encryptedPassword = user.demo['webex-' + demoVersion].password
       // console.log('encryptedPassword', encryptedPassword)
       const vpnPassword = await decrypt(encryptedPassword)
       // console.log('vpnPassword', vpnPassword)

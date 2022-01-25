@@ -1,5 +1,6 @@
 const globals = require('./globals')
 const fetch = require('./fetch')
+const demoVersion = 'webexV' + require('./demo-version')
 
 const baseUrl = 'https://rialto.broadcloudpbx.com/enterpriseportalapi/v1.0/customers'
 
@@ -13,8 +14,8 @@ async function getPhoneNumbers ({siteId, query}) {
   }
   // wait for globals to exist
   await Promise.resolve(globals.initialLoad)
-  const customerId = globals.get('webexV4BroadCloudCustomerId')
-  const token = globals.get('webexV4ControlHubToken').access_token
+  const customerId = globals.get(demoVersion + 'BroadCloudCustomerId')
+  const token = globals.get(demoVersion + 'ControlHubToken').access_token
   const url = `${baseUrl}/${customerId}/sites/${siteId}/phoneassignments`
   const combinedQuery = {...defaultQuery, ...query}
   const options = {
@@ -51,8 +52,8 @@ async function getExtensions ({siteId, query}) {
   }
   // wait for globals to exist
   await Promise.resolve(globals.initialLoad)
-  const customerId = globals.get('webexV4BroadCloudCustomerId')
-  const token = globals.get('webexV4ControlHubToken').access_token
+  const customerId = globals.get(demoVersion + 'BroadCloudCustomerId')
+  const token = globals.get(demoVersion + 'ControlHubToken').access_token
   const url = `${baseUrl}/${customerId}/sites/${siteId}/userassignments`
   const combinedQuery = {...defaultQuery, ...query}
   const options = {
@@ -84,8 +85,8 @@ async function getSites () {
   // wait for globals to exist
   await Promise.resolve(globals.initialLoad)
   // get customer ID from globals
-  const customerId = globals.get('webexV4BroadCloudCustomerId')
-  const token = globals.get('webexV4ControlHubToken').access_token
+  const customerId = globals.get(demoVersion + 'BroadCloudCustomerId')
+  const token = globals.get(demoVersion + 'ControlHubToken').access_token
   const url = `${baseUrl}/${customerId}/sites`
   const options = {
     headers: {
@@ -100,8 +101,8 @@ async function isAvailable ({siteId, extension}) {
   // wait for globals to exist
   await Promise.resolve(globals.initialLoad)
   // get customer ID from globals
-  const customerId = globals.get('webexV4BroadCloudCustomerId')
-  const token = globals.get('webexV4ControlHubToken').access_token
+  const customerId = globals.get(demoVersion + 'BroadCloudCustomerId')
+  const token = globals.get(demoVersion + 'ControlHubToken').access_token
   const url = `${baseUrl}/${customerId}/sites/${siteId}/userassignments/extension/${extension}/duplicate`
   // console.log('url', url)
   const options = {

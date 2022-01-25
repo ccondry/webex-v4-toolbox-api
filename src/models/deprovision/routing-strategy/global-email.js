@@ -1,4 +1,6 @@
 const cjpClient = require('../../cjp/client')
+const demoVersion = 'webexV' + require('../../demo-version')
+
 // wrapper for compatibility
 const cjp = {
   get () {
@@ -26,14 +28,14 @@ async function get (name) {
 async function deleteQueue (name) {
   try {
     await Promise.resolve(globals.initialLoad)
-    if (!globals.get('webexV4CjpEmailRoutingStrategyName')) {
+    if (!globals.get(demoVersion + 'CjpEmailRoutingStrategyName')) {
       // cannot continue without routing strategy name
-      const message = 'global value "webexV4CjpEmailRoutingStrategyName" is missing'
+      const message = 'global value "' + demoVersion + 'CjpEmailRoutingStrategyName" is missing'
       teamsLogger.log(message)
       throw Error(message)
     }
     // name of the global email routing strategy
-    const strategyName = globals.get('webexV4CjpEmailRoutingStrategyName')
+    const strategyName = globals.get(demoVersion + 'CjpEmailRoutingStrategyName')
     // get the current global email routing strategy
     const strategy = await get('Current-' + strategyName)
     if (!strategy) {

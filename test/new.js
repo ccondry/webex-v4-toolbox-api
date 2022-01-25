@@ -3,6 +3,7 @@ const provision = require('../src/models/new/template/provision')
 const cjp = require('../src/models/cjp/client')
 const globals = require('../src/models/globals')
 const {xml2js, js2xml} = require('../src/models/parsers')
+const demoVersion = 'webexV' + require('../src/models/demo-version')
 
 async function main (userId) {
   // get user team ID
@@ -13,10 +14,10 @@ async function main (userId) {
   // wait for globals to init
   await Promise.resolve(globals.initialLoad)
   // get the names of the templates from globals
-  const chatQueueTemplateName = globals.get('webexV4ChatQueueTemplateName')
-  const emailQueueTemplateName = globals.get('webexV4EmailQueueTemplateName')
-  const chatEntryPointTemplateName = globals.get('webexV4ChatEntryPointTemplateName')
-  const chatEntryPointRoutingStrategyTemplateName = globals.get('webexV4ChatEntryPointRoutingStrategyTemplateName')
+  const chatQueueTemplateName = globals.get(demoVersion + 'ChatQueueTemplateName')
+  const emailQueueTemplateName = globals.get(demoVersion + 'EmailQueueTemplateName')
+  const chatEntryPointTemplateName = globals.get(demoVersion + 'ChatEntryPointTemplateName')
+  const chatEntryPointRoutingStrategyTemplateName = globals.get(demoVersion + 'ChatEntryPointRoutingStrategyTemplateName')
 
   // // chat queue
   const chatQueueId = await provision({

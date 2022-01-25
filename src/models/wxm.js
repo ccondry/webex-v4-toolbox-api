@@ -1,13 +1,14 @@
 const fetch = require('./fetch')
 const globals = require('./globals')
+const demoVersion = 'webexV' + require('./demo-version')
 
 // map control hub user ID to username in WXM. enables users for the WXM gadget.
 // users is an array of control hub user objects
 async function mapUsers (users) {
   const url = 'https://api.getcloudcherry.com/api/account/UpdateExternalIdp/Bulk'
 
-  const credentials = await globals.getAsync('webexV4WxmCredentials')
-  const orgId = await globals.getAsync('webexV4ControlHubOrgId')
+  const credentials = await globals.getAsync(demoVersion + 'WxmCredentials')
+  const orgId = await globals.getAsync(demoVersion + 'ControlHubOrgId')
   const body = {
     ExternalIdentityProviderName: 'webexci',
     IDPMapppings: users.map(user => {

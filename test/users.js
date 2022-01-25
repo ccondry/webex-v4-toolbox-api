@@ -1,20 +1,21 @@
 require('dotenv').config()
 const db = require('../src/models/db')
+const demoVersionTag = require('../src/models/demo-version-tag')
 
 async function getProvisionStartedUsers () {
   // users need to be provisioned if they have org ID set but queue ID
   // and template ID have not been set (or have been unset)
   const query = {
     $and: [
-      {'demo.webex-v4prod.orgId': process.env.ORG_ID},
+      {['demo.webex-' + demoVersionTag + '.orgId']: process.env.ORG_ID},
       {
         $or: [
-          {'demo.webex-v4prod.queueId': {exists: false}},
-          {'demo.webex-v4prod.queueId': {$eq: ''}},
-          {'demo.webex-v4prod.queueId': {$eq: null}},
-          {'demo.webex-v4prod.templateId': {exists: false}},
-          {'demo.webex-v4prod.templateId': {$eq: ''}},
-          {'demo.webex-v4prod.templateId': {$eq: null}}
+          {['demo.webex-' + demoVersionTag + '.queueId']: {exists: false}},
+          {['demo.webex-' + demoVersionTag + '.queueId']: {$eq: ''}},
+          {['demo.webex-' + demoVersionTag + '.queueId']: {$eq: null}},
+          {['demo.webex-' + demoVersionTag + '.templateId']: {exists: false}},
+          {['demo.webex-' + demoVersionTag + '.templateId']: {$eq: ''}},
+          {['demo.webex-' + demoVersionTag + '.templateId']: {$eq: null}}
         ]
       }
     ]

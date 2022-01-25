@@ -1,13 +1,14 @@
 require('dotenv').config()
 const db = require('../src/models/db')
+const demoVersionTag = require('../src/models/demo-version-tag')
 
 // stop provisioning anyone who is queued for provision
 const filter = {
-  'demo.webex-v4prod.provision': 'starting'
+  ['demo.webex-' + demoVersionTag + '.provision']: 'starting'
 }
 const updates = {
   $set: {
-    'demo.webex-v4prod.provision': ''
+    ['demo.webex-' + demoVersionTag + '.provision']: ''
   }
 }
 db.updateMany('toolbox', 'users', filter, updates)

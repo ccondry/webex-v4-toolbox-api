@@ -1,5 +1,6 @@
 require('dotenv').config()
 const db = require('../src/models/db')
+const demoVersionTag = require('../src/models/demo-version-tag')
 
 // provision all users in v4 who are provisioned in v3
 const filter = {
@@ -7,7 +8,7 @@ const filter = {
 }
 const updates = {
   $set: {
-    'demo.webex-v4prod.provision': 'starting'
+    ['demo.webex-' + demoVersionTag + '.provision']: 'starting'
   }
 }
 db.updateMany('toolbox', 'users', filter, updates)

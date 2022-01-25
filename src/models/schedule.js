@@ -7,6 +7,8 @@ const globals = require('./globals')
 const teamsLogger = require('./teams-logger')
 const ldap = require('./ldap')
 const teamsNotifier = require('./teams-notifier')
+const demoVersion = 'webexV' + require('./demo-version')
+const demoVersionTag = require('./demo-version-tag')
 
 // number of milliseconds to wait after completing the scheduled job before
 // starting again
@@ -20,9 +22,9 @@ async function getProvisionStartedUsers () {
   const query = {
     $and: [{
       $or: [
-        {'demo.webex-v4prod.provision': 'start'},
-        {'demo.webex-v4prod.provision': 'starting'},
-        {'demo.webex-v4prod.provision': 'started'}
+        {['demo.webex-' + demoVersionTag + '.provision']: 'start'},
+        {['demo.webex-' + demoVersionTag + '.provision']: 'starting'},
+        {['demo.webex-' + demoVersionTag + '.provision']: 'started'}
       ]
     }, {
       id: {$exists: true}
@@ -39,8 +41,8 @@ async function getProvisionDeletingUsers () {
     const query = {
       $and: [{
         $or: [
-          {'demo.webex-v4prod.provision': 'delete'},
-          {'demo.webex-v4prod.provision': 'deleting'}
+          {['demo.webex-' + demoVersionTag + '.provision']: 'delete'},
+          {['demo.webex-' + demoVersionTag + '.provision']: 'deleting'}
         ]
       }, {
         id: {$exists: true}
@@ -49,9 +51,9 @@ async function getProvisionDeletingUsers () {
     const users = await toolbox.findUsers(query)
     // filter out any template user IDs
     const templateUsers = [
-      globals.get('webexV4ChatQueueTemplateName').split('_').pop(),
-      globals.get('webexV4EmailQueueTemplateName').split('_').pop(),
-      globals.get('webexV4ChatEntryPointTemplateName').split('_').pop()
+      globals.get(demoVersion + 'ChatQueueTemplateName').split('_').pop(),
+      globals.get(demoVersion + 'EmailQueueTemplateName').split('_').pop(),
+      globals.get(demoVersion + 'ChatEntryPointTemplateName').split('_').pop()
     ]
     return users.filter(v => {
       return !templateUsers.includes(v.id)
@@ -61,7 +63,7 @@ async function getProvisionDeletingUsers () {
   }
 }
 
-// find licensed users over the webexV4MaxUsers setting, and mark them 'deleting'
+// find licensed users over the MaxUsers setting, and mark them 'deleting'
 // so they will be deprovisioned
 async function checkMaxUsers () {
   try {
@@ -72,11 +74,11 @@ async function checkMaxUsers () {
     console.log('global variables are set.')
     // max number of users that can be provisioned. more than this will trigger
     // deprovision. this is number of toolbox users.
-    const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
-    console.log('global variables webexV4MaxUsers is', maxUsers)
+    const maxUsers = parseInt(globals.get(demoVersion + 'MaxUsers'))
+    console.log('global variables ' + demoVersion + 'MaxUsers is', maxUsers)
     // number of users to delete below the maxUser limit
-    const maxUsersBuffer = parseInt(globals.get('webexV4MaxUsersBuffer'))
-    console.log('global variables webexV4MaxUsersBuffer is', maxUsersBuffer)
+    const maxUsersBuffer = parseInt(globals.get(demoVersion + 'MaxUsersBuffer'))
+    console.log('global variables ' + demoVersion + 'MaxUsersBuffer is', maxUsersBuffer)
     // find license usage in control hub
     const client = await ch.getClient()
     const licenseUsage = await client.org.getLicenseUsage()
@@ -111,11 +113,11 @@ async function checkMaxUsers () {
       console.log('licensedUsers count =', licensedUsers.length)
       // find user provision info for this demo
       const query = {
-        'demo.webex-v4prod.lastAccess': {$exists: 1},
-        'demo.webex-v4prod.provision': 'complete'
+        ['demo.webex-' + demoVersionTag + '.lastAccess']: {$exists: 1},
+        ['demo.webex-' + demoVersionTag + '.provision']: 'complete'
       }
       // const projection = {password: false}
-      const projection = {id: 1, 'demo.webex-v4prod.lastAccess': 1}
+      const projection = {id: 1, ['demo.webex-' + demoVersionTag + '.lastAccess']: 1}
       const provisionedUsers = await toolbox.findUsers(query, projection)
       console.log('found', provisionedUsers.length, 'users with complete webex provision and a last access time in the toolbox')
       // filter provisioned toolbox users to those with matching licensed control hub users
@@ -125,8 +127,8 @@ async function checkMaxUsers () {
       console.log(userMap.length, 'users in userMap')
       // sort by last access time descending
       userMap.sort((a, b) => {
-        const aDate = new Date(a.demo['webex-v4prod'].lastAccess || 0)
-        const bDate = new Date(b.demo['webex-v4prod'].lastAccess || 0)
+        const aDate = new Date(a.demo['webex-' + demoVersionTag].lastAccess || 0)
+        const bDate = new Date(b.demo['webex-' + demoVersionTag].lastAccess || 0)
         // descending
         return bDate - aDate
       })
@@ -202,7 +204,7 @@ async function go () {
     // get max users number
     await Promise.resolve(globals.initialLoad)
     console.log('global variables are loaded.')
-    const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
+    const maxUsers = parseInt(globals.get(demoVersion + 'MaxUsers'))
     const licenseUsageCount = await getLicenseUsageCount()
     console.log('licenseUsageCount =', licenseUsageCount)
     // check if provision amount would be too many
