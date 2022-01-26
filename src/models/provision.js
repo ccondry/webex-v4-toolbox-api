@@ -159,138 +159,147 @@ module.exports = async function (user) {
     await cjp.virtualTeam.addTeam(voiceQueueName, userTeam.id)
     
     // new template provision script
-    // chat queue
-    const chatQueue = await provision({
-      templateName: chatQueueTemplateName,
-      name: 'Q_Chat_dCloud_' + userId,
-      type: 'virtualTeam',
-      typeName: 'chat queue',
-      modify: (body) => {
-        // apply these modifications to the template data
-        const distributionGroups = [{
-          order: 1,
-          duration: 0,
-          agentGroups: [{
-            teamId: userTeam.id
+
+    // on v4/v5 only (both share version 4 tag)
+    let chatQueue
+    let emailQueue
+    if (demoVersion === '4') {
+      // chat queue
+      chatQueue = await provision({
+        templateName: chatQueueTemplateName,
+        name: 'Q_Chat_dCloud_' + userId,
+        type: 'virtualTeam',
+        typeName: 'chat queue',
+        modify: (body) => {
+          // apply these modifications to the template data
+          const distributionGroups = [{
+            order: 1,
+            duration: 0,
+            agentGroups: [{
+              teamId: userTeam.id
+            }]
           }]
-        }]
-        body.attributes.callDistributionGroups__s = JSON.stringify(distributionGroups)
-      }
-    })
+          body.attributes.callDistributionGroups__s = JSON.stringify(distributionGroups)
+        }
+      })
 
-    // email queue
-    const emailQueue = await provision({
-      templateName: emailQueueTemplateName,
-      name: 'Q_Email_dCloud_' + userId,
-      type: 'virtualTeam',
-      typeName: 'email queue',
-      modify: (body) => {
-        // apply these modifications to the template data
-        const distributionGroups = [{
-          order: 1,
-          duration: 0,
-          agentGroups: [{
-            teamId: userTeam.id
+      // email queue
+      emailQueue = await provision({
+        templateName: emailQueueTemplateName,
+        name: 'Q_Email_dCloud_' + userId,
+        type: 'virtualTeam',
+        typeName: 'email queue',
+        modify: (body) => {
+          // apply these modifications to the template data
+          const distributionGroups = [{
+            order: 1,
+            duration: 0,
+            agentGroups: [{
+              teamId: userTeam.id
+            }]
           }]
-        }]
-        body.attributes.callDistributionGroups__s = JSON.stringify(distributionGroups)
-      }
-    })
+          body.attributes.callDistributionGroups__s = JSON.stringify(distributionGroups)
+        }
+      })
+    }
 
-    // chat entry point
-    const chatEntryPoint = await provision({
-      templateName: chatEntryPointTemplateName,
-      name: 'EP_Chat_' + userId,
-      type: 'virtualTeam',
-      typeName: 'chat entry point'
-    })
+    // on v4/v5 only (both share version 4 tag)
+    if (demoVersion === '4') {
+      // chat entry point
+      const chatEntryPoint = await provision({
+        templateName: chatEntryPointTemplateName,
+        name: 'EP_Chat_' + userId,
+        type: 'virtualTeam',
+        typeName: 'chat entry point'
+      })
 
-    // generate a random hour of the day for script start. this fixes
-    // CCBU db query/logging issue when many current routing strategies are
-    // generated at the same time
-    const randomHour = Math.floor(Math.random() * 24)
-    const randomTime = randomHour * 60 * 60 * 1000
+      // generate a random hour of the day for script start. this fixes
+      // CCBU db query/logging issue when many current routing strategies are
+      // generated at the same time
+      const randomHour = Math.floor(Math.random() * 24)
+      const randomTime = randomHour * 60 * 60 * 1000
     
-    // chat entry point routing strategy
-    const parentStrategy = await provision({
-      templateName: chatEntryPointRoutingStrategyTemplateName,
-      name: 'EP_Chat_' + userId,
-      type: 'routingStrategy',
-      typeName: 'chat entry point routing strategy',
-      modify: (body) => {
-        // set script
-        const json = xml2js(body.attributes.script__s)
-        // get current time in milliseconds
-        const now = new Date().getTime()
-        const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
-        json['call-distribution-script']['@_name'] = 'EP_Chat_' + userId
-        json['call-distribution-script']['@_scriptid'] = now
-        // start date is start of day today in milliseconds
-        json['call-distribution-script']['@_start-date'] = startOfToday
-        // set the start time and end time to the same random time
-        body.attributes.startTime__l = randomTime
-        body.attributes.endTime__l = randomTime
-        // and set start and end time in the script data
-        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime)
-        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime)
-        // chat entry point ID
-        json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
-        // chat entry point db ID
-        json['call-distribution-script']['vdn']['@_vteam-id'] = chatEntryPoint.attributes.dbId__l
-        // chat entry point name
-        json['call-distribution-script']['vdn']['@_vteam-name'] = 'EP_Chat_' + userId
-        // chat queue db ID
-        json['call-distribution-script']['call-flow-params']['param']['@_value'] = chatQueue.attributes.dbId__l
-        // convert script back to xml
-        body.attributes.script__s = js2xml(json)
-        // chat entry point db ID
-        body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
-        // chat entry point ID
-        body.attributes.virtualTeamId__s = chatEntryPoint.id
-      }
-    })
+      // chat entry point routing strategy
+      const parentStrategy = await provision({
+        templateName: chatEntryPointRoutingStrategyTemplateName,
+        name: 'EP_Chat_' + userId,
+        type: 'routingStrategy',
+        typeName: 'chat entry point routing strategy',
+        modify: (body) => {
+          // set script
+          const json = xml2js(body.attributes.script__s)
+          // get current time in milliseconds
+          const now = new Date().getTime()
+          const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
+          json['call-distribution-script']['@_name'] = 'EP_Chat_' + userId
+          json['call-distribution-script']['@_scriptid'] = now
+          // start date is start of day today in milliseconds
+          json['call-distribution-script']['@_start-date'] = startOfToday
+          // set the start time and end time to the same random time
+          body.attributes.startTime__l = randomTime
+          body.attributes.endTime__l = randomTime
+          // and set start and end time in the script data
+          json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime)
+          json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime)
+          // chat entry point ID
+          json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
+          // chat entry point db ID
+          json['call-distribution-script']['vdn']['@_vteam-id'] = chatEntryPoint.attributes.dbId__l
+          // chat entry point name
+          json['call-distribution-script']['vdn']['@_vteam-name'] = 'EP_Chat_' + userId
+          // chat queue db ID
+          json['call-distribution-script']['call-flow-params']['param']['@_value'] = chatQueue.attributes.dbId__l
+          // convert script back to xml
+          body.attributes.script__s = js2xml(json)
+          // chat entry point db ID
+          body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
+          // chat entry point ID
+          body.attributes.virtualTeamId__s = chatEntryPoint.id
+        }
+      })
 
-    // chat entry point current routing strategy
-    await provision({
-      templateName: 'Current-' + chatEntryPointRoutingStrategyTemplateName,
-      name: `Current-EP_Chat_${userId}`,
-      type: 'routingStrategy',
-      typeName: 'chat entry point current routing strategy',
-      modify: (body) => {
-        // set script
-        const json = xml2js(body.attributes.script__s)
-        // get current time in milliseconds
-        const now = new Date().getTime()
-        json['call-distribution-script']['@_name'] = 'Current-EP_Chat_' + userId
-        json['call-distribution-script']['@_scriptid'] = now
-        // start date is start of day today in milliseconds
-        const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
-        json['call-distribution-script']['@_start-date'] = startOfToday
-        json['call-distribution-script']['@_end-date'] = startOfToday
-        // set the start time and end time to the same random time
-        body.attributes.startTime__l = randomTime
-        body.attributes.endTime__l = randomTime
-        // and set start and end time in the script data
-        json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime)
-        json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime)
-        // chat entry point ID
-        json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
-        // chat entry point db ID
-        json['call-distribution-script']['vdn']['@_vteam-id'] = chatEntryPoint.attributes.dbId__l
-        // chat entry point name
-        json['call-distribution-script']['vdn']['@_vteam-name'] = 'Current-EP_Chat_' + userId
-        // chat queue db ID
-        json['call-distribution-script']['call-flow-params']['param']['@_value'] = chatQueue.attributes.dbId__l
-        // convert script back to xml
-        body.attributes.script__s = js2xml(json)
-        // chat entry point db ID
-        body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
-        // chat entry point ID
-        body.attributes.virtualTeamId__s = chatEntryPoint.id
-        // set parent RS
-        body.attributes.parentStrategyId__s = parentStrategy.id
-      }
-    })
+      // chat entry point current routing strategy
+      await provision({
+        templateName: 'Current-' + chatEntryPointRoutingStrategyTemplateName,
+        name: `Current-EP_Chat_${userId}`,
+        type: 'routingStrategy',
+        typeName: 'chat entry point current routing strategy',
+        modify: (body) => {
+          // set script
+          const json = xml2js(body.attributes.script__s)
+          // get current time in milliseconds
+          const now = new Date().getTime()
+          json['call-distribution-script']['@_name'] = 'Current-EP_Chat_' + userId
+          json['call-distribution-script']['@_scriptid'] = now
+          // start date is start of day today in milliseconds
+          const startOfToday = Math.floor(now / 1000 / 86400) * 86400 * 1000
+          json['call-distribution-script']['@_start-date'] = startOfToday
+          json['call-distribution-script']['@_end-date'] = startOfToday
+          // set the start time and end time to the same random time
+          body.attributes.startTime__l = randomTime
+          body.attributes.endTime__l = randomTime
+          // and set start and end time in the script data
+          json['call-distribution-script']['@_execution-start-time-of-day'] = String(randomTime)
+          json['call-distribution-script']['@_execution-end-time-of-day'] = String(randomTime)
+          // chat entry point ID
+          json['call-distribution-script']['vdn']['@_id'] = chatEntryPoint.attributes.dbId__l
+          // chat entry point db ID
+          json['call-distribution-script']['vdn']['@_vteam-id'] = chatEntryPoint.attributes.dbId__l
+          // chat entry point name
+          json['call-distribution-script']['vdn']['@_vteam-name'] = 'Current-EP_Chat_' + userId
+          // chat queue db ID
+          json['call-distribution-script']['call-flow-params']['param']['@_value'] = chatQueue.attributes.dbId__l
+          // convert script back to xml
+          body.attributes.script__s = js2xml(json)
+          // chat entry point db ID
+          body.attributes.legacyVirtualTeamId__l = chatEntryPoint.attributes.dbId__l
+          // chat entry point ID
+          body.attributes.virtualTeamId__s = chatEntryPoint.id
+          // set parent RS
+          body.attributes.parentStrategyId__s = parentStrategy.id
+        }
+      })
+    }
 
     // get or create the Webex Control Hub chat template
     const chatTemplate = await chProvision({
@@ -486,9 +495,12 @@ module.exports = async function (user) {
     // get/create email treatment in Webex Control Hub
     await controlHub.treatment.getOrCreate(userId)
     
-    // get/create global email routing strategy in CJP, referencing the
-    // numerical ID of the user's email queue in CJP
-    await cjp.routingStrategy.globalEmail.provision(userId, emailQueue.attributes.dbId__l)
+    // on v4/v5 only (both share version 4 tag)
+    if (demoVersion === '4') {
+      // get/create global email routing strategy in CJP, referencing the
+      // numerical ID of the user's email queue in CJP
+      await cjp.routingStrategy.globalEmail.provision(userId, emailQueue.attributes.dbId__l)
+    }
 
     // create/set agent extensions
     await ch.user.onboard({
