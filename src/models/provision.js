@@ -301,24 +301,32 @@ module.exports = async function (user) {
       })
     }
 
-    // get or create the Webex Control Hub chat template
-    const chatTemplate = await chProvision({
-      name: `EP_Chat_${userId}`,
-      templateName: chatTemplateTemplateName,
-      type: 'chatTemplate',
-      typeName: 'chat template',
-      idName: 'templateId',
-      modify: (body) => {
-        // delete data that server will generate
-        delete body.createdTime
-        delete body.lastUpdatedTime
-        delete body.updatedBy
-        delete body.uri
+    // on v4/v5 only (both share version 4 tag)
+    if (demoVersion === '4') {
+      // get or create the Webex Control Hub chat template
+      const chatTemplate = await chProvision({
+        name: `EP_Chat_${userId}`,
+        templateName: chatTemplateTemplateName,
+        type: 'chatTemplate',
+        typeName: 'chat template',
+        idName: 'templateId',
+        modify: (body) => {
+          // delete data that server will generate
+          delete body.createdTime
+          delete body.lastUpdatedTime
+          delete body.updatedBy
+          delete body.uri
 
-        // set entry point ID
-        body.entryPoint = chatEntryPoint.id
-      }
-    })
+          // set entry point ID
+          body.entryPoint = chatEntryPoint.id
+        }
+      })
+      // set chat templateId on user details in toolbox db
+      await toolbox.updateUser(userId, {
+        templateId: chatTemplate.templateId
+      })
+      console.log(`updated toolbox user ${userId} demo.webex-${demoVersion} configuration with templateId ${chatTemplate.templateId}`)
+    }
 
     // add read-only admin role to Rick user in Webex Control Hub
     
@@ -486,12 +494,6 @@ module.exports = async function (user) {
     })
     console.log(`assigned skill profile ${skillProfile.id} and team ID ${userTeam.id} to CJP user ${sandra.name} (${sandra.cjp.id}).`)
   
-    // set chat templateId on user details in toolbox db
-    await toolbox.updateUser(userId, {
-      templateId: chatTemplate.templateId
-    })
-    console.log(`updated toolbox user ${userId} demo.webex-${demoVersion} configuration with templateId ${chatTemplate.templateId}`)
-    
     // get/create email treatment in Webex Control Hub
     await controlHub.treatment.getOrCreate(userId)
     
