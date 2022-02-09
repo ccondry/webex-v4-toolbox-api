@@ -4,7 +4,7 @@ const cjpClient = require('../cjp/client')
 const toolbox = require('../toolbox')
 // const teamsNotifier = require('../teams-notifier')
 const demoVersion = 'webexV' + require('../demo-version')
-const demoVersionTag = require('./demo-version-tag')
+const demoVersionTag = require('../demo-version-tag')
 
 // wrapper to translate the `await cjp.get()` call
 const cjp = {
