@@ -10,7 +10,7 @@ const teamsNotifier = require('./teams-notifier')
 
 // number of milliseconds to wait after completing the scheduled job before
 // starting again
-const throttle = 10 * 1000
+const throttle = 90 * 1000
 
 // running state
 let running = false
