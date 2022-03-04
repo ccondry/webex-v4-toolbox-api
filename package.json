@@ -24,6 +24,7 @@
     "dotenv": "^8.2.0",
     "fast-xml-parser": "^3.18.0",
     "moment": "^2.29.1",
+    "node-cache": "^5.1.2",
     "node-fetch": "^2.6.0",
     "simple-ldap-client": "^2020.12.15",
     "webex-control-hub": "^1.8.0",
