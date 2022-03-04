@@ -174,11 +174,13 @@ async function updateLicenseUsageCache () {
 async function getLicenseUsageCount () {
   try {
     // check cache
-    const licenseUsage = cache.get('licenseUsage')
+    let licenseUsage = cache.get('licenseUsage')
     // if cache miss
     if (!licenseUsage) {
       // update cache
       await updateLicenseUsageCache()
+      // get cache again
+      licenseUsage = cache.get('licenseUsage')
     }
     
     // return cjpprm usage value from cache
