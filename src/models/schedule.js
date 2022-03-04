@@ -164,10 +164,14 @@ async function checkMaxUsers () {
 
 // find license usage in control hub
 async function getLicenseUsageCount () {
-  const client = await ch.getClient()
-  const licenseUsage = await client.org.getLicenseUsage()
-  const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
-  return cjpPremiumLicenses.usage
+  try {
+    const client = await ch.getClient()
+    const licenseUsage = await client.org.getLicenseUsage()
+    const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
+    return cjpPremiumLicenses.usage
+  } catch (e) {
+    throw e
+  }
 }
 
 async function go () {
@@ -202,7 +206,7 @@ async function go () {
     // get max users number
     await Promise.resolve(globals.initialLoad)
     console.log('global variables are loaded.')
-    const maxUsers = parseInt(globals.get('webexV4MaxUsers'))
+    const maxUsers = parseInt(globals.get('webexV4MaxUsers'), 10)
     const licenseUsageCount = await getLicenseUsageCount()
     console.log('licenseUsageCount =', licenseUsageCount)
     // check if provision amount would be too many
