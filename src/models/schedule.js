@@ -7,13 +7,19 @@ const globals = require('./globals')
 const teamsLogger = require('./teams-logger')
 const ldap = require('./ldap')
 const teamsNotifier = require('./teams-notifier')
+const NodeCache = require('node-cache')
+
+// caching for file GET requests
+const cache = new NodeCache({
+  // keep in cache forever
+  stdTTL: 0,
+  // create copies of data
+  useClones: true
+})
 
 // number of milliseconds to wait after completing the scheduled job before
 // starting again
 const throttle = 40 * 1000
-
-// running state
-let running = false
 
 async function getProvisionStartedUsers () {
   // return array of users with a user ID who need to be provisioned
@@ -79,17 +85,10 @@ async function checkMaxUsers () {
     console.log('global variables webexV4MaxUsersBuffer is', maxUsersBuffer)
     // find license usage in control hub
     const client = await ch.getClient()
-    const licenseUsage = await client.org.getLicenseUsage()
-    const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
-    console.log('cjpPremiumLicenses.usage:', cjpPremiumLicenses.usage)
-    // if license usage of CJP premium is > 95%
-    // if (cjpPremiumLicenses.usage / cjpPremiumLicenses.volume >= 0.95) {
-    // if (cjpPremiumLicenses.volume - cjpPremiumLicenses.usage <= 10) {
-    // console.log('cjpPremiumLicenses.usage', cjpPremiumLicenses.usage)
-    // console.log('maxUsers', maxUsers)
+    const licenseUsage = await getLicenseUsageCount()
     // delete 10 users below the max, so that old users can be cycled out when
     // new users are waiting to be provisioned and we are at max capacity
-    if (cjpPremiumLicenses.usage / 2 > maxUsers - maxUsersBuffer) {
+    if (licenseUsage / 2 > maxUsers - maxUsersBuffer) {
       // too full - need to deprovision some users
       // const qtyUsersToDeprovision = cjpPremiumLicenses.usage / 2 - maxUsers + maxUsersBuffer
       // console.log('max users has been reached. we need to mark', qtyUsersToDeprovision, 'for deprovision.')
@@ -162,11 +161,27 @@ async function checkMaxUsers () {
   }
 }
 
-// find license usage in control hub
-async function getLicenseUsageCount () {
+async function updateLicenseUsageCache () {
   try {
     const client = await ch.getClient()
-    const licenseUsage = await client.org.getLicenseUsage()
+    cache.set('licenseUsage', await client.org.getLicenseUsage())
+  } catch (e) {
+    throw e
+  }
+}
+
+// find CJPPRM license usage in control hub
+async function getLicenseUsageCount () {
+  try {
+    // check cache
+    const licenseUsage = cache.get('licenseUsage')
+    // if cache miss
+    if (!licenseUsage) {
+      // update cache
+      await updateLicenseUsageCache()
+    }
+    
+    // return cjpprm usage value from cache
     const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
     return cjpPremiumLicenses.usage
   } catch (e) {
@@ -259,6 +274,8 @@ async function go () {
         for (const user of successfulUsers) {
           await provision(user)
         }
+        // update the license usage count
+        updateLicenseUsageCache()
       }
     } else {
       // no users to provision
