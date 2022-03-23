@@ -182,7 +182,7 @@ async function getLicenseUsageCount () {
       // get cache again
       licenseUsage = cache.get('licenseUsage')
     }
-    
+    console.log(licenseUsage)
     // return cjpprm usage value from cache
     const cjpPremiumLicenses = licenseUsage[0].licenses.find(v => v.offerName === 'CJPPRM')
     return cjpPremiumLicenses.usage
