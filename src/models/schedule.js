@@ -192,6 +192,15 @@ async function getLicenseUsageCount () {
 }
 
 async function go () {
+  // check if provisioning enabled
+  const enabledString = await globals.getAsync('WebexV4ProvisionEnabled')
+  const enabled = enabledString === 'true'
+  if (!enabled) {
+    // do nothing now - set timer to call this function again
+    setTimeout(go, throttle)
+    return
+  }
+  
   // check if there are too many users provisioned
   try {
     await checkMaxUsers()
